@@ -22,7 +22,7 @@ class WmoCmpTest(unittest.TestCase):
 
     def setUp(self):
         """setup test fixtures, etc."""
-        print msg(self.tid, self.shortDescription())
+        print msg(self.id(), self.shortDescription())
 
     def tearDown(self):
         """return to pristine state"""
