@@ -25,5 +25,7 @@ for i in TESTS:
     print test_name
     try:
         getattr(TS, test_name)()
+    except AssertionError, err:
+        print 'ASSERTION ERROR: ', err
     except Exception, err:
-        print err
+        print 'OTHER ERROR: ', err
