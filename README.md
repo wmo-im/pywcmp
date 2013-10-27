@@ -15,6 +15,7 @@ cd wmo-cmp-ts
 git clone git@github.com:OGCMetOceanDWG/wmo-cmp-ts.git
 cd wmo-cmp-ts
 pip install -r requirements.txt
+python setup.py build
 python setup.py install
 ```
 
