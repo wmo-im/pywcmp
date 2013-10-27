@@ -7,9 +7,11 @@ from lxml import etree
 
 LOGGER = logging.getLogger(__name__)
 
+
 def get_tempdir():
     """Helper function to get tempdir"""
     return '%s%s%s' % (tempfile.gettempdir(), os.sep, 'wmo-cmp-ts')
+
 
 def validate_iso_xml(xml):
     """Perform XML Schema validation of ISO XML Metadata"""
