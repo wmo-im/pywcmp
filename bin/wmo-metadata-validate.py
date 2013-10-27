@@ -16,7 +16,7 @@ TESTS = ['6_1_1', '6_1_2', '6_2_1', '6_3_1', '8_1_1',
 
 EXML = etree.parse(sys.argv[1])
 
-TS = test_suite.WMOCoreMetadataProfileTestSuite_1_3(EXML)
+TS = test_suite.WMOCoreMetadataProfileTestSuite13(EXML)
 
 # run the tests
 

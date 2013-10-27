@@ -13,6 +13,15 @@ def get_tempdir():
     return '%s%s%s' % (tempfile.gettempdir(), os.sep, 'wmo-cmp-ts')
 
 
+def nspath_eval(xpath, nsmap):
+    """Return an etree friendly xpath"""
+    out = []
+    for chunks in xpath.split('/'):
+        namespace, element = chunks.split(':')
+        out.append('{%s}%s' % (nsmap[namespace], element))
+    return '/'.join(out)
+
+
 def validate_iso_xml(xml):
     """Perform XML Schema validation of ISO XML Metadata"""
     tempdir = get_tempdir()
