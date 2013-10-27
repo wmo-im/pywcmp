@@ -1,5 +1,10 @@
 # -*- coding: ISO-8859-15 -*-
 
+import logging
+from wmo_cmp_ts.util import validate_iso_xml
+
+LOGGER = logging.getLogger(__name__)
+
 def msg(testid, test_description):
     """Convenience function to print test props"""
     requirement = testid.split('test_requirement_')[-1].replace('_', '.')
@@ -22,6 +27,7 @@ class WMOCoreMetadataProfileTestSuite_1_3(object):
     def test_requirement_6_1_1(self):
         """Each WIS Discovery Metadata record shall validate without error against the XML schemas defined in ISO/TS 19139:2007."""
         self.test_id = test_id('ISO-TS-19139-2007-xml-schema-validation')
+        validate_iso_xml(self.exml)
 
     def test_requirement_6_1_2(self):
         """Each WIS Discovery Metadata record shall validate without error against the rule-based constraints listed in ISO/TS 19139:2007 Annex A (Table A.1)."""

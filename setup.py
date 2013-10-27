@@ -26,7 +26,7 @@ CONTACT = 'OGC Meteorology and Oceanography Domain Working Group'
 
 EMAIL = 'tomkralidis@gmail.com'
 
-SCRIPTS = [os.path.join('bin', 'wmo-cmp-validate.py')]
+SCRIPTS = [os.path.join('bin', 'wmo-metadata-validate.py')]
 
 URL = 'https://github.com/OGCMetOceanDWG/wmo-cmp-ts'
 
@@ -66,7 +66,7 @@ if not os.path.exists(TEMPDIR):
         z.extractall(TEMPDIR)
 
 setup(
-    name='wmo_cmp_ts',
+    name='wmo-cmp-ts',
     version=wmo_cmp_ts.__version__,
     description=DESCRIPTION.strip(),
     long_description=open('README.md').read(),
