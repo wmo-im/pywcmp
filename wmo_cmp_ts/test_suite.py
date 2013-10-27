@@ -5,10 +5,15 @@ from wmo_cmp_ts.util import nspath_eval, validate_iso_xml
 
 LOGGER = logging.getLogger(__name__)
 
+CODELIST_PREFIX = 'http://wis.wmo.int/2012/codelists/WMOCodeLists.xml'
+
 NAMESPACES = {
     'gmd': 'http://www.isotc211.org/2005/gmd',
-    'gml': 'http://www.opengis.net/gml/3.2'
+    'gml': 'http://www.opengis.net/gml/3.2',
+    'gmx': 'http://www.isotc211.org/2005/gmx',
+    'xlink': 'http://www.w3.org/1999/xlink',
 }
+
 
 def msg(testid, test_description):
     """Convenience function to print test props"""
@@ -28,6 +33,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
         """init"""
         self.test_id = None
         self.exml = exml  # serialized already
+        self.namespaces = self.exml.getroot().nsmap
 
     def test_requirement_6_1_1(self):
         """Each WIS Discovery Metadata record shall validate without error against the XML schemas defined in ISO/TS 19139:2007."""
@@ -42,16 +48,14 @@ class WMOCoreMetadataProfileTestSuite13(object):
         """Each WIS Discovery Metadata record shall explicitly name all namespaces used within the record; use of default namespaces is prohibited."""
         self.test_id = gen_test_id('explicit-xml-namespace-identification')
 
-        root_nsmap = self.exml.getroot().nsmap
-        assert(None not in root_nsmap), self.test_requirement_6_2_1.__doc__
+        assert(None not in self.namespaces), self.test_requirement_6_2_1.__doc__
 
     def test_requirement_6_3_1(self):
         """Each WIS Discovery Metadata record shall declare the following XML namespace for GML: http://www.opengis.net/gml/3.2."""
         self.test_id = gen_test_id('gml-namespace-specification')
 
-        root_nsmap = self.exml.getroot().nsmap
-        if 'gml' in root_nsmap:
-            assert(root_nsmap['gml'] == NAMESPACES['gml']), self.test_requirement_6_3_1.__doc__
+        if 'gml' in self.namespaces:
+            assert(self.namespaces['gml'] == NAMESPACES['gml']), self.test_requirement_6_3_1.__doc__
 
     def test_requirement_8_1_1(self):
         """Each WIS Discovery Metadata record shall include one gmd:MD_Metadata/gmd:fileIdentifier attribute."""
@@ -63,6 +67,19 @@ class WMOCoreMetadataProfileTestSuite13(object):
     def test_requirement_8_2_1(self):
         """Each WIS Discovery Metadata record shall include at least one keyword from the WMO_CategoryCode code list."""
         self.test_id = gen_test_id('WMO_CategoryCode-keyword-cardinality')
+
+        # (i) check thesaurus
+        node = self.exml.xpath('/gmd:MD_Metadata/gmd:identificationInfo//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title', namespaces=NAMESPACES)
+        if len(node) == 1:
+            node2 = node[0].find(nspath_eval('gmx:Anchor', NAMESPACES))
+            if node2 is not None:  # search gmx:Anchor
+                value = node2.get(nspath_eval('xlink:href', NAMESPACES))
+            else:  # gmd:title should be WMO_CategoryCode
+                value = node[0].text
+
+            assert(value == '%s#WMO_CategoryCode' % CODELIST_PREFIX), self.test_requirement_8_2_1
+
+        # (ii) check valid codelist value
 
     def test_requirement_8_2_2(self):
         """Keywords from WMO_CategoryCode code list shall be defined as keyword type "theme"."""
