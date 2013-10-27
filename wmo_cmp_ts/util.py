@@ -29,7 +29,7 @@ def validate_iso_xml(xml):
         raise IOError('%s does not exist' % tempdir)
     if isinstance(xml, str):
         xml = etree.fromstring(xml)
-    xsd = os.path.join(tempdir, 'schema', 'gmd', 'gmd.xsd')
+    xsd = os.path.join(tempdir, 'iso-all.xsd')
     LOGGER.info('Validating %s against schema %s', xml, xsd)
     schema = etree.XMLSchema(etree.parse(xsd))
     schema.assertValid(xml)

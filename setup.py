@@ -5,8 +5,9 @@ import os
 from StringIO import StringIO
 from urllib2 import urlopen
 import zipfile
+from lxml import etree
 
-import wmo_cmp_ts
+from wmo_cmp_ts import __version__ as version
 from wmo_cmp_ts import util
 
 # set dependencies
@@ -69,9 +70,24 @@ if not os.path.exists(TEMPDIR):
     with open('%s%sWMOCodeLists.xml' % (TEMPDIR, os.sep), 'w') as f:
         f.write(urlopen(CODELIST_URL).read())
 
+    # because some ISO instances ref both gmd and gmx, create a
+    # stub xsd in order to validate
+    SCHEMA = etree.Element('schema',
+                           elementFormDefault='qualified',
+                           version='1.0.0',
+                           nsmap={None: 'http://www.w3.org/2001/XMLSchema'})
+
+    with open('%s%siso-all.xsd' % (TEMPDIR, os.sep), 'w') as f:
+        for uri in ['gmd', 'gmx']:
+            etree.SubElement(SCHEMA, 'import',
+                             namespace='http://www.isotc211.org/2005/%s' % uri,
+                             schemaLocation='schema/%s/%s.xsd' % (uri, uri))
+        f.write(etree.tostring(SCHEMA, pretty_print=True))
+
+
 setup(
     name='wmo-cmp-ts',
-    version=wmo_cmp_ts.__version__,
+    version=version,
     description=DESCRIPTION.strip(),
     long_description=open('README.md').read(),
     license='MIT',
