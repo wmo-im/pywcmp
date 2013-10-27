@@ -54,7 +54,7 @@ def find_packages(path, base=""):
             packages.update(find_packages(dir1, module_name))
     return packages
 
-print 'Downloading WMO ISO XML Schemas'
+print 'Downloading WMO ISO XML Schemas and Codelists.xml'
 
 TEMPDIR = util.get_tempdir()
 
@@ -64,6 +64,10 @@ if not os.path.exists(TEMPDIR):
     FH = StringIO(urlopen(ZIPFILE_URL).read())
     with zipfile.ZipFile(FH) as z:
         z.extractall(TEMPDIR)
+    CODELIST_URL = 'http://wis.wmo.int/2012/codelists/WMOCodeLists.xml'
+
+    with open('%s%sWMOCodeLists.xml' % (TEMPDIR, os.sep), 'w') as f:
+        f.write(urlopen(CODELIST_URL).read())
 
 setup(
     name='wmo-cmp-ts',
