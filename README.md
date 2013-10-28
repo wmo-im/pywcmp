@@ -31,7 +31,7 @@ From Python:
 ```python
 >>> from lxml import etree
 >>> from wmo_cmp_ts import test_suite
->>> exml = etree.parse('/path/to/file.xml')
+>>> exml = etree.parse('/path/to/file.xml')  # etree.fromstring() also works
 >>> ts = test_suite.WMOCoreMetadataProfileTestSuite13(exml)
 >>> ts.run_tests()  # raises ValueError error stack on exception
 ```
