@@ -92,7 +92,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
         found = 0
 
         # (i) check thesaurus
-        wmo_cats = _get_wmo_keyword_lists(self.exml, 'WMO_CategoryCode')
+        wmo_cats = self._get_wmo_keyword_lists()
         assert(len(wmo_cats) > 0), self.test_requirement_8_2_1.__doc__
 
         # (ii) check all WMO keyword sets valid codelist value
@@ -108,7 +108,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
         """Keywords from WMO_CategoryCode code list shall be defined as keyword type "theme"."""
         self.test_id = gen_test_id('WMO_CategoryCode-keyword-theme')
 
-        wmo_cats = _get_wmo_keyword_lists(self.exml, 'WMO_CategoryCode')
+        wmo_cats = self._get_wmo_keyword_lists()
         assert(len(wmo_cats) > 0), self.test_requirement_8_2_2.__doc__
 
         for cat in wmo_cats:
@@ -121,7 +121,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
 
         unique = 0
         thesauri = []
-        wmo_cats = _get_wmo_keyword_lists(self.exml, 'WMO_CategoryCode')
+        wmo_cats = self._get_wmo_keyword_lists()
         assert(len(wmo_cats) > 0), self.test_requirement_8_2_3.__doc__
 
         for cat in wmo_cats:
@@ -157,7 +157,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
         """A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the scope of distribution using the keyword "GlobalExchange" of type "dataCenterdataCentre" from thesaurus WMO_DistributionScopeCode."""
         self.test_id = gen_test_id('identification-of-globally-exchanged-data')
 
-        dist_cats = _get_wmo_keyword_lists(self.exml, 'WMO_DistributionScopeCode')
+        dist_cats = self._get_wmo_keyword_lists('WMO_DistributionScopeCode')
         if len(dist_cats) > 0:
             for cat in dist_cats:
                 for keyword_type in cat.findall(nspath_eval('gmd:type/gmd:MD_KeywordTypeCode')):
@@ -196,23 +196,22 @@ class WMOCoreMetadataProfileTestSuite13(object):
                 count += 1
         assert(count == 1), self.test_requirement_9_3_2.__doc__
 
+    def _get_wmo_keyword_lists(self, code='WMO_CategoryCode'):
+        """Helper function to retrive all keyword sets by code"""
+        wmo_cats = []
 
-def _get_wmo_keyword_lists(exml, code):
-    """Helper function to retrive all keyword sets by code"""
-    wmo_cats = []
+        keywords_sets = self.exml.findall(nspath_eval('gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords'))
 
-    keywords_sets = exml.findall(nspath_eval('gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords'))
-
-    for kwd in keywords_sets:  # find thesaurusname
-        node = kwd.find(nspath_eval('gmd:thesaurusName/gmd:CI_Citation/gmd:title'))
-        if node is not None:
-            node2 = node.find(nspath_eval('gmx:Anchor'))
-            if node2 is not None:  # search gmx:Anchor
-                value = node2.get(nspath_eval('xlink:href'))
-                if value == '%s#%s' % (CODELIST_PREFIX, code):
-                    wmo_cats.append(kwd)
-            else:  # gmd:title should be code var
-                value = node.text
-                if value == code:
-                    wmo_cats.append(kwd)
-    return wmo_cats
+        for kwd in keywords_sets:  # find thesaurusname
+            node = kwd.find(nspath_eval('gmd:thesaurusName/gmd:CI_Citation/gmd:title'))
+            if node is not None:
+                node2 = node.find(nspath_eval('gmx:Anchor'))
+                if node2 is not None:  # search gmx:Anchor
+                    value = node2.get(nspath_eval('xlink:href'))
+                    if value == '%s#%s' % (CODELIST_PREFIX, code):
+                        wmo_cats.append(kwd)
+                else:  # gmd:title should be code var
+                    value = node.text
+                    if value == code:
+                        wmo_cats.append(kwd)
+        return wmo_cats
