@@ -69,7 +69,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
         found = 0
 
         # (i) check thesaurus
-        wmo_cats = _get_wmo_keyword_lists(self.exml)
+        wmo_cats = _get_wmo_keyword_lists(self.exml, 'WMO_CategoryCode')
         assert(len(wmo_cats) > 0), self.test_requirement_8_2_1.__doc__
 
         # (ii) check all WMO keyword sets valid codelist value
@@ -85,7 +85,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
         """Keywords from WMO_CategoryCode code list shall be defined as keyword type "theme"."""
         self.test_id = gen_test_id('WMO_CategoryCode-keyword-theme')
 
-        wmo_cats = _get_wmo_keyword_lists(self.exml)
+        wmo_cats = _get_wmo_keyword_lists(self.exml, 'WMO_CategoryCode')
         assert(len(wmo_cats) > 0), self.test_requirement_8_2_2.__doc__
 
         for cat in wmo_cats:
@@ -98,7 +98,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
 
         unique = 0
         thesauri = []
-        wmo_cats = _get_wmo_keyword_lists(self.exml)
+        wmo_cats = _get_wmo_keyword_lists(self.exml, 'WMO_CategoryCode')
         assert(len(wmo_cats) > 0), self.test_requirement_8_2_3.__doc__
 
         for cat in wmo_cats:
@@ -134,9 +134,22 @@ class WMOCoreMetadataProfileTestSuite13(object):
         """A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the scope of distribution using the keyword "GlobalExchange" of type "dataCenterdataCentre" from thesaurus WMO_DistributionScopeCode."""
         self.test_id = gen_test_id('identification-of-globally-exchanged-data')
 
+        dist_cats = _get_wmo_keyword_lists(self.exml, 'WMO_DistributionScopeCode')
+        if len(dist_cats) > 0:
+            for cat in dist_cats:
+                for keyword_type in cat.findall(nspath_eval('gmd:type/gmd:MD_KeywordTypeCode')):
+                    assert(keyword_type.text == 'dataCentre'), self.test_requirement_9_1_1.__doc__
+
+            assert('GlobalExchange' in dist_cats), self.test_requirement_9_1_1.__doc__
+
     def test_requirement_9_2_1(self):
         """A WIS Discovery Metadata record describing data for global exchange via the WIS shall have a gmd:MD_Metadata/gmd:fileIdentifier attribute formatted as follows (where {uid} is a unique identifier derived from the GTS bulletin or file name): urn:x-wmo:md:int.wmo.wis::{uid}."""
         self.test_id = gen_test_id('fileIdentifier-for-globally-exchanged-data')
+
+        regex = 'urn:x-wmo:md:int.wmo.wis::'
+        identifier = self.exml.find(nspath_eval('gmd:fileIdentifier/gco:CharacterString')).text
+
+        assert(identifier.find(regex) == 0), self.test_requirement_9_2_1.__doc__
 
     def test_requirement_9_3_1(self):
         """A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the WMO Data License as Legal Constraint (type: "otherConstraints") using one and only one term from the WMO_DataLicenseCode code list."""
@@ -147,8 +160,8 @@ class WMOCoreMetadataProfileTestSuite13(object):
         self.test_id = gen_test_id('GTS-priority-for-globally-exchanged-data')
 
 
-def _get_wmo_keyword_lists(exml):
-    """Helper function to retrive all keyword sets of type WMO_CategoryCode"""
+def _get_wmo_keyword_lists(exml, code):
+    """Helper function to retrive all keyword sets by code"""
     wmo_cats = []
 
     keywords_sets = exml.findall(nspath_eval('gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords'))
@@ -159,10 +172,10 @@ def _get_wmo_keyword_lists(exml):
             node2 = node.find(nspath_eval('gmx:Anchor'))
             if node2 is not None:  # search gmx:Anchor
                 value = node2.get(nspath_eval('xlink:href'))
-                if value == '%s#WMO_CategoryCode' % CODELIST_PREFIX:
+                if value == '%s#%s' % (CODELIST_PREFIX, code):
                     wmo_cats.append(kwd)
-            else:  # gmd:title should be WMO_CategoryCode
+            else:  # gmd:title should be code var
                 value = node.text
-                if value == 'WMO_CategoryCode':
+                if value == code:
                     wmo_cats.append(kwd)
     return wmo_cats
