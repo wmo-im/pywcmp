@@ -32,6 +32,29 @@ class WMOCoreMetadataProfileTestSuite13(object):
         # generate dict of codelists
         self.codelists = get_codelists()
 
+    def run_tests(self):
+        """Wrapper function to run all tests"""
+        tests = ['6_1_1', '6_1_2', '6_2_1', '6_3_1', '8_1_1',
+                 '8_2_1', '8_2_2', '8_2_3', '8_2_4', '9_1_1',
+                 '9_2_1', '9_3_1', '9_3_2']
+
+        error_stack = []
+        for i in tests:
+            test_name = 'test_requirement_%s' % i
+            try:
+                getattr(self, test_name)()
+            except AssertionError, err:
+                message = 'ASSERTION ERROR: %s' % err
+                LOGGER.error(message)
+                error_stack.append(message)
+            except Exception, err:
+                message = 'OTHER ERROR: %s' % err
+                LOGGER.error(message)
+                error_stack.append(message)
+
+        if len(error_stack) > 0:
+            raise ValueError(error_stack)
+
     def test_requirement_6_1_1(self):
         """Each WIS Discovery Metadata record shall validate without error against the XML schemas defined in ISO/TS 19139:2007."""
         self.test_id = gen_test_id('ISO-TS-19139-2007-xml-schema-validation')
