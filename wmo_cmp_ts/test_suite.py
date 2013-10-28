@@ -1,18 +1,12 @@
 # -*- coding: ISO-8859-15 -*-
 
 import logging
-from wmo_cmp_ts.util import nspath_eval, validate_iso_xml
+from wmo_cmp_ts.util import get_codelists, NAMESPACES, nspath_eval, \
+    validate_iso_xml
 
 LOGGER = logging.getLogger(__name__)
 
 CODELIST_PREFIX = 'http://wis.wmo.int/2012/codelists/WMOCodeLists.xml'
-
-NAMESPACES = {
-    'gmd': 'http://www.isotc211.org/2005/gmd',
-    'gml': 'http://www.opengis.net/gml/3.2',
-    'gmx': 'http://www.isotc211.org/2005/gmx',
-    'xlink': 'http://www.w3.org/1999/xlink',
-}
 
 
 def msg(testid, test_description):
@@ -35,6 +29,9 @@ class WMOCoreMetadataProfileTestSuite13(object):
         self.exml = exml  # serialized already
         self.namespaces = self.exml.getroot().nsmap
 
+        # generate dict of codelists
+        self.codelists = get_codelists()
+
     def test_requirement_6_1_1(self):
         """Each WIS Discovery Metadata record shall validate without error against the XML schemas defined in ISO/TS 19139:2007."""
         self.test_id = gen_test_id('ISO-TS-19139-2007-xml-schema-validation')
@@ -43,6 +40,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
     def test_requirement_6_1_2(self):
         """Each WIS Discovery Metadata record shall validate without error against the rule-based constraints listed in ISO/TS 19139:2007 Annex A (Table A.1)."""
         self.test_id = gen_test_id('ISO-TS-19139-2007-rule-based-validation')
+        # TODO
 
     def test_requirement_6_2_1(self):
         """Each WIS Discovery Metadata record shall explicitly name all namespaces used within the record; use of default namespaces is prohibited."""
@@ -61,33 +59,66 @@ class WMOCoreMetadataProfileTestSuite13(object):
         """Each WIS Discovery Metadata record shall include one gmd:MD_Metadata/gmd:fileIdentifier attribute."""
         self.test_id = gen_test_id('fileIdentifier-cardinality')
 
-        ids = self.exml.findall(nspath_eval('gmd:fileIdentifier', NAMESPACES))
+        ids = self.exml.findall(nspath_eval('gmd:fileIdentifier'))
         assert(len(ids) == 1), self.test_requirement_8_1_1.__doc__
 
     def test_requirement_8_2_1(self):
         """Each WIS Discovery Metadata record shall include at least one keyword from the WMO_CategoryCode code list."""
         self.test_id = gen_test_id('WMO_CategoryCode-keyword-cardinality')
 
+        found = 0
+
         # (i) check thesaurus
-        node = self.exml.xpath('/gmd:MD_Metadata/gmd:identificationInfo//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title', namespaces=NAMESPACES)
-        if len(node) == 1:
-            node2 = node[0].find(nspath_eval('gmx:Anchor', NAMESPACES))
-            if node2 is not None:  # search gmx:Anchor
-                value = node2.get(nspath_eval('xlink:href', NAMESPACES))
-            else:  # gmd:title should be WMO_CategoryCode
-                value = node[0].text
+        wmo_cats = _get_wmo_keyword_lists(self.exml)
+        assert(len(wmo_cats) > 0), self.test_requirement_8_2_1.__doc__
 
-            assert(value == '%s#WMO_CategoryCode' % CODELIST_PREFIX), self.test_requirement_8_2_1
+        # (ii) check all WMO keyword sets valid codelist value
+        for cat in wmo_cats:
+            for keyword in cat.findall(nspath_eval('gmd:keyword/gco:CharacterString')):
+                if keyword.text in self.codelists['WMO_CategoryCode']:
+                    found = 1
+                    break
 
-        # (ii) check valid codelist value
+        assert(found == 1), self.test_requirement_8_2_1.__doc__
 
     def test_requirement_8_2_2(self):
         """Keywords from WMO_CategoryCode code list shall be defined as keyword type "theme"."""
         self.test_id = gen_test_id('WMO_CategoryCode-keyword-theme')
 
+        wmo_cats = _get_wmo_keyword_lists(self.exml)
+        assert(len(wmo_cats) > 0), self.test_requirement_8_2_2.__doc__
+
+        for cat in wmo_cats:
+            for keyword_type in cat.findall(nspath_eval('gmd:type/gmd:MD_KeywordTypeCode')):
+                assert(keyword_type.text == 'theme'), self.test_requirement_8_2_2.__doc__
+
     def test_requirement_8_2_3(self):
         """All keywords sourced from a particular keyword thesaurus shall be grouped into a single instance of the MD_Keywords class."""
         self.test_id = gen_test_id('keyword-grouping')
+
+        unique = 0
+        thesauri = []
+        wmo_cats = _get_wmo_keyword_lists(self.exml)
+        assert(len(wmo_cats) > 0), self.test_requirement_8_2_3.__doc__
+
+        for cat in wmo_cats:
+            for node in cat.findall(nspath_eval('gmd:thesaurusName/gmd:CI_Citation/gmd:title')):
+                if node is not None:
+                    node2 = node.find(nspath_eval('gmx:Anchor'))
+                    if node2 is not None:  # search gmx:Anchor
+                        value = node2.text
+                    else:  # gmd:title should be WMO_CategoryCode
+                        value = node.text
+                    thesauri.append(value)
+
+        if len(thesauri) == 1:
+            unique = 1
+        else:  # check if list if unique
+            thesauri2 = list(set(thesauri))
+            if len(thesauri) == len(thesauri2):
+                unique = 1
+
+        assert(unique == 1), self.test_requirement_8_2_3.__doc__
 
     def test_requirement_8_2_4(self):
         """Each WIS Discovery Metadata record describing geographic data shall include the description of at least one geographic bounding box defining the spatial extent of the data"""
@@ -108,3 +139,24 @@ class WMOCoreMetadataProfileTestSuite13(object):
     def test_requirement_9_3_2(self):
         """A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the GTS Priority as Legal Constraint (type: "otherConstraints") using one and only one term from the WMO_GTSProductCategoryCode code list."""
         self.test_id = gen_test_id('GTS-priority-for-globally-exchanged-data')
+
+
+def _get_wmo_keyword_lists(exml):
+    """Helper function to retrive all keyword sets of type WMO_CategoryCode"""
+    wmo_cats = []
+
+    keywords_sets = exml.findall(nspath_eval('gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords'))
+
+    for kwd in keywords_sets:  # find thesaurusname
+        node = kwd.find(nspath_eval('gmd:thesaurusName/gmd:CI_Citation/gmd:title'))
+        if node is not None:
+            node2 = node.find(nspath_eval('gmx:Anchor'))
+            if node2 is not None:  # search gmx:Anchor
+                value = node2.get(nspath_eval('xlink:href'))
+                if value == '%s#WMO_CategoryCode' % CODELIST_PREFIX:
+                    wmo_cats.append(kwd)
+            else:  # gmd:title should be WMO_CategoryCode
+                value = node.text
+                if value == 'WMO_CategoryCode':
+                    wmo_cats.append(kwd)
+    return wmo_cats
