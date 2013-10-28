@@ -124,6 +124,12 @@ class WMOCoreMetadataProfileTestSuite13(object):
         """Each WIS Discovery Metadata record describing geographic data shall include the description of at least one geographic bounding box defining the spatial extent of the data"""
         self.test_id = gen_test_id('geographic-bounding-box')
 
+        hierarchy = self.exml.find(nspath_eval('gmd:hierarchyLevel/gmd:MD_ScopeCode'))
+        assert(hierarchy.text != 'nonGeographicDataset'), self.test_requirement_8_2_4.__doc__
+
+        bbox = self.exml.find(nspath_eval('gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox'))
+        assert(bbox is not None), self.test_requirement_8_2_4.__doc__
+
     def test_requirement_9_1_1(self):
         """A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the scope of distribution using the keyword "GlobalExchange" of type "dataCenterdataCentre" from thesaurus WMO_DistributionScopeCode."""
         self.test_id = gen_test_id('identification-of-globally-exchanged-data')
