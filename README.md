@@ -1,9 +1,9 @@
 [![Build Status](https://travis-ci.org/OGCMetOceanDWG/wmo-cmp-ts.png?branch=master)](https://travis-ci.org/OGCMetOceanDWG/wmo-cmp-ts)
 
-wmo-cmp-ts
-==========
-
 WMO Core Metadata Profile Test Suite
+====================================
+
+This library implements validation against [WMO Core Metadata Profile 1.3] (http://wis.wmo.int/2013/metadata/version_1-3-0/WMO_Core_Metadata_Profile_v1.3_Specification_Part_1_v1.0FINALcorrected.pdf), specifically [Part 2] (http://wis.wmo.int/2013/metadata/version_1-3-0/WMO_Core_Metadata_Profile_v1.3_Specification_Part_2_v1.0FINAL.pdf), Section 2.
 
 Installation
 ------------
