@@ -155,9 +155,23 @@ class WMOCoreMetadataProfileTestSuite13(object):
         """A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the WMO Data License as Legal Constraint (type: "otherConstraints") using one and only one term from the WMO_DataLicenseCode code list."""
         self.test_id = gen_test_id('WMO-data-policy-for-globally-exchanged-data')
 
+        count = 0
+        other_constraints = [legal.text for legal in self.exml.findall(nspath_eval('gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints/gco:CharacterString'))]
+        for constr in other_constraints:
+            if constr in self.codelists['WMO_DataLicenseCode']:
+                count += 1
+        assert(count == 1), self.test_requirement_9_3_1.__doc__
+
     def test_requirement_9_3_2(self):
         """A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the GTS Priority as Legal Constraint (type: "otherConstraints") using one and only one term from the WMO_GTSProductCategoryCode code list."""
         self.test_id = gen_test_id('GTS-priority-for-globally-exchanged-data')
+
+        count = 0
+        other_constraints = [legal.text for legal in self.exml.findall(nspath_eval('gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints/gco:CharacterString'))]
+        for constr in other_constraints:
+            if constr in self.codelists['WMO_GTSProductCategoryCode']:
+                count += 1
+        assert(count == 1), self.test_requirement_9_3_2.__doc__
 
 
 def _get_wmo_keyword_lists(exml, code):
