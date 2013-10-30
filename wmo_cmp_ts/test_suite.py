@@ -56,37 +56,37 @@ class WMOCoreMetadataProfileTestSuite13(object):
             raise TestSuiteError(error_stack)
 
     def test_requirement_6_1_1(self):
-        """Each WIS Discovery Metadata record shall validate without error against the XML schemas defined in ISO/TS 19139:2007."""
+        """Requirement 6.1.1: Each WIS Discovery Metadata record shall validate without error against the XML schemas defined in ISO/TS 19139:2007."""
         self.test_id = gen_test_id('ISO-TS-19139-2007-xml-schema-validation')
         validate_iso_xml(self.exml)
 
     def test_requirement_6_1_2(self):
-        """Each WIS Discovery Metadata record shall validate without error against the rule-based constraints listed in ISO/TS 19139:2007 Annex A (Table A.1)."""
+        """Requirement 6.1.2: Each WIS Discovery Metadata record shall validate without error against the rule-based constraints listed in ISO/TS 19139:2007 Annex A (Table A.1)."""
         self.test_id = gen_test_id('ISO-TS-19139-2007-rule-based-validation')
         # TODO
 
     def test_requirement_6_2_1(self):
-        """Each WIS Discovery Metadata record shall explicitly name all namespaces used within the record; use of default namespaces is prohibited."""
+        """Requirement 6.2.1: Each WIS Discovery Metadata record shall explicitly name all namespaces used within the record; use of default namespaces is prohibited."""
         self.test_id = gen_test_id('explicit-xml-namespace-identification')
 
         assert(None not in self.namespaces), self.test_requirement_6_2_1.__doc__
 
     def test_requirement_6_3_1(self):
-        """Each WIS Discovery Metadata record shall declare the following XML namespace for GML: http://www.opengis.net/gml/3.2."""
+        """Requirement 6.3.1: Each WIS Discovery Metadata record shall declare the following XML namespace for GML: http://www.opengis.net/gml/3.2."""
         self.test_id = gen_test_id('gml-namespace-specification')
 
         if 'gml' in self.namespaces:
             assert(self.namespaces['gml'] == NAMESPACES['gml']), self.test_requirement_6_3_1.__doc__
 
     def test_requirement_8_1_1(self):
-        """Each WIS Discovery Metadata record shall include one gmd:MD_Metadata/gmd:fileIdentifier attribute."""
+        """Requirement 8.1.1: Each WIS Discovery Metadata record shall include one gmd:MD_Metadata/gmd:fileIdentifier attribute."""
         self.test_id = gen_test_id('fileIdentifier-cardinality')
 
         ids = self.exml.findall(nspath_eval('gmd:fileIdentifier'))
         assert(len(ids) == 1), self.test_requirement_8_1_1.__doc__
 
     def test_requirement_8_2_1(self):
-        """Each WIS Discovery Metadata record shall include at least one keyword from the WMO_CategoryCode code list."""
+        """Requirement 8.2.1: Each WIS Discovery Metadata record shall include at least one keyword from the WMO_CategoryCode code list."""
         self.test_id = gen_test_id('WMO_CategoryCode-keyword-cardinality')
 
         found = 0
@@ -105,7 +105,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
         assert(found == 1), self.test_requirement_8_2_1.__doc__
 
     def test_requirement_8_2_2(self):
-        """Keywords from WMO_CategoryCode code list shall be defined as keyword type "theme"."""
+        """Requirement 8.2.2: Keywords from WMO_CategoryCode code list shall be defined as keyword type "theme"."""
         self.test_id = gen_test_id('WMO_CategoryCode-keyword-theme')
 
         wmo_cats = self._get_wmo_keyword_lists()
@@ -116,7 +116,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
                 assert(keyword_type.text == 'theme'), self.test_requirement_8_2_2.__doc__
 
     def test_requirement_8_2_3(self):
-        """All keywords sourced from a particular keyword thesaurus shall be grouped into a single instance of the MD_Keywords class."""
+        """Requirement 8.2.3: All keywords sourced from a particular keyword thesaurus shall be grouped into a single instance of the MD_Keywords class."""
         self.test_id = gen_test_id('keyword-grouping')
 
         unique = 0
@@ -144,7 +144,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
         assert(unique == 1), self.test_requirement_8_2_3.__doc__
 
     def test_requirement_8_2_4(self):
-        """Each WIS Discovery Metadata record describing geographic data shall include the description of at least one geographic bounding box defining the spatial extent of the data"""
+        """Requirement 8.2.4: Each WIS Discovery Metadata record describing geographic data shall include the description of at least one geographic bounding box defining the spatial extent of the data"""
         self.test_id = gen_test_id('geographic-bounding-box')
 
         hierarchy = self.exml.find(nspath_eval('gmd:hierarchyLevel/gmd:MD_ScopeCode'))
@@ -154,7 +154,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
         assert(bbox is not None), self.test_requirement_8_2_4.__doc__
 
     def test_requirement_9_1_1(self):
-        """A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the scope of distribution using the keyword "GlobalExchange" of type "dataCenterdataCentre" from thesaurus WMO_DistributionScopeCode."""
+        """Requirement 9.1.1: A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the scope of distribution using the keyword "GlobalExchange" of type "dataCenterdataCentre" from thesaurus WMO_DistributionScopeCode."""
         self.test_id = gen_test_id('identification-of-globally-exchanged-data')
 
         dist_cats = self._get_wmo_keyword_lists('WMO_DistributionScopeCode')
@@ -166,7 +166,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
             assert('GlobalExchange' in dist_cats), self.test_requirement_9_1_1.__doc__
 
     def test_requirement_9_2_1(self):
-        """A WIS Discovery Metadata record describing data for global exchange via the WIS shall have a gmd:MD_Metadata/gmd:fileIdentifier attribute formatted as follows (where {uid} is a unique identifier derived from the GTS bulletin or file name): urn:x-wmo:md:int.wmo.wis::{uid}."""
+        """Requirement 9.2.1: A WIS Discovery Metadata record describing data for global exchange via the WIS shall have a gmd:MD_Metadata/gmd:fileIdentifier attribute formatted as follows (where {uid} is a unique identifier derived from the GTS bulletin or file name): urn:x-wmo:md:int.wmo.wis::{uid}."""
         self.test_id = gen_test_id('fileIdentifier-for-globally-exchanged-data')
 
         regex = 'urn:x-wmo:md:int.wmo.wis::'
@@ -175,7 +175,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
         assert(identifier.find(regex) == 0), self.test_requirement_9_2_1.__doc__
 
     def test_requirement_9_3_1(self):
-        """A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the WMO Data License as Legal Constraint (type: "otherConstraints") using one and only one term from the WMO_DataLicenseCode code list."""
+        """Requirement 9.3.1: A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the WMO Data License as Legal Constraint (type: "otherConstraints") using one and only one term from the WMO_DataLicenseCode code list."""
         self.test_id = gen_test_id('WMO-data-policy-for-globally-exchanged-data')
 
         count = 0
@@ -186,7 +186,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
         assert(count == 1), self.test_requirement_9_3_1.__doc__
 
     def test_requirement_9_3_2(self):
-        """A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the GTS Priority as Legal Constraint (type: "otherConstraints") using one and only one term from the WMO_GTSProductCategoryCode code list."""
+        """Requirement 9.3.2: A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the GTS Priority as Legal Constraint (type: "otherConstraints") using one and only one term from the WMO_GTSProductCategoryCode code list."""
         self.test_id = gen_test_id('GTS-priority-for-globally-exchanged-data')
 
         count = 0
