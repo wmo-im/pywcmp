@@ -35,9 +35,6 @@ From Python:
 >>> exml = etree.parse('/path/to/file.xml')
 >>> ts = test_suite.WMOCoreMetadataProfileTestSuite13(exml)
 >>> ts.run_tests()  # raises ValueError error stack on exception
-```
-
-```python
 # test a URL
 >>> from urllib2 import urlopen
 >>> from StringIO import StringIO
@@ -45,4 +42,11 @@ From Python:
 >>> exml = etree.parse(content)
 >>> ts = test_suite.WMOCoreMetadataProfileTestSuite13(exml)
 >>> ts.run_tests()  # raises ValueError error stack on exception
+# handle test_suite.TestSuiteError
+# test_suite.TestSuiteError.message is a list of error messages
+>>> try:
+...    ts.run_tests()
+... except test_suite.TestSuiteError, err:
+...    '\n'.join(err.message)
+>>> ...
 ```
