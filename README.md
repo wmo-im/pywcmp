@@ -29,7 +29,7 @@ wmo-metadata-validate.py /path/to/file.xml
 
 From Python:
 ```python
->>> test a file on disk
+# test a file on disk
 >>> from lxml import etree
 >>> from wmo_cmp_ts import test_suite
 >>> exml = etree.parse('/path/to/file.xml')
@@ -38,9 +38,11 @@ From Python:
 ```
 
 ```python
->>> test a URL
+# test a URL
 >>> from urllib2 import urlopen
 >>> from StringIO import StringIO
 >>> content = StringIO(urlopen('http://....').read())
 >>> exml = etree.parse(content)
+>>> ts = test_suite.WMOCoreMetadataProfileTestSuite13(exml)
+>>> ts.run_tests()  # raises ValueError error stack on exception
 ```
