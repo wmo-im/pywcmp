@@ -24,5 +24,5 @@ TS = test_suite.WMOCoreMetadataProfileTestSuite13(EXML)
 # run the tests
 try:
     TS.run_tests()
-except ValueError, err:
-    print err
+except test_suite.TestSuiteError, err:
+    print '\n'.join(err.message)
