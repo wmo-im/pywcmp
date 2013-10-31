@@ -17,6 +17,7 @@ class WmoTestSuiteTest(unittest.TestCase):
 
     def test_jma_raise(self):
         """Simple JMA Tests"""
+        print etree.__version__
         exml = etree.parse('data/md-WTPQ50RJTD-gmd.xml')
         ts = test_suite.WMOCoreMetadataProfileTestSuite13(exml)
         with self.assertRaises(test_suite.TestSuiteError):
