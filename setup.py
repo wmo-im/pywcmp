@@ -55,19 +55,19 @@ def find_packages(path, base=""):
             packages.update(find_packages(dir1, module_name))
     return packages
 
-print 'Downloading WMO ISO XML Schemas and Codelists.xml'
+USERDIR = util.get_userdir()
 
-TEMPDIR = util.get_tempdir()
+print 'Downloading WMO ISO XML Schemas and Codelists.xml to %s' % USERDIR
 
-if not os.path.exists(TEMPDIR):
-    os.mkdir(TEMPDIR)
+if not os.path.exists(USERDIR):
+    os.mkdir(USERDIR)
     ZIPFILE_URL = 'http://wis.wmo.int/2011/schemata/iso19139_2007/19139.zip'
     FH = StringIO(urlopen(ZIPFILE_URL).read())
     with zipfile.ZipFile(FH) as z:
-        z.extractall(TEMPDIR)
+        z.extractall(USERDIR)
     CODELIST_URL = 'http://wis.wmo.int/2012/codelists/WMOCodeLists.xml'
 
-    with open('%s%sWMOCodeLists.xml' % (TEMPDIR, os.sep), 'w') as f:
+    with open('%s%sWMOCodeLists.xml' % (USERDIR, os.sep), 'w') as f:
         f.write(urlopen(CODELIST_URL).read())
 
     # because some ISO instances ref both gmd and gmx, create a
@@ -77,12 +77,14 @@ if not os.path.exists(TEMPDIR):
                            version='1.0.0',
                            nsmap={None: 'http://www.w3.org/2001/XMLSchema'})
 
-    with open('%s%siso-all.xsd' % (TEMPDIR, os.sep), 'w') as f:
+    with open('%s%siso-all.xsd' % (USERDIR, os.sep), 'w') as f:
         for uri in ['gmd', 'gmx']:
             etree.SubElement(SCHEMA, 'import',
                              namespace='http://www.isotc211.org/2005/%s' % uri,
                              schemaLocation='schema/%s/%s.xsd' % (uri, uri))
         f.write(etree.tostring(SCHEMA, pretty_print=True))
+else:
+    print 'Directory exists: %s' % USERDIR
 
 
 setup(

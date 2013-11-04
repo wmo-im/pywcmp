@@ -2,7 +2,6 @@
 
 import logging
 import os
-import tempfile
 from lxml import etree
 
 LOGGER = logging.getLogger(__name__)
@@ -19,8 +18,8 @@ NAMESPACES = {
 def get_codelists():
     """Helper function to assemble dict of WMO codelists"""
     codelists = {}
-    tempdir = get_tempdir()
-    xml = etree.parse('%s%sWMOCodeLists.xml' % (tempdir, os.sep))
+    userdir = get_userdir()
+    xml = etree.parse('%s%sWMOCodeLists.xml' % (userdir, os.sep))
     for cld in xml.xpath('gmx:codelistItem/gmx:CodeListDictionary', namespaces=NAMESPACES):
         identifier = cld.get(nspath_eval('gml:id'))
         codelists[identifier] = []
@@ -29,9 +28,9 @@ def get_codelists():
     return codelists
 
 
-def get_tempdir():
-    """Helper function to get tempdir"""
-    return '%s%s%s' % (tempfile.gettempdir(), os.sep, 'wmo-cmp-ts')
+def get_userdir():
+    """Helper function to get userdir"""
+    return '%s%s%s' % (os.path.expanduser('~'), os.sep, '.wmo-cmp-ts')
 
 
 def nspath_eval(xpath):
@@ -45,12 +44,12 @@ def nspath_eval(xpath):
 
 def validate_iso_xml(xml):
     """Perform XML Schema validation of ISO XML Metadata"""
-    tempdir = get_tempdir()
-    if not os.path.exists(tempdir):
-        raise IOError('%s does not exist' % tempdir)
+    userdir = get_userdir()
+    if not os.path.exists(userdir):
+        raise IOError('%s does not exist' % userdir)
     if isinstance(xml, str):
         xml = etree.fromstring(xml)
-    xsd = os.path.join(tempdir, 'iso-all.xsd')
+    xsd = os.path.join(userdir, 'iso-all.xsd')
     LOGGER.info('Validating %s against schema %s', xml, xsd)
     schema = etree.XMLSchema(etree.parse(xsd))
     schema.assertValid(xml)
