@@ -169,10 +169,10 @@ class WMOCoreMetadataProfileTestSuite13(object):
         """Requirement 9.2.1: A WIS Discovery Metadata record describing data for global exchange via the WIS shall have a gmd:MD_Metadata/gmd:fileIdentifier attribute formatted as follows (where {uid} is a unique identifier derived from the GTS bulletin or file name): urn:x-wmo:md:int.wmo.wis::{uid}."""
         self.test_id = gen_test_id('fileIdentifier-for-globally-exchanged-data')
 
-        regex = 'urn:x-wmo:md:int.wmo.wis::'
+        mask = 'urn:x-wmo:md:int.wmo.wis::'
         identifier = self.exml.find(nspath_eval('gmd:fileIdentifier/gco:CharacterString')).text
 
-        assert(identifier.find(regex) == 0), self.test_requirement_9_2_1.__doc__
+        assert(identifier.startswith(mask)), self.test_requirement_9_2_1.__doc__
 
     def test_requirement_9_3_1(self):
         """Requirement 9.3.1: A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the WMO Data License as Legal Constraint (type: "otherConstraints") using one and only one term from the WMO_DataLicenseCode code list."""
