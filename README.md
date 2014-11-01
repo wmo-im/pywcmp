@@ -28,7 +28,7 @@ wmo-metadata-validate.py /path/to/file.xml
 ```
 
 From Python:
-```python
+```pycon
 # test a file on disk
 >>> from lxml import etree
 >>> from wmo_cmp_ts import test_suite
