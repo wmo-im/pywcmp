@@ -38,7 +38,7 @@ def is_package(path):
     return (
         os.path.isdir(path) and
         os.path.isfile(os.path.join(path, '__init__.py'))
-        )
+    )
 
 
 def find_packages(path, base=""):
@@ -102,7 +102,7 @@ setup(
     url=URL,
     install_requires=INSTALL_REQUIRES,
     packages=find_packages('.'),
-    #package_data=PACKAGE_DATA,
+    # package_data=PACKAGE_DATA,
     scripts=SCRIPTS,
     classifiers=[
         'Development Status :: 4 - Beta',
