@@ -29,7 +29,7 @@ class WmoTestSuiteTest(unittest.TestCase):
         try:
             ts.run_tests()
         except test_suite.TestSuiteError, err:
-            self.assertEquals(3, len(err.message))
+            self.assertEqual(3, len(err.message))
 
 if __name__ == '__main__':
     unittest.main()

@@ -11,7 +11,8 @@ from wmo_cmp_ts import __version__ as version
 from wmo_cmp_ts import util
 
 # set dependencies
-INSTALL_REQUIRES = [line.strip() for line in open('requirements.txt')]
+with open('requirements.txt') as f:
+    INSTALL_REQUIRES = f.read().splitlines()
 
 KEYWORDS = [
     'WMO',
@@ -22,6 +23,9 @@ KEYWORDS = [
 
 DESCRIPTION = '''A Python implementation of the test suite for
     WMO Core Metadata Profile'''
+
+with open('README.md') as f:
+    LONG_DESCRIPTION = f.read()
 
 CONTACT = 'OGC Meteorology and Oceanography Domain Working Group'
 
@@ -91,7 +95,7 @@ setup(
     name='wmo-cmp-ts',
     version=version,
     description=DESCRIPTION.strip(),
-    long_description=open('README.md').read(),
+    long_description=LONG_DESCRIPTION,
     license='MIT',
     platforms='all',
     keywords=' '.join(KEYWORDS),
