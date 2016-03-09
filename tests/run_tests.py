@@ -44,4 +44,46 @@
 #
 # =================================================================
 
-__version__ = '0.1-dev'
+import os
+import unittest
+from lxml import etree
+from wmo_cmp_ts import test_suite
+
+
+def get_test_file_path(filename):
+    """helper function to open test file safely"""
+
+    if os.path.isfile(filename):
+        return filename
+    else:
+        return 'tests/{}'.format(filename)
+
+
+class WmoTestSuiteTest(unittest.TestCase):
+    """Test suite for package Foo"""
+    def setUp(self):
+        """setup test fixtures, etc."""
+        pass
+
+    def tearDown(self):
+        """return to pristine state"""
+        pass
+
+    def test_jma_raise(self):
+        """Simple JMA Tests"""
+        exml = etree.parse(get_test_file_path('data/md-WTPQ50RJTD-gmd.xml'))
+        ts = test_suite.WMOCoreMetadataProfileTestSuite13(exml)
+        with self.assertRaises(test_suite.TestSuiteError):
+            ts.run_tests()
+
+    def test_jma_inspect_errors(self):
+        """Simple JMA Tests"""
+        exml = etree.parse(get_test_file_path('data/md-SMJP01RJTD-gmd.xml'))
+        ts = test_suite.WMOCoreMetadataProfileTestSuite13(exml)
+        try:
+            ts.run_tests()
+        except test_suite.TestSuiteError as err:
+            self.assertEqual(3, len(err.errors))
+
+if __name__ == '__main__':
+    unittest.main()
