@@ -43,10 +43,11 @@ From Python:
 >>> ts = test_suite.WMOCoreMetadataProfileTestSuite13(exml)
 >>> ts.run_tests()  # raises ValueError error stack on exception
 # handle test_suite.TestSuiteError
-# test_suite.TestSuiteError.message is a list of error messages
+# test_suite.TestSuiteError.errors is a list of errors
 >>> try:
 ...    ts.run_tests()
 ... except test_suite.TestSuiteError, err:
-...    '\n'.join(err.message)
+...    print(err.message)
+...    '\n'.join(err.errors)
 >>> ...
 ```

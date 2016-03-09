@@ -53,7 +53,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
                 error_stack.append(message)
 
         if len(error_stack) > 0:
-            raise TestSuiteError(error_stack)
+            raise TestSuiteError('Invalid metadata', error_stack)
 
     def test_requirement_6_1_1(self):
         """Requirement 6.1.1: Each WIS Discovery Metadata record shall validate without error against the XML schemas defined in ISO/TS 19139:2007."""
@@ -219,7 +219,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
 
 class TestSuiteError(Exception):
     """custom exception handler"""
-    def __init__(self, message):
+    def __init__(self, message, errors):
         """set error list/stack"""
         super(TestSuiteError, self).__init__(message)
-        self.message = message
+        self.errors = errors
