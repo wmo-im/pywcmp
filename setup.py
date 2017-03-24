@@ -19,7 +19,7 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2016 Government of Canada
+# Copyright (c) 2017 Government of Canada
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -44,7 +44,7 @@
 #
 # =================================================================
 
-from distutils.core import setup, Command
+from setuptools import setup, Command
 import os
 import sys
 from io import BytesIO
@@ -78,8 +78,6 @@ with open('README.md') as f:
 CONTACT = 'OGC Meteorology and Oceanography Domain Working Group'
 
 EMAIL = 'tomkralidis@gmail.com'
-
-SCRIPTS = [os.path.join('bin', 'wmo-metadata-validate.py')]
 
 URL = 'https://github.com/OGCMetOceanDWG/wmo-cmp-ts'
 
@@ -126,6 +124,7 @@ def find_packages(path, base=""):
             packages[module_name] = dir1
             packages.update(find_packages(dir1, module_name))
     return packages
+
 
 USERDIR = util.get_userdir()
 
@@ -175,7 +174,11 @@ setup(
     install_requires=INSTALL_REQUIRES,
     packages=find_packages('.'),
     # package_data=PACKAGE_DATA,
-    scripts=SCRIPTS,
+    entry_points={
+        'console_scripts': [
+            'wmo-metadata-validate.py=wmo_cmp_ts:cli'
+        ]
+    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',

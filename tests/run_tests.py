@@ -85,5 +85,6 @@ class WmoTestSuiteTest(unittest.TestCase):
         except test_suite.TestSuiteError as err:
             self.assertEqual(3, len(err.errors))
 
+
 if __name__ == '__main__':
     unittest.main()

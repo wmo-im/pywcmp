@@ -19,7 +19,7 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2016 Government of Canada
+# Copyright (c) 2017 Government of Canada
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -45,3 +45,42 @@
 # =================================================================
 
 __version__ = '0.1-dev'
+
+# run test suite as per WMO Core Metadata Profile 1.3, Part 2
+
+import sys
+try:
+    from urllib2 import urlopen
+except ImportError:
+    from urllib.request import urlopen
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+from lxml import etree
+from wmo_cmp_ts import test_suite
+
+
+def cli():
+    """command line interface"""
+
+    if len(sys.argv) < 2:
+        print('Usage: %s <xmlfile or url>' % sys.argv[0])
+        sys.exit(1)
+
+    content = sys.argv[1]
+
+    if content.startswith('http://'):  # URL
+        content = StringIO(urlopen(content).read())
+
+    EXML = etree.parse(content)
+
+    ts = test_suite.WMOCoreMetadataProfileTestSuite13(EXML)
+
+    ts.run_tests()
+    # run the tests
+    try:
+        ts.run_tests()
+        print('Successful!')
+    except test_suite.TestSuiteError as err:
+        print('\n'.join(err.message))
