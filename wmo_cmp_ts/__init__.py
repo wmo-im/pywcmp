@@ -44,11 +44,12 @@
 #
 # =================================================================
 
+import click
+
 __version__ = '0.2.dev0'
 
 # run test suite as per WMO Core Metadata Profile 1.3, Part 2
 
-import sys
 try:
     from urllib2 import urlopen
 except ImportError:
@@ -61,16 +62,22 @@ from lxml import etree
 from wmo_cmp_ts import test_suite
 
 
-def cli():
+@click.command()
+@click.version_option(version=__version__)
+@click.option('--file', '-f', 'file_',
+              type=click.Path(exists=True, resolve_path=True),
+              help='Path to XML file')
+@click.option('--url', '-u',
+              help='URL of XML file')
+def cli(file_, url):
     """command line interface"""
 
-    if len(sys.argv) < 2:
-        print('Usage: %s <xmlfile or url>' % sys.argv[0])
-        sys.exit(1)
+    if file_ is None and url is None:
+        raise click.UsageError('Missing --file or --url options')
 
-    content = sys.argv[1]
-
-    if content.startswith('http://'):  # URL
+    if file_ is not None:
+        content = file_
+    elif url is not None:
         content = StringIO(urlopen(content).read())
 
     EXML = etree.parse(content)

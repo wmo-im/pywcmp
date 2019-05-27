@@ -21,7 +21,14 @@ python setup.py install
 
 From command line:
 ```bash
+# fetch version
+wmo-cmp-validate-metadata --version
+
+# validate file on disk
 wmo-cmp-validate-metadata /path/to/file.xml
+
+# validate URL
+wmo-cmp-validate-metadata http://example.org/path/to/file.xml
 ```
 
 ## Using the API
