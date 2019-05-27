@@ -101,14 +101,6 @@ KEYWORDS = [
 
 DESCRIPTION = 'A Python implementation of the test suite for WMO Core Metadata Profile'  # noqa
 
-LONG_DESCRIPTION = read('README.md')
-
-CONTACT = 'Tom Kralidis'
-
-EMAIL = 'tomkralidis@gmail.com'
-
-URL = 'https://github.com/wmo-im/wmo-cmp-ts'
-
 # ensure a fresh MANIFEST file is generated
 if (os.path.exists('MANIFEST')):
     os.unlink('MANIFEST')
@@ -155,16 +147,16 @@ setup(
     name='wmo-cmp-ts',
     version=get_package_version(),
     description=DESCRIPTION.strip(),
-    long_description=LONG_DESCRIPTION,
+    long_description=read('README.md'),
     long_description_content_type='text/markdown',
     license='MIT',
     platforms='all',
     keywords=' '.join(KEYWORDS),
-    author=CONTACT,
-    author_email=EMAIL,
-    maintainer=CONTACT,
-    maintainer_email=EMAIL,
-    url=URL,
+    author='Tom Kralidis',
+    author_email='tomkralidis@gmail.com',
+    maintainer='Tom Kralidis',
+    maintainer_email='tomkralidis@gmail.com',
+    url='https://github.com/wmo-im/wmo-cmp-ts',
     install_requires=read('requirements.txt').splitlines(),
     packages=find_packages(),
     # package_data=PACKAGE_DATA,

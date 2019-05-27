@@ -83,7 +83,6 @@ twine upload dist/*
 
 ## Code Conventions
 
-wmo-cmp-ts code conventions are as per
 [PEP8](https://www.python.org/dev/peps/pep-0008)
 
 ## Issues
