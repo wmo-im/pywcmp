@@ -1,4 +1,1 @@
-recursive-include wmo-cmp-ts
-include LICENSE.md
-include README.md
-include requirements.txt
+include LICENSE.md README.md requirements.txt

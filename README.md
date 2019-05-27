@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/OGCMetOceanDWG/wmo-cmp-ts.png?branch=master)](https://travis-ci.org/OGCMetOceanDWG/wmo-cmp-ts)
+[![Build Status](https://travis-ci.org/wmo-im/wmo-cmp-ts.png?branch=master)](https://travis-ci.org/wmo-im/wmo-cmp-ts)
 
 # WMO Core Metadata Profile Test Suite
 
@@ -10,7 +10,7 @@ This library implements validation against [WMO Core Metadata Profile 1.3](http:
 virtualenv wmo-cmp-ts
 cd wmo-cmp-ts
 . bin/activate
-git clone git@github.com:OGCMetOceanDWG/wmo-cmp-ts.git
+git clone https://github.com/wmo-im/wmo-cmp-ts.git
 cd wmo-cmp-ts
 pip install -r requirements.txt
 python setup.py build
@@ -21,7 +21,7 @@ python setup.py install
 
 From command line:
 ```bash
-wmo-metadata-validate.py /path/to/file.xml
+wmo-cmp-validate-metadata /path/to/file.xml
 ```
 
 ## Using the API
@@ -55,23 +55,34 @@ wmo-metadata-validate.py /path/to/file.xml
 virtualenv wmo-cmp-ts
 cd wmo-cmp-ts
 source bin/activate
-git clone git@github.com:OGCMetOceanDWG/wmo-cmp-ts.git
+git clone https://github.com/wmo-im/wmo-cmp-ts.git
 ```
 
 ### Running tests
 
 ```bash
-# via distutils
+# via setuptools
 python setup.py test
 # manually
 python tests/run_tests.py
 ```
 
-### Code Conventions
+## Releasing
+
+```bash
+python setup.py sdist bdist_wheel --universal
+twine upload dist/*
+```
+
+## Code Conventions
 
 wmo-cmp-ts code conventions are as per
 [PEP8](https://www.python.org/dev/peps/pep-0008)
 
 ## Issues
 
-Issues are managed at https://github.com/OGCMetOceanDWG/wmo-cmp-ts/issues
+Issues are managed at https://github.com/wmo-im/wmo-cmp-ts/issues
+
+## Contact
+
+* [Tom Kralidis](https://github.com/tomkralidis)

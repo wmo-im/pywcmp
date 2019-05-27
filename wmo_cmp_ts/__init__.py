@@ -44,7 +44,7 @@
 #
 # =================================================================
 
-__version__ = '0.1-dev'
+__version__ = '0.2.dev0'
 
 # run test suite as per WMO Core Metadata Profile 1.3, Part 2
 
