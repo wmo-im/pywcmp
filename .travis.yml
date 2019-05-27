@@ -1,8 +1,5 @@
 language: python
 
-dist: xenial
-sudo: required
-
 python:
   - "3.6"
   - "3.7"
@@ -13,8 +10,9 @@ addons:
       - libxml2-dev
 
 install:
-  - python setup.py install
+  - pip install -r requirements.txt
   - pip install -r requirements-dev.txt
+  - python setup.py install
 
 script:
   - python setup.py test
