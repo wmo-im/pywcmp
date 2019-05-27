@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # =================================================================
 #
 # Terms and Conditions of Use
@@ -19,7 +18,7 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2017 Government of Canada
+# Copyright (c) 2019 Government of Canada
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -44,46 +43,17 @@
 #
 # =================================================================
 
-from setuptools import setup, Command
+import io
 import os
+import re
+from setuptools import Command, find_packages, setup
 import sys
-from io import BytesIO
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
+from urllib.request import urlopen
 import zipfile
+
 from lxml import etree
 
-from wmo_cmp_ts import __version__ as version
 from wmo_cmp_ts import util
-
-# set dependencies
-with open('requirements.txt') as f:
-    INSTALL_REQUIRES = f.read().splitlines()
-
-KEYWORDS = [
-    'WMO',
-    'Metadata',
-    'WIS',
-    'Test Suite',
-]
-
-DESCRIPTION = '''A Python implementation of the test suite for
-    WMO Core Metadata Profile'''
-
-with open('README.md') as f:
-    LONG_DESCRIPTION = f.read()
-
-CONTACT = 'OGC Meteorology and Oceanography Domain Working Group'
-
-EMAIL = 'tomkralidis@gmail.com'
-
-URL = 'https://github.com/OGCMetOceanDWG/wmo-cmp-ts'
-
-# ensure a fresh MANIFEST file is generated
-if (os.path.exists('MANIFEST')):
-    os.unlink('MANIFEST')
 
 
 class PyTest(Command):
@@ -102,43 +72,61 @@ class PyTest(Command):
         raise SystemExit(errno)
 
 
-# from https://wiki.python.org/moin/Distutils/Cookbook/AutoPackageDiscovery
-def is_package(path):
-    """decipher whether path is a Python package"""
-    return (
-        os.path.isdir(path) and
-        os.path.isfile(os.path.join(path, '__init__.py'))
-    )
+def read(filename, encoding='utf-8'):
+    """read file contents"""
+    full_path = os.path.join(os.path.dirname(__file__), filename)
+    with io.open(full_path, encoding=encoding) as fh:
+        contents = fh.read().strip()
+    return contents
 
 
-def find_packages(path, base=""):
-    """Find all packages in path"""
-    packages = {}
-    for item in os.listdir(path):
-        dir1 = os.path.join(path, item)
-        if is_package(dir1):
-            if base:
-                module_name = "%(base)s.%(item)s" % vars()
-            else:
-                module_name = item
-            packages[module_name] = dir1
-            packages.update(find_packages(dir1, module_name))
-    return packages
+def get_package_version():
+    """get version from top-level package init"""
+    version_file = read('wmo_cmp_ts/__init__.py')
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                              version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
 
 
 USERDIR = util.get_userdir()
 
-print('Downloading WMO ISO XML Schemas and Codelists.xml to %s' % USERDIR)
+KEYWORDS = [
+    'WMO',
+    'Metadata',
+    'WIS',
+    'Test Suite',
+]
+
+DESCRIPTION = 'A Python implementation of the test suite for WMO Core Metadata Profile'  # noqa
+
+LONG_DESCRIPTION = read('README.md')
+
+CONTACT = 'Tom Kralidis'
+
+EMAIL = 'tomkralidis@gmail.com'
+
+URL = 'https://github.com/wmo-im/wmo-cmp-ts'
+
+# ensure a fresh MANIFEST file is generated
+if (os.path.exists('MANIFEST')):
+    os.unlink('MANIFEST')
+
+print('Downloading WMO ISO XML Schemas and Codelists.xml to {}'.format(
+    USERDIR))
 
 if not os.path.exists(USERDIR):
     os.mkdir(USERDIR)
     ZIPFILE_URL = 'http://wis.wmo.int/2011/schemata/iso19139_2007/19139.zip'
-    FH = BytesIO(urlopen(ZIPFILE_URL).read())
+    FH = io.BytesIO(urlopen(ZIPFILE_URL).read())
     with zipfile.ZipFile(FH) as z:
         z.extractall(USERDIR)
     CODELIST_URL = 'http://wis.wmo.int/2012/codelists/WMOCodeLists.xml'
 
-    with open('%s%sWMOCodeLists.xml' % (USERDIR, os.sep), 'wb') as f:
+    schema_filename = '{}{}WMOCodeLists.xml'.format(USERDIR, os.sep)
+
+    with open(schema_filename, 'wb') as f:
         f.write(urlopen(CODELIST_URL).read())
 
     # because some ISO instances ref both gmd and gmx, create a
@@ -148,21 +136,27 @@ if not os.path.exists(USERDIR):
                            version='1.0.0',
                            nsmap={None: 'http://www.w3.org/2001/XMLSchema'})
 
-    with open('%s%siso-all.xsd' % (USERDIR, os.sep), 'wb') as f:
+    schema_wrapper_filename = '{}{}iso-all.xsd'.format(USERDIR, os.sep)
+
+    with open(schema_wrapper_filename, 'wb') as f:
         for uri in ['gmd', 'gmx']:
+            namespace = 'http://www.isotc211.org/2005/{}'.format(uri)
+            schema_location = 'schema/{}/{}.xsd'.format(uri, uri)
+
             etree.SubElement(SCHEMA, 'import',
-                             namespace='http://www.isotc211.org/2005/%s' % uri,
-                             schemaLocation='schema/%s/%s.xsd' % (uri, uri))
+                             namespace=namespace,
+                             schemaLocation=schema_location)
         f.write(etree.tostring(SCHEMA, pretty_print=True))
 else:
-    print('Directory exists: %s' % USERDIR)
+    print('Directory {} exists'.format(USERDIR))
 
 
 setup(
     name='wmo-cmp-ts',
-    version=version,
+    version=get_package_version(),
     description=DESCRIPTION.strip(),
     long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/markdown',
     license='MIT',
     platforms='all',
     keywords=' '.join(KEYWORDS),
@@ -171,12 +165,12 @@ setup(
     maintainer=CONTACT,
     maintainer_email=EMAIL,
     url=URL,
-    install_requires=INSTALL_REQUIRES,
-    packages=find_packages('.'),
+    install_requires=read('requirements.txt').splitlines(),
+    packages=find_packages(),
     # package_data=PACKAGE_DATA,
     entry_points={
         'console_scripts': [
-            'wmo-metadata-validate.py=wmo_cmp_ts:cli'
+            'wmo-cmp-validate-metadata=wmo_cmp_ts:cli'
         ]
     },
     classifiers=[
