@@ -7,7 +7,7 @@ This library implements validation against [WMO Core Metadata Profile 1.3](http:
 ## Installation
 
 ```bash
-virtualenv wmo-cmp-ts
+python3 -m venv wmo-cmp-ts
 cd wmo-cmp-ts
 . bin/activate
 git clone https://github.com/wmo-im/wmo-cmp-ts.git
@@ -25,10 +25,10 @@ From command line:
 wmo-cmp-validate-metadata --version
 
 # validate file on disk
-wmo-cmp-validate-metadata /path/to/file.xml
+wmo-cmp-validate-metadata --file /path/to/file.xml
 
 # validate URL
-wmo-cmp-validate-metadata http://example.org/path/to/file.xml
+wmo-cmp-validate-metadata --url http://example.org/path/to/file.xml
 ```
 
 ## Using the API

@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 # =================================================================
 #
 # Terms and Conditions of Use
 #
 # Unless otherwise noted, computer program source code of this
-# distribution # is covered under Crown Copyright, Government of
+# distribution is covered under Crown Copyright, Government of
 # Canada, and is distributed under the MIT License.
 #
 # The Canada wordmark and related graphics associated with this
@@ -19,7 +18,7 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2016 Government of Canada
+# Copyright (c) 2019 Government of Canada
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -46,6 +45,7 @@
 
 import os
 import unittest
+
 from lxml import etree
 from wmo_cmp_ts import test_suite
 

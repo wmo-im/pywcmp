@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 # =================================================================
 #
 # Terms and Conditions of Use
 #
 # Unless otherwise noted, computer program source code of this
-# distribution # is covered under Crown Copyright, Government of
+# distribution is covered under Crown Copyright, Government of
 # Canada, and is distributed under the MIT License.
 #
 # The Canada wordmark and related graphics associated with this
@@ -19,7 +18,7 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2017 Government of Canada
+# Copyright (c) 2019 Government of Canada
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -50,16 +49,11 @@ __version__ = '0.2.dev0'
 
 # run test suite as per WMO Core Metadata Profile 1.3, Part 2
 
-try:
-    from urllib2 import urlopen
-except ImportError:
-    from urllib.request import urlopen
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+from io import StringIO
 from lxml import etree
+
 from wmo_cmp_ts import test_suite
+from wmo_cmp_ts.util import urlopen_
 
 
 @click.command()
@@ -78,7 +72,7 @@ def cli(file_, url):
     if file_ is not None:
         content = file_
     elif url is not None:
-        content = StringIO(urlopen(content).read())
+        content = StringIO(urlopen_(content).read())
 
     EXML = etree.parse(content)
 
