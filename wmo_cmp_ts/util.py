@@ -46,6 +46,7 @@
 import logging
 import os
 import ssl
+from urllib.error import URLError
 from urllib.request import urlopen
 
 from lxml import etree
@@ -72,7 +73,7 @@ def urlopen_(url):
 
     try:
         response = urlopen(url)
-    except ssl.SSLError as err:
+    except (ssl.SSLError, URLError) as err:
         LOGGER.warning(err)
         LOGGER.warning('Creating unverified context')
         context = ssl._create_unverified_context()
