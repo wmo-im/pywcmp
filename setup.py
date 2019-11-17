@@ -3,7 +3,7 @@
 # Terms and Conditions of Use
 #
 # Unless otherwise noted, computer program source code of this
-# distribution # is covered under Crown Copyright, Government of
+# distribution is covered under Crown Copyright, Government of
 # Canada, and is distributed under the MIT License.
 #
 # The Canada wordmark and related graphics associated with this
@@ -48,12 +48,11 @@ import os
 import re
 from setuptools import Command, find_packages, setup
 import sys
-from urllib.request import urlopen
 import zipfile
 
 from lxml import etree
 
-from wmo_cmp_ts import util
+from wmo_cmp_ts.util import get_userdir, urlopen_
 
 
 class PyTest(Command):
@@ -90,7 +89,7 @@ def get_package_version():
     raise RuntimeError("Unable to find version string.")
 
 
-USERDIR = util.get_userdir()
+USERDIR = get_userdir()
 
 KEYWORDS = [
     'WMO',
@@ -110,16 +109,16 @@ print('Downloading WMO ISO XML Schemas and Codelists.xml to {}'.format(
 
 if not os.path.exists(USERDIR):
     os.mkdir(USERDIR)
-    ZIPFILE_URL = 'http://wis.wmo.int/2011/schemata/iso19139_2007/19139.zip'
-    FH = io.BytesIO(urlopen(ZIPFILE_URL).read())
+    ZIPFILE_URL = 'https://wis.wmo.int/2011/schemata/iso19139_2007/19139.zip'
+    FH = io.BytesIO(urlopen_(ZIPFILE_URL).read())
     with zipfile.ZipFile(FH) as z:
         z.extractall(USERDIR)
-    CODELIST_URL = 'http://wis.wmo.int/2012/codelists/WMOCodeLists.xml'
+    CODELIST_URL = 'https://wis.wmo.int/2012/codelists/WMOCodeLists.xml'
 
     schema_filename = '{}{}WMOCodeLists.xml'.format(USERDIR, os.sep)
 
     with open(schema_filename, 'wb') as f:
-        f.write(urlopen(CODELIST_URL).read())
+        f.write(urlopen_(CODELIST_URL).read())
 
     # because some ISO instances ref both gmd and gmx, create a
     # stub xsd in order to validate

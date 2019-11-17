@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 # =================================================================
 #
 # Terms and Conditions of Use
 #
 # Unless otherwise noted, computer program source code of this
-# distribution # is covered under Crown Copyright, Government of
+# distribution is covered under Crown Copyright, Government of
 # Canada, and is distributed under the MIT License.
 #
 # The Canada wordmark and related graphics associated with this
@@ -19,7 +18,7 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2016 Government of Canada
+# Copyright (c) 2019 Government of Canada
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -45,30 +44,52 @@
 # =================================================================
 
 import logging
-from wmo_cmp_ts.util import get_codelists, NAMESPACES, nspath_eval, \
-    validate_iso_xml
+from wmo_cmp_ts.util import (get_codelists, NAMESPACES, nspath_eval,
+                             validate_iso_xml)
 
 LOGGER = logging.getLogger(__name__)
 
 CODELIST_PREFIX = 'http://wis.wmo.int/2012/codelists/WMOCodeLists.xml'
 
 
-def msg(testid, test_description):
-    """Convenience function to print test props"""
-    requirement = testid.split('test_requirement_')[-1].replace('_', '.')
-    return 'Requirement %s:\n    %s' % (requirement, test_description)
+def msg(test_id, test_description):
+    """
+    Convenience function to print test props
+
+    :param test_id: test suite identifier
+    :param test_description: test suite identifier
+
+    :returns: user-friendly string of test properties
+    """
+
+    requirement = test_id.split('test_requirement_')[-1].replace('_', '.')
+    return 'Requirement {}:\n    {}'.format(requirement, test_description)
 
 
-def gen_test_id(tid):
-    """Convenience function to print Test id"""
-    return 'http://wis.wmo.int/2012/metadata/conf/%s' % tid
+def gen_test_id(test_id):
+    """
+    Convenience function to print test identifier as URI
+
+    :param test_id: test suite identifier
+
+    :returns: test identifier as URI
+    """
+
+    return 'http://wis.wmo.int/2012/metadata/conf/{}'.format(test_id)
 
 
 class WMOCoreMetadataProfileTestSuite13(object):
     """Test suite for WMO Core Metadata Profile assertions"""
 
     def __init__(self, exml):
-        """init"""
+        """
+        initializer
+
+        :param exml: `etree.ElementTree` object
+
+        :returns: `wmo_cmp_ts.WMOCoreMetadataProfileTestSuite13`
+        """
+
         self.test_id = None
         self.exml = exml  # serialized already
         self.namespaces = self.exml.getroot().nsmap
@@ -77,22 +98,23 @@ class WMOCoreMetadataProfileTestSuite13(object):
         self.codelists = get_codelists()
 
     def run_tests(self):
-        """Wrapper function to run all tests"""
+        """Convenience function to run all tests"""
+
         tests = ['6_1_1', '6_1_2', '6_2_1', '6_3_1', '8_1_1',
                  '8_2_1', '8_2_2', '8_2_3', '8_2_4', '9_1_1',
                  '9_2_1', '9_3_1', '9_3_2']
 
         error_stack = []
         for i in tests:
-            test_name = 'test_requirement_%s' % i
+            test_name = 'test_requirement_{}'.format(i)
             try:
                 getattr(self, test_name)()
             except AssertionError as err:
-                message = 'ASSERTION ERROR: %s' % err
+                message = 'ASSERTION ERROR: {}'.format(err)
                 LOGGER.error(message)
                 error_stack.append(message)
             except Exception as err:
-                message = 'OTHER ERROR: %s' % err
+                message = 'OTHER ERROR: {}'.format(err)
                 LOGGER.error(message)
                 error_stack.append(message)
 
@@ -241,7 +263,14 @@ class WMOCoreMetadataProfileTestSuite13(object):
         assert(count == 1), self.test_requirement_9_3_2.__doc__
 
     def _get_wmo_keyword_lists(self, code='WMO_CategoryCode'):
-        """Helper function to retrive all keyword sets by code"""
+        """
+        Helper function to retrieve all keyword sets by code
+
+        :param code: code list name (default: `WMO_CategoryCode`)
+
+        :returns: `list` of keyword set by code
+        """
+
         wmo_cats = []
 
         keywords_sets = self.exml.findall(nspath_eval('gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords'))
