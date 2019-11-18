@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/wmo-im/wmo-cmp-ts.png?branch=master)](https://travis-ci.org/wmo-im/wmo-cmp-ts)
+[![Build Status](https://travis-ci.org/wmo-im/wmcp-validator.png?branch=master)](https://travis-ci.org/wmo-im/wmcp-validator)
 
 # WMO Core Metadata Profile Test Suite
 
@@ -7,11 +7,11 @@ This library implements validation against [WMO Core Metadata Profile 1.3](http:
 ## Installation
 
 ```bash
-python3 -m venv wmo-cmp-ts
-cd wmo-cmp-ts
+python3 -m venv wmcp-validator
+cd wmcp-validator
 . bin/activate
-git clone https://github.com/wmo-im/wmo-cmp-ts.git
-cd wmo-cmp-ts
+git clone https://github.com/wmo-im/wmcp-validator.git
+cd wmcp-validator
 pip install -r requirements.txt
 python setup.py build
 python setup.py install
@@ -22,20 +22,20 @@ python setup.py install
 From command line:
 ```bash
 # fetch version
-wmo-cmp-validate-metadata --version
+wmcp-validator --version
 
 # validate file on disk
-wmo-cmp-validate-metadata --file /path/to/file.xml
+wmcp-validator --file /path/to/file.xml
 
 # validate URL
-wmo-cmp-validate-metadata --url http://example.org/path/to/file.xml
+wmcp-validator --url http://example.org/path/to/file.xml
 ```
 
 ## Using the API
 ```pycon
 # test a file on disk
 >>> from lxml import etree
->>> from wmo_cmp_ts import test_suite
+>>> from wmcp_validator import test_suite
 >>> exml = etree.parse('/path/to/file.xml')
 >>> ts = test_suite.WMOCoreMetadataProfileTestSuite13(exml)
 >>> ts.run_tests()  # raises ValueError error stack on exception
@@ -59,10 +59,10 @@ wmo-cmp-validate-metadata --url http://example.org/path/to/file.xml
 ## Development
 
 ```bash
-virtualenv wmo-cmp-ts
-cd wmo-cmp-ts
+virtualenv wmcp-validator
+cd wmcp-validator
 source bin/activate
-git clone https://github.com/wmo-im/wmo-cmp-ts.git
+git clone https://github.com/wmo-im/wmcp-validator.git
 ```
 
 ### Running tests
@@ -87,7 +87,7 @@ twine upload dist/*
 
 ## Issues
 
-Issues are managed at https://github.com/wmo-im/wmo-cmp-ts/issues
+Issues are managed at https://github.com/wmo-im/wmcp-validator/issues
 
 ## Contact
 

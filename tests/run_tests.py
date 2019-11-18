@@ -47,7 +47,7 @@ import os
 import unittest
 
 from lxml import etree
-from wmo_cmp_ts import test_suite
+from wmcp_validator import test_suite
 
 
 def get_test_file_path(filename):

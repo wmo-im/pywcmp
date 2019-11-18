@@ -108,7 +108,7 @@ def get_userdir():
     :returns: user's home directory
     """
 
-    return '{}{}{}'.format(os.path.expanduser('~'), os.sep, '.wmo-cmp-ts')
+    return '{}{}{}'.format(os.path.expanduser('~'), os.sep, '.wmcp-validator')
 
 
 def nspath_eval(xpath):

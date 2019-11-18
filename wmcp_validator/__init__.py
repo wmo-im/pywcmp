@@ -52,8 +52,8 @@ __version__ = '0.2.dev0'
 from io import StringIO
 from lxml import etree
 
-from wmo_cmp_ts import test_suite
-from wmo_cmp_ts.util import urlopen_
+from wmcp_validator import test_suite
+from wmcp_validator.util import urlopen_
 
 
 @click.command()

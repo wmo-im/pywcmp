@@ -44,8 +44,8 @@
 # =================================================================
 
 import logging
-from wmo_cmp_ts.util import (get_codelists, NAMESPACES, nspath_eval,
-                             validate_iso_xml)
+from wmcp_validator.util import (get_codelists, NAMESPACES, nspath_eval,
+                                 validate_iso_xml)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -87,7 +87,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
 
         :param exml: `etree.ElementTree` object
 
-        :returns: `wmo_cmp_ts.WMOCoreMetadataProfileTestSuite13`
+        :returns: `wmcp_validator.WMOCoreMetadataProfileTestSuite13`
         """
 
         self.test_id = None

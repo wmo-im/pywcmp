@@ -52,7 +52,7 @@ import zipfile
 
 from lxml import etree
 
-from wmo_cmp_ts.util import get_userdir, urlopen_
+from wmcp_validator.util import get_userdir, urlopen_
 
 
 class PyTest(Command):
@@ -81,7 +81,7 @@ def read(filename, encoding='utf-8'):
 
 def get_package_version():
     """get version from top-level package init"""
-    version_file = read('wmo_cmp_ts/__init__.py')
+    version_file = read('wmcp_validator/__init__.py')
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
                               version_file, re.M)
     if version_match:
@@ -143,7 +143,7 @@ else:
 
 
 setup(
-    name='wmo-cmp-ts',
+    name='wmcp-validator',
     version=get_package_version(),
     description=DESCRIPTION.strip(),
     long_description=read('README.md'),
@@ -155,13 +155,13 @@ setup(
     author_email='tomkralidis@gmail.com',
     maintainer='Tom Kralidis',
     maintainer_email='tomkralidis@gmail.com',
-    url='https://github.com/wmo-im/wmo-cmp-ts',
+    url='https://github.com/wmo-im/wmcp-validator',
     install_requires=read('requirements.txt').splitlines(),
     packages=find_packages(),
     # package_data=PACKAGE_DATA,
     entry_points={
         'console_scripts': [
-            'wmo-cmp-validate-metadata=wmo_cmp_ts:cli'
+            'wmcp-validator=wmcp_validator:cli'
         ]
     },
     classifiers=[
