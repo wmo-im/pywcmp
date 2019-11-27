@@ -47,7 +47,7 @@ import os
 import unittest
 
 from lxml import etree
-from wmcp_validator import test_suite
+from pywmcp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
 
 
 def get_test_file_path(filename):
@@ -72,17 +72,17 @@ class WmoTestSuiteTest(unittest.TestCase):
     def test_jma_raise(self):
         """Simple JMA Tests"""
         exml = etree.parse(get_test_file_path('data/md-WTPQ50RJTD-gmd.xml'))
-        ts = test_suite.WMOCoreMetadataProfileTestSuite13(exml)
-        with self.assertRaises(test_suite.TestSuiteError):
+        ts = WMOCoreMetadataProfileTestSuite13(exml)
+        with self.assertRaises(TestSuiteError):
             ts.run_tests()
 
     def test_jma_inspect_errors(self):
         """Simple JMA Tests"""
         exml = etree.parse(get_test_file_path('data/md-SMJP01RJTD-gmd.xml'))
-        ts = test_suite.WMOCoreMetadataProfileTestSuite13(exml)
+        ts = WMOCoreMetadataProfileTestSuite13(exml)
         try:
             ts.run_tests()
-        except test_suite.TestSuiteError as err:
+        except TestSuiteError as err:
             self.assertEqual(3, len(err.errors))
 
 

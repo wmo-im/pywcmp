@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/wmo-im/wmcp-validator.png?branch=master)](https://travis-ci.org/wmo-im/wmcp-validator)
+[![Build Status](https://travis-ci.org/wmo-im/pywmcp.png?branch=master)](https://travis-ci.org/wmo-im/pywmcp)
 
 # WMO Core Metadata Profile Test Suite
 
@@ -7,11 +7,11 @@ This library implements validation against [WMO Core Metadata Profile 1.3](http:
 ## Installation
 
 ```bash
-python3 -m venv wmcp-validator
-cd wmcp-validator
+python3 -m venv pywmcp
+cd pywmcp
 . bin/activate
-git clone https://github.com/wmo-im/wmcp-validator.git
-cd wmcp-validator
+git clone https://github.com/wmo-im/pywmcp.git
+cd pywmcp
 pip install -r requirements.txt
 python setup.py build
 python setup.py install
@@ -22,35 +22,35 @@ python setup.py install
 From command line:
 ```bash
 # fetch version
-wmcp-validator --version
+pywmcp --version
 
-# validate file on disk
-wmcp-validator --file /path/to/file.xml
+# validate metadata against abstract test suite (file on disk)
+pywmcp validate ats --file /path/to/file.xml
 
-# validate URL
-wmcp-validator --url http://example.org/path/to/file.xml
+# validate metadata against abstract test suite (URL)
+pywmcp validate ats --url http://example.org/path/to/file.xml
 ```
 
 ## Using the API
 ```pycon
 # test a file on disk
 >>> from lxml import etree
->>> from wmcp_validator import test_suite
+>>> from pywmcp.ats import ats
 >>> exml = etree.parse('/path/to/file.xml')
->>> ts = test_suite.WMOCoreMetadataProfileTestSuite13(exml)
+>>> ts = ats.WMOCoreMetadataProfileTestSuite13(exml)
 >>> ts.run_tests()  # raises ValueError error stack on exception
 # test a URL
 >>> from urllib2 import urlopen
 >>> from StringIO import StringIO
 >>> content = StringIO(urlopen('http://....').read())
 >>> exml = etree.parse(content)
->>> ts = test_suite.WMOCoreMetadataProfileTestSuite13(exml)
+>>> ts = ats.WMOCoreMetadataProfileTestSuite13(exml)
 >>> ts.run_tests()  # raises ValueError error stack on exception
-# handle test_suite.TestSuiteError
-# test_suite.TestSuiteError.errors is a list of errors
+# handle ats.TestSuiteError
+# ats.TestSuiteError.errors is a list of errors
 >>> try:
 ...    ts.run_tests()
-... except test_suite.TestSuiteError as err:
+... except ats.TestSuiteError as err:
 ...    print(err.message)
 ...    '\n'.join(err.errors)
 >>> ...
@@ -59,10 +59,13 @@ wmcp-validator --url http://example.org/path/to/file.xml
 ## Development
 
 ```bash
-virtualenv wmcp-validator
-cd wmcp-validator
+python3 -m venv pywmcp
+cd pywmcp
 source bin/activate
-git clone https://github.com/wmo-im/wmcp-validator.git
+git clone https://github.com/wmo-im/pywmcp.git
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+python setup.py install
 ```
 
 ### Running tests
@@ -87,7 +90,7 @@ twine upload dist/*
 
 ## Issues
 
-Issues are managed at https://github.com/wmo-im/wmcp-validator/issues
+Issues are managed at https://github.com/wmo-im/pywmcp/issues
 
 ## Contact
 

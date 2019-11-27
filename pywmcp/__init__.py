@@ -45,43 +45,23 @@
 
 import click
 
+from pywmcp.ats import ats
+
 __version__ = '0.2.dev0'
 
-# run test suite as per WMO Core Metadata Profile 1.3, Part 2
 
-from io import StringIO
-from lxml import etree
-
-from wmcp_validator import test_suite
-from wmcp_validator.util import urlopen_
+@click.group()
+def validate():
+    pass
 
 
-@click.command()
+validate.add_command(ats)
+
+
+@click.group()
 @click.version_option(version=__version__)
-@click.option('--file', '-f', 'file_',
-              type=click.Path(exists=True, resolve_path=True),
-              help='Path to XML file')
-@click.option('--url', '-u',
-              help='URL of XML file')
-def cli(file_, url):
-    """command line interface"""
+def cli():
+    pass
 
-    if file_ is None and url is None:
-        raise click.UsageError('Missing --file or --url options')
 
-    if file_ is not None:
-        content = file_
-    elif url is not None:
-        content = StringIO(urlopen_(content).read())
-
-    EXML = etree.parse(content)
-
-    ts = test_suite.WMOCoreMetadataProfileTestSuite13(EXML)
-
-    ts.run_tests()
-    # run the tests
-    try:
-        ts.run_tests()
-        print('Successful!')
-    except test_suite.TestSuiteError as err:
-        print('\n'.join(err.message))
+cli.add_command(validate)

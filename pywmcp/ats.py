@@ -43,9 +43,16 @@
 #
 # =================================================================
 
+# abstract test suite as per WMO Core Metadata Profile 1.3, Part 2
+
+from io import StringIO
 import logging
-from wmcp_validator.util import (get_codelists, NAMESPACES, nspath_eval,
-                                 validate_iso_xml)
+
+import click
+from lxml import etree
+
+from pywmcp.util import (get_codelists, NAMESPACES, nspath_eval,
+                         urlopen_, validate_iso_xml)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -87,7 +94,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
 
         :param exml: `etree.ElementTree` object
 
-        :returns: `wmcp_validator.WMOCoreMetadataProfileTestSuite13`
+        :returns: `pywmcp.WMOCoreMetadataProfileTestSuite13`
         """
 
         self.test_id = None
@@ -296,3 +303,34 @@ class TestSuiteError(Exception):
         """set error list/stack"""
         super(TestSuiteError, self).__init__(message)
         self.errors = errors
+
+
+@click.command()
+@click.pass_context
+@click.option('--file', '-f', 'file_',
+              type=click.Path(exists=True, resolve_path=True),
+              help='Path to XML file')
+@click.option('--url', '-u',
+              help='URL of XML file')
+def ats(ctx, file_, url):
+    """command line interface"""
+
+    if file_ is None and url is None:
+        raise click.UsageError('Missing --file or --url options')
+
+    if file_ is not None:
+        content = file_
+    elif url is not None:
+        content = StringIO(urlopen_(content).read())
+
+    exml = etree.parse(content)
+
+    ts = WMOCoreMetadataProfileTestSuite13(exml)
+
+    ts.run_tests()
+    # run the tests
+    try:
+        ts.run_tests()
+        print('Successful!')
+    except TestSuiteError as err:
+        print('\n'.join(err.message))
