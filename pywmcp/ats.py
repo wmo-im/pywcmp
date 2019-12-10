@@ -162,7 +162,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
         """Requirement 8.2.1: Each WIS Discovery Metadata record shall include at least one keyword from the WMO_CategoryCode code list."""
         self.test_id = gen_test_id('WMO_CategoryCode-keyword-cardinality')
 
-        found = 0
+        found = False
 
         # (i) check thesaurus
         wmo_cats = self._get_wmo_keyword_lists()
@@ -170,12 +170,13 @@ class WMOCoreMetadataProfileTestSuite13(object):
 
         # (ii) check all WMO keyword sets valid codelist value
         for cat in wmo_cats:
-            for keyword in cat.findall(nspath_eval('gmd:keyword/gco:CharacterString')):
-                if keyword.text in self.codelists['WMO_CategoryCode']:
-                    found = 1
+            keyword_values = self._get_keyword_values(cat.findall(nspath_eval('gmd:keyword')))
+            for keyword_value in keyword_values:
+                if keyword_value in self.codelists['WMO_CategoryCode']:
+                    found = True
                     break
 
-        assert(found == 1), self.test_requirement_8_2_1.__doc__
+        assert(found == True), self.test_requirement_8_2_1.__doc__
 
     def test_requirement_8_2_2(self):
         """Requirement 8.2.2: Keywords from WMO_CategoryCode code list shall be defined as keyword type "theme"."""
@@ -227,7 +228,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
         assert(bbox is not None), self.test_requirement_8_2_4.__doc__
 
     def test_requirement_9_1_1(self):
-        """Requirement 9.1.1: A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the scope of distribution using the keyword "GlobalExchange" of type "dataCenterdataCentre" from thesaurus WMO_DistributionScopeCode."""
+        """Requirement 9.1.1: A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the scope of distribution using the keyword "GlobalExchange" of type "dataCenter" from thesaurus WMO_DistributionScopeCode."""
         self.test_id = gen_test_id('identification-of-globally-exchanged-data')
 
         dist_cats = self._get_wmo_keyword_lists('WMO_DistributionScopeCode')
@@ -235,8 +236,8 @@ class WMOCoreMetadataProfileTestSuite13(object):
             for cat in dist_cats:
                 for keyword_type in cat.findall(nspath_eval('gmd:type/gmd:MD_KeywordTypeCode')):
                     assert(keyword_type.text == 'dataCentre'), self.test_requirement_9_1_1.__doc__
-
-            assert('GlobalExchange' in dist_cats), self.test_requirement_9_1_1.__doc__
+                    keyword_values = self._get_keyword_values(cat.findall(nspath_eval('gmd:keyword')))
+                    assert('GlobalExchange' in keyword_values), self.test_requirement_9_1_1.__doc__
 
     def test_requirement_9_2_1(self):
         """Requirement 9.2.1: A WIS Discovery Metadata record describing data for global exchange via the WIS shall have a gmd:MD_Metadata/gmd:fileIdentifier attribute formatted as follows (where {uid} is a unique identifier derived from the GTS bulletin or file name): urn:x-wmo:md:int.wmo.wis::{uid}."""
@@ -296,6 +297,17 @@ class WMOCoreMetadataProfileTestSuite13(object):
                         wmo_cats.append(kwd)
         return wmo_cats
 
+    def _get_keyword_values(self, keyword_nodes):
+        values = []
+        for keyword_node in keyword_nodes:
+            anchor_node = keyword_node.find(nspath_eval('gmx:Anchor'))
+            if anchor_node is not None:
+                value = anchor_node.get(nspath_eval('xlink:href'))
+                values.append(value)
+            else:
+                value = keyword_node.find(nspath_eval('gco:CharacterString')).text
+                values.append(value)
+        return values
 
 class TestSuiteError(Exception):
     """custom exception handler"""
