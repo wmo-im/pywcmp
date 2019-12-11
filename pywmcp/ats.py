@@ -45,6 +45,7 @@
 
 # abstract test suite as per WMO Core Metadata Profile 1.3, Part 2
 
+import os
 from io import StringIO
 import logging
 
@@ -103,6 +104,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
 
         # generate dict of codelists
         self.codelists = get_codelists()
+
 
     def run_tests(self):
         """Convenience function to run all tests"""
@@ -326,14 +328,24 @@ class TestSuiteError(Exception):
               help='Path to XML file')
 @click.option('--url', '-u',
               help='URL of XML file')
-def ats(ctx, file_, url):
+@click.option('--log', '-l', 'logfile_',
+              type=click.Path(resolve_path=True),
+              help='Log file')
+def ats(ctx, file_, url, logfile_):
     """command line interface"""
 
     if file_ is None and url is None:
         raise click.UsageError('Missing --file or --url options')
 
+    if logfile_ is not None:
+        logging.basicConfig(filename=logfile_,level=logging.INFO)
+
     if file_ is not None:
+        if not os.path.isfile(file_):
+            LOGGER.info("Skipping non file object'{}'".format(file_))
+            return
         content = file_
+        LOGGER.info("Validating '{}'".format(file_))
     elif url is not None:
         content = StringIO(urlopen_(content).read())
 
@@ -345,6 +357,8 @@ def ats(ctx, file_, url):
     # run the tests
     try:
         ts.run_tests()
-        print('Successful!')
+        print('Success!')
+        LOGGER.info("Success!\n")
     except TestSuiteError as err:
-        print('\n'.join(err.message))
+        LOGGER.info("Failure!\n")
+        print('Failure!')
