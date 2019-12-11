@@ -143,6 +143,6 @@ def validate_iso_xml(xml):
     if isinstance(xml, str):
         xml = etree.fromstring(xml)
     xsd = os.path.join(userdir, 'iso-all.xsd')
-    LOGGER.debug('Validating {} against schema {}'.format(xml, xsd))
+    LOGGER.info('Validating {} against schema {}'.format(xml, xsd))
     schema = etree.XMLSchema(etree.parse(xsd))
     schema.assertValid(xml)
