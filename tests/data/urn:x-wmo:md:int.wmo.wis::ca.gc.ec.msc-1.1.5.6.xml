@@ -1,0 +1,240 @@
+<gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://wis.wmo.int/2011/schemata/iso19139_2007/schema/gmd/gmd.xsd  http://www.isotc211.org/2005/gmx http://wis.wmo.int/2011/schemata/iso19139_2007/schema/gmx/gmx.xsd">
+	<gmd:fileIdentifier>
+	<gco:CharacterString>urn:x-wmo:md:int.wmo.wis::ca.gc.ec.msc-1.1.5.6</gco:CharacterString>
+	</gmd:fileIdentifier>
+	<gmd:language>
+	<gco:CharacterString>eng; CAN</gco:CharacterString>
+	</gmd:language>
+	<gmd:characterSet>
+	<gmd:MD_CharacterSetCode codeList="http://wis.wmo.int/2012/codelists/WMOCodeLists.xml#MD_CharacterSetCode" codeListValue="utf8" codeSpace="ISOTC211/19115">utf8</gmd:MD_CharacterSetCode>
+	</gmd:characterSet>
+	<gmd:hierarchyLevel>
+	<gmd:MD_ScopeCode codeList="http://wis.wmo.int/2012/codelists/WMOCodeLists.xml#MD_ScopeCode" codeListValue="dataset" codeSpace="ISOTC211/19115">dataset</gmd:MD_ScopeCode>
+	</gmd:hierarchyLevel>
+	<gmd:contact>
+	<gmd:CI_ResponsibleParty>
+		<gmd:individualName>
+		<gco:CharacterString>National Inquiry</gco:CharacterString>
+		</gmd:individualName>
+		<gmd:organisationName>
+		<gco:CharacterString>Environment Canada, Meteorological Service of Canada</gco:CharacterString>
+		</gmd:organisationName>
+		<gmd:positionName>
+		<gco:CharacterString>National Inquiry Response Team</gco:CharacterString>
+		</gmd:positionName>
+		<gmd:contactInfo>
+		<gmd:CI_Contact>
+			<gmd:phone>
+			<gmd:CI_Telephone>
+				<gmd:voice>
+				<gco:CharacterString>+01-819-997-2800</gco:CharacterString>
+				</gmd:voice>
+				<gmd:facsimile>
+				<gco:CharacterString>+01-506-451-6010</gco:CharacterString>
+				</gmd:facsimile>
+			</gmd:CI_Telephone>
+			</gmd:phone>
+			<gmd:address>
+			<gmd:CI_Address>
+				<gmd:deliveryPoint>
+				<gco:CharacterString>77 Westmorland Street, Suite 260</gco:CharacterString>
+				</gmd:deliveryPoint>
+				<gmd:deliveryPoint>
+				<gco:CharacterString>Fredericton</gco:CharacterString>
+				</gmd:deliveryPoint>
+				<gmd:administrativeArea>
+				<gco:CharacterString>New Brunswick</gco:CharacterString>
+				</gmd:administrativeArea>
+				<gmd:postalCode>
+				<gco:CharacterString>E3B 6Z3</gco:CharacterString>
+				</gmd:postalCode>
+				<gmd:country>
+				<gco:CharacterString>Canada</gco:CharacterString>
+				</gmd:country>
+				<gmd:electronicMailAddress>
+				<gco:CharacterString>http://www.weatheroffice.gc.ca/mainmenu/contact_us_e.html</gco:CharacterString>
+				</gmd:electronicMailAddress>
+			</gmd:CI_Address>
+			</gmd:address>
+			<gmd:onlineResource>
+			<gmd:CI_OnlineResource>
+				<gmd:linkage>
+				<gmd:URL>http://www.weatheroffice.gc.ca/mainmenu/contact_us_e.html</gmd:URL>
+				</gmd:linkage>
+			</gmd:CI_OnlineResource>
+			</gmd:onlineResource>
+			<gmd:hoursOfService>
+			<gco:CharacterString>0900h - 1500h EST</gco:CharacterString>
+			</gmd:hoursOfService>
+			<gmd:contactInstructions>
+			<gco:CharacterString>contact during working business hours</gco:CharacterString>
+			</gmd:contactInstructions>
+		</gmd:CI_Contact>
+		</gmd:contactInfo>
+		<gmd:role>
+		<gmd:CI_RoleCode codeList="http://wis.wmo.int/2012/codelists/WMOCodeLists.xml#CI_RoleCode" codeListValue="publisher" codeSpace="ISOTC211/19115">publisher</gmd:CI_RoleCode>
+		</gmd:role>
+	</gmd:CI_ResponsibleParty>
+	</gmd:contact>
+	<gmd:dateStamp>
+	<gco:DateTime>2013-11-18T13:59:26Z</gco:DateTime>
+	</gmd:dateStamp>
+	<gmd:metadataStandardName>
+	<gco:CharacterString>WMO Core Metadata Profile of ISO 19115 (WMO Core), 2003/Cor.1:2006 (ISO 19115), 2007 (ISO/TS 19139)</gco:CharacterString>
+	</gmd:metadataStandardName>
+	<gmd:metadataStandardVersion>
+	<gco:CharacterString>1.3</gco:CharacterString>
+	</gmd:metadataStandardVersion>
+	<gmd:dataSetURI>
+	<gco:CharacterString>http://www.dev.alerting.ca/oraviewer/product/</gco:CharacterString>
+	</gmd:dataSetURI>
+	<gmd:identificationInfo>
+	<gmd:MD_DataIdentification>
+		<gmd:citation>
+		<gmd:CI_Citation>
+			<gmd:title>
+			<gco:CharacterString>Local/Area Forecast</gco:CharacterString>
+			</gmd:title>
+			<gmd:date>
+			<gmd:CI_Date>
+				<gmd:date>
+				<gco:Date>1970-01-01</gco:Date>
+				</gmd:date>
+				<gmd:dateType>
+				<gmd:CI_DateTypeCode codeList="http://wis.wmo.int/2012/codelists/WMOCodeLists.xml#CI_DateTypeCode" codeListValue="creation" codeSpace="ISOTC211/19115">creation</gmd:CI_DateTypeCode>
+				</gmd:dateType>
+			</gmd:CI_Date>
+			</gmd:date>
+		</gmd:CI_Citation>
+		</gmd:citation>
+		<gmd:abstract>
+		<gco:CharacterString>Weather forecast for a specific geographical region</gco:CharacterString>
+		</gmd:abstract>
+		<gmd:status>
+		<gmd:MD_ProgressCode codeList="http://wis.wmo.int/2012/codelists/WMOCodeLists.xml#MD_ProgressCode" codeListValue="onGoing" codeSpace="ISOTC211/19115">onGoing</gmd:MD_ProgressCode>
+		</gmd:status>
+		<gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+			<gmd:keyword>
+			<gco:CharacterString>Forecast
+Region
+Geographical</gco:CharacterString>
+			</gmd:keyword>
+			<gmd:type>
+			<gmd:MD_KeywordTypeCode codeList="http://wis.wmo.int/2012/codelists/WMOCodeLists.xml#MD_KeywordTypeCode" codeListValue="theme" codeSpace="ISOTC211/19115">theme</gmd:MD_KeywordTypeCode>
+			</gmd:type>
+		</gmd:MD_Keywords>
+		</gmd:descriptiveKeywords>
+		<gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+			<gmd:keyword>
+			<gco:CharacterString>meteorology</gco:CharacterString>
+			</gmd:keyword>
+			<gmd:type>
+			<gmd:MD_KeywordTypeCode codeList="http://wis.wmo.int/2012/codelists/WMOCodeLists.xml#WMO_CategoryCode" codeListValue="theme" codeSpace="ISOTC211/19115">theme</gmd:MD_KeywordTypeCode>
+			</gmd:type>
+			<gmd:thesaurusName>
+			<gmd:CI_Citation>
+				<gmd:title>
+				<gmx:Anchor xlink:href="http://wis.wmo.int/2012/codelists/WMOCodeLists.xml#WMO_CategoryCode" />
+				</gmd:title>
+				<gmd:date gco:nilReason="missing" />
+			</gmd:CI_Citation>
+			</gmd:thesaurusName>
+		</gmd:MD_Keywords>
+		</gmd:descriptiveKeywords>
+		<gmd:resourceConstraints>
+		<gmd:MD_LegalConstraints>
+			<gmd:accessConstraints>
+			<gmd:MD_RestrictionCode codeList="http://wis.wmo.int/2012/codelists/WMOCodeLists.xml#MD_RestrictionCode" codeListValue="none" codeSpace="ISOTC211/19115">none</gmd:MD_RestrictionCode>
+			</gmd:accessConstraints>
+			<gmd:otherConstraints>
+			<gco:CharacterString>WMOEssential</gco:CharacterString>
+			</gmd:otherConstraints>
+			<gmd:otherConstraints>
+			<gco:CharacterString>GTSPriority2</gco:CharacterString>
+			</gmd:otherConstraints>
+		</gmd:MD_LegalConstraints>
+		</gmd:resourceConstraints>
+		<gmd:language>
+		<gco:CharacterString>eng</gco:CharacterString>
+		</gmd:language>
+		<gmd:characterSet>
+		<gmd:MD_CharacterSetCode codeList="http://wis.wmo.int/2012/codelists/WMOCodeLists.xml#MD_CharacterSetCode" codeListValue="usAscii" codeSpace="ISOTC211/19115">usAscii</gmd:MD_CharacterSetCode>
+		</gmd:characterSet>
+		<gmd:topicCategory>
+		<gmd:MD_TopicCategoryCode>climatologyMeteorologyAtmosphere</gmd:MD_TopicCategoryCode>
+		</gmd:topicCategory>
+		<gmd:extent>
+		<gmd:EX_Extent>
+			<gmd:geographicElement>
+			<gmd:EX_GeographicBoundingBox>
+				<gmd:westBoundLongitude>
+				<gco:Decimal>-141.0</gco:Decimal>
+				</gmd:westBoundLongitude>
+				<gmd:eastBoundLongitude>
+				<gco:Decimal>-52.0</gco:Decimal>
+				</gmd:eastBoundLongitude>
+				<gmd:southBoundLatitude>
+				<gco:Decimal>42.0</gco:Decimal>
+				</gmd:southBoundLatitude>
+				<gmd:northBoundLatitude>
+				<gco:Decimal>84.0</gco:Decimal>
+				</gmd:northBoundLatitude>
+			</gmd:EX_GeographicBoundingBox>
+			</gmd:geographicElement>
+			<gmd:temporalElement>
+			<gmd:EX_TemporalExtent>
+				<gmd:extent>
+				<gml:TimePeriod gml:id="T001">
+					<gml:beginPosition>1970</gml:beginPosition>
+					<gml:endPosition indeterminatePosition="now" />
+				</gml:TimePeriod>
+				</gmd:extent>
+			</gmd:EX_TemporalExtent>
+			</gmd:temporalElement>
+		</gmd:EX_Extent>
+		</gmd:extent>
+		<gmd:supplementalInformation>
+		<gco:CharacterString>http://www.wmo.int/pages/prog/www/WIS/Publications/49%20(Technical%20Regulations)/49%20-%20Volume%20I/49_II_E.pdf</gco:CharacterString>
+		</gmd:supplementalInformation>
+	</gmd:MD_DataIdentification>
+	</gmd:identificationInfo>
+	<gmd:distributionInfo>
+	<gmd:MD_Distribution>
+		<gmd:distributor>
+		<gmd:MD_Distributor>
+			<gmd:distributorContact>
+			<gmd:CI_ResponsibleParty>
+				<gmd:organisationName>
+				<gco:CharacterString>Environment Canada, Meteorological Service of Canada</gco:CharacterString>
+				</gmd:organisationName>
+				<gmd:contactInfo>
+				<gmd:CI_Contact>
+					<gmd:onlineResource>
+					<gmd:CI_OnlineResource>
+						<gmd:linkage>
+						<gmd:URL>http://www.weatheroffice.gc.ca/mainmenu/contact_us_e.html</gmd:URL>
+						</gmd:linkage>
+					</gmd:CI_OnlineResource>
+					</gmd:onlineResource>
+				</gmd:CI_Contact>
+				</gmd:contactInfo>
+				<gmd:role>
+				<gmd:CI_RoleCode codeList="http://wis.wmo.int/2012/codelists/WMOCodeLists.xml#CI_RoleCode" codeListValue="distributor" codeSpace="ISOTC211/19115">distributor</gmd:CI_RoleCode>
+				</gmd:role>
+			</gmd:CI_ResponsibleParty>
+			</gmd:distributorContact>
+			<gmd:distributionOrderProcess>
+			<gmd:MD_StandardOrderProcess>
+				<gmd:fees>
+				<gco:CharacterString>Inquire quote for service contract</gco:CharacterString>
+				</gmd:fees>
+			</gmd:MD_StandardOrderProcess>
+			</gmd:distributionOrderProcess>
+		</gmd:MD_Distributor>
+		</gmd:distributor>
+	</gmd:MD_Distribution>
+	</gmd:distributionInfo>
+</gmd:MD_Metadata>
+
