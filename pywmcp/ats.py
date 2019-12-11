@@ -305,8 +305,9 @@ class WMOCoreMetadataProfileTestSuite13(object):
                 value = anchor_node.get(nspath_eval('xlink:href'))
                 values.append(value)
             else:
-                value = keyword_node.find(nspath_eval('gco:CharacterString')).text
-                values.append(value)
+                value_node = keyword_node.find(nspath_eval('gco:CharacterString'))
+                if value_node is not None:
+                    values.append(value_node.text)
         return values
 
 
