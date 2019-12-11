@@ -176,7 +176,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
                     found = True
                     break
 
-        assert(found == True), self.test_requirement_8_2_1.__doc__
+        assert(found), self.test_requirement_8_2_1.__doc__
 
     def test_requirement_8_2_2(self):
         """Requirement 8.2.2: Keywords from WMO_CategoryCode code list shall be defined as keyword type "theme"."""
