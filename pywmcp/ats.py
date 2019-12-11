@@ -341,6 +341,7 @@ def ats(ctx, file_, url):
 
     ts = WMOCoreMetadataProfileTestSuite13(exml)
 
+    ts.run_tests()
     # run the tests
     try:
         ts.run_tests()
