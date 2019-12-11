@@ -309,6 +309,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
                 values.append(value)
         return values
 
+
 class TestSuiteError(Exception):
     """custom exception handler"""
     def __init__(self, message, errors):
