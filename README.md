@@ -29,6 +29,12 @@ pywmcp validate ats --file /path/to/file.xml
 
 # validate metadata against abstract test suite (URL)
 pywmcp validate ats --url http://example.org/path/to/file.xml
+
+# adjust debugging messages (CRITICAL, ERROR, WARNING, INFO, DEBUG) to stdout
+pywmcp validate ats --url http://example.org/path/to/file.xml --verobsity DEBUG
+
+# write results to logfile
+pywmcp validate ats --url http://example.org/path/to/file.xml --verobsity DEBUG --logfile /tmp/foo.txt
 ```
 
 ## Using the API
@@ -51,8 +57,7 @@ pywmcp validate ats --url http://example.org/path/to/file.xml
 >>> try:
 ...    ts.run_tests()
 ... except ats.TestSuiteError as err:
-...    print(err.message)
-...    '\n'.join(err.errors)
+...    print('\n'.join(err.errors))
 >>> ...
 ```
 

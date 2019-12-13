@@ -46,6 +46,7 @@
 import logging
 import os
 import ssl
+import sys
 from urllib.error import URLError
 from urllib.request import urlopen
 
@@ -62,25 +63,20 @@ NAMESPACES = {
 }
 
 
-def urlopen_(url):
+def get_cli_common_options(function):
     """
-    Helper function for downloading a URL
-
-    :param url: URL to download
-
-    :returns: `http.client.HTTPResponse`
+    Define common CLI options
     """
 
-    try:
-        response = urlopen(url)
-    except (ssl.SSLError, URLError) as err:
-        LOGGER.warning(err)
-        LOGGER.warning('Creating unverified context')
-        context = ssl._create_unverified_context()
-
-        response = urlopen(url, context=context)
-
-    return response
+    import click
+    function = click.option('--verbosity', '-v',
+                            type=click.Choice(
+                                ['ERROR', 'WARNING', 'INFO', 'DEBUG']),
+                            help='Verbosity')(function)
+    function = click.option('--log', '-l', 'logfile',
+                            type=click.Path(writable=True, dir_okay=False),
+                            help='Log file')(function)
+    return function
 
 
 def get_codelists():
@@ -126,6 +122,67 @@ def nspath_eval(xpath):
         namespace, element = chunks.split(':')
         out.append('{{{}}}{}'.format(NAMESPACES[namespace], element))
     return '/'.join(out)
+
+
+def setup_logger(loglevel=None, logfile=None):
+    """
+    Setup logging
+
+    :param loglevel: logging level
+    :param logfile: logfile location
+
+    :returns: void (creates logging instance)
+    """
+
+    if loglevel is None and logfile is None:  # no logging
+        return
+
+    if loglevel is None and logfile is not None:
+        loglevel = 'INFO'
+
+    log_format = \
+        '[%(asctime)s] %(levelname)s - %(message)s'
+    date_format = '%Y-%m-%dT%H:%M:%SZ'
+
+    loglevels = {
+        'CRITICAL': logging.CRITICAL,
+        'ERROR': logging.ERROR,
+        'WARNING': logging.WARNING,
+        'INFO': logging.INFO,
+        'DEBUG': logging.DEBUG,
+        'NOTSET': logging.NOTSET,
+    }
+
+    loglevel = loglevels[loglevel]
+
+    if logfile is not None:  # log to file
+        logging.basicConfig(level=loglevel, datefmt=date_format,
+                            format=log_format, filename=logfile)
+    elif loglevel is not None:  # log to stdout
+        logging.basicConfig(level=loglevel, datefmt=date_format,
+                            format=log_format, stream=sys.stdout)
+        LOGGER.debug('Logging initialized')
+
+
+def urlopen_(url):
+    """
+    Helper function for downloading a URL
+
+    :param url: URL to download
+
+    :returns: `http.client.HTTPResponse`
+    """
+
+    try:
+        response = urlopen(url)
+    except (ssl.SSLError, URLError) as err:
+        LOGGER.warning(err)
+        LOGGER.warning('Creating unverified context')
+        context = ssl._create_unverified_context()
+
+        response = urlopen(url, context=context)
+
+    return response
 
 
 def validate_iso_xml(xml):

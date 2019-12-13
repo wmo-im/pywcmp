@@ -51,8 +51,8 @@ import logging
 import click
 from lxml import etree
 
-from pywmcp.util import (get_codelists, NAMESPACES, nspath_eval,
-                         urlopen_, validate_iso_xml)
+from pywmcp.util import (get_cli_common_options, get_codelists, NAMESPACES,
+                         nspath_eval, setup_logger, urlopen_, validate_iso_xml)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -118,11 +118,11 @@ class WMOCoreMetadataProfileTestSuite13(object):
                 getattr(self, test_name)()
             except AssertionError as err:
                 message = 'ASSERTION ERROR: {}'.format(err)
-                LOGGER.error(message)
+                LOGGER.info(message)
                 error_stack.append(message)
             except Exception as err:
                 message = 'OTHER ERROR: {}'.format(err)
-                LOGGER.error(message)
+                LOGGER.info(message)
                 error_stack.append(message)
 
         if len(error_stack) > 0:
@@ -321,19 +321,23 @@ class TestSuiteError(Exception):
 
 @click.command()
 @click.pass_context
+@get_cli_common_options
 @click.option('--file', '-f', 'file_',
               type=click.Path(exists=True, resolve_path=True),
               help='Path to XML file')
 @click.option('--url', '-u',
               help='URL of XML file')
-def ats(ctx, file_, url):
+def ats(ctx, file_, url, logfile, verbosity):
     """command line interface"""
 
     if file_ is None and url is None:
         raise click.UsageError('Missing --file or --url options')
 
+    setup_logger(verbosity, logfile)
+
     if file_ is not None:
         content = file_
+        click.echo('Validating file {}'.format(file_))
     elif url is not None:
         content = StringIO(urlopen_(content).read())
 
@@ -344,6 +348,7 @@ def ats(ctx, file_, url):
     # run the tests
     try:
         ts.run_tests()
-        print('Successful!')
+        print('Success!')
     except TestSuiteError as err:
-        print('\n'.join(err.message))
+        msg = '\n'.join(err.errors)
+        print(msg)
