@@ -105,7 +105,6 @@ class WMOCoreMetadataProfileTestSuite13(object):
         # generate dict of codelists
         self.codelists = get_codelists()
 
-
     def run_tests(self):
         """Convenience function to run all tests"""
 
@@ -338,7 +337,7 @@ def ats(ctx, file_, url, logfile_):
         raise click.UsageError('Missing --file or --url options')
 
     if logfile_ is not None:
-        logging.basicConfig(filename=logfile_,level=logging.INFO)
+        logging.basicConfig(filename=logfile_, level=logging.INFO)
 
     if file_ is not None:
         if not os.path.isfile(file_):
@@ -361,4 +360,5 @@ def ats(ctx, file_, url, logfile_):
         LOGGER.info("Success!\n")
     except TestSuiteError as err:
         LOGGER.info("Failure!\n")
+        LOGGER.debug('\n'.join(err.message))
         print('Failure!')
