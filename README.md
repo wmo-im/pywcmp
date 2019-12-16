@@ -31,10 +31,10 @@ pywmcp validate ats --file /path/to/file.xml
 pywmcp validate ats --url http://example.org/path/to/file.xml
 
 # adjust debugging messages (CRITICAL, ERROR, WARNING, INFO, DEBUG) to stdout
-pywmcp validate ats --url http://example.org/path/to/file.xml --verobsity DEBUG
+pywmcp validate ats --url http://example.org/path/to/file.xml --verbosity DEBUG
 
 # write results to logfile
-pywmcp validate ats --url http://example.org/path/to/file.xml --verobsity DEBUG --logfile /tmp/foo.txt
+pywmcp validate ats --url http://example.org/path/to/file.xml --verbosity DEBUG --logfile /tmp/foo.txt
 ```
 
 ## Using the API
