@@ -337,7 +337,9 @@ def ats(ctx, file_, url, logfile, verbosity):
 
     if file_ is not None:
         content = file_
-        click.echo('Validating file {}'.format(file_))
+        msg = 'Validating file {}'.format(file_)
+        LOGGER.info(msg)
+        click.echo(msg)
     elif url is not None:
         content = StringIO(urlopen_(content).read())
 
