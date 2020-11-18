@@ -45,7 +45,7 @@
 
 import click
 
-from pywmcp.ats import ats
+from pywcmp.ats import ats
 
 __version__ = '0.2.dev0'
 

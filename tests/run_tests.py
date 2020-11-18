@@ -47,7 +47,7 @@ import os
 import unittest
 
 from lxml import etree
-from pywmcp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
+from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
 
 
 def get_test_file_path(filename):

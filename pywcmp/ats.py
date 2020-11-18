@@ -51,7 +51,7 @@ import logging
 import click
 from lxml import etree
 
-from pywmcp.util import (get_cli_common_options, get_codelists, NAMESPACES,
+from pywcmp.util import (get_cli_common_options, get_codelists, NAMESPACES,
                          nspath_eval, setup_logger, urlopen_, validate_iso_xml)
 
 LOGGER = logging.getLogger(__name__)
@@ -94,7 +94,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
 
         :param exml: `etree.ElementTree` object
 
-        :returns: `pywmcp.WMOCoreMetadataProfileTestSuite13`
+        :returns: `pywcmp.WMOCoreMetadataProfileTestSuite13`
         """
 
         self.test_id = None

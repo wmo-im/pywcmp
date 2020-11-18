@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/wmo-im/pywmcp.png?branch=master)](https://travis-ci.org/wmo-im/pywmcp)
+[![Build Status](https://travis-ci.org/wmo-im/pywcmp.png?branch=master)](https://travis-ci.org/wmo-im/pywcmp)
 
 # WMO Core Metadata Profile Test Suite
 
@@ -7,11 +7,11 @@ This library implements validation against [WMO Core Metadata Profile 1.3](http:
 ## Installation
 
 ```bash
-python3 -m venv pywmcp
-cd pywmcp
+python3 -m venv pywcmp
+cd pywcmp
 . bin/activate
-git clone https://github.com/wmo-im/pywmcp.git
-cd pywmcp
+git clone https://github.com/wmo-im/pywcmp.git
+cd pywcmp
 pip install -r requirements.txt
 python setup.py build
 python setup.py install
@@ -22,26 +22,26 @@ python setup.py install
 From command line:
 ```bash
 # fetch version
-pywmcp --version
+pywcmp --version
 
 # validate metadata against abstract test suite (file on disk)
-pywmcp validate ats --file /path/to/file.xml
+pywcmp validate ats --file /path/to/file.xml
 
 # validate metadata against abstract test suite (URL)
-pywmcp validate ats --url http://example.org/path/to/file.xml
+pywcmp validate ats --url http://example.org/path/to/file.xml
 
 # adjust debugging messages (CRITICAL, ERROR, WARNING, INFO, DEBUG) to stdout
-pywmcp validate ats --url http://example.org/path/to/file.xml --verbosity DEBUG
+pywcmp validate ats --url http://example.org/path/to/file.xml --verbosity DEBUG
 
 # write results to logfile
-pywmcp validate ats --url http://example.org/path/to/file.xml --verbosity DEBUG --logfile /tmp/foo.txt
+pywcmp validate ats --url http://example.org/path/to/file.xml --verbosity DEBUG --logfile /tmp/foo.txt
 ```
 
 ## Using the API
 ```pycon
 # test a file on disk
 >>> from lxml import etree
->>> from pywmcp.ats import ats
+>>> from pywcmp.ats import ats
 >>> exml = etree.parse('/path/to/file.xml')
 >>> ts = ats.WMOCoreMetadataProfileTestSuite13(exml)
 >>> ts.run_tests()  # raises ValueError error stack on exception
@@ -64,10 +64,10 @@ pywmcp validate ats --url http://example.org/path/to/file.xml --verbosity DEBUG 
 ## Development
 
 ```bash
-python3 -m venv pywmcp
-cd pywmcp
+python3 -m venv pywcmp
+cd pywcmp
 source bin/activate
-git clone https://github.com/wmo-im/pywmcp.git
+git clone https://github.com/wmo-im/pywcmp.git
 pip install -r requirements.txt
 pip install -r requirements-dev.txt
 python setup.py install
@@ -95,7 +95,7 @@ twine upload dist/*
 
 ## Issues
 
-Issues are managed at https://github.com/wmo-im/pywmcp/issues
+Issues are managed at https://github.com/wmo-im/pywcmp/issues
 
 ## Contact
 
