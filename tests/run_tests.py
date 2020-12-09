@@ -48,6 +48,7 @@ import unittest
 
 from lxml import etree
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
+from pywcmp.kpi import WMOCoreMetadataProfileKeyPerformanceIndicators
 
 
 def get_test_file_path(filename):
@@ -59,8 +60,9 @@ def get_test_file_path(filename):
         return 'tests/{}'.format(filename)
 
 
-class WmoTestSuiteTest(unittest.TestCase):
-    """Test suite for package Foo"""
+class WCMPATSTest(unittest.TestCase):
+    """WCMP ATS tests of tests"""
+
     def setUp(self):
         """setup test fixtures, etc."""
         pass
@@ -84,6 +86,29 @@ class WmoTestSuiteTest(unittest.TestCase):
             ts.run_tests()
         except TestSuiteError as err:
             self.assertEqual(3, len(err.errors))
+
+
+class WCMPKPITest(unittest.TestCase):
+    """WCMP KPI tests of tests"""
+
+    def setUp(self):
+        """setup test fixtures, etc."""
+        pass
+
+    def tearDown(self):
+        """return to pristine state"""
+        pass
+
+    def test_kpi_evaluate(self):
+        exml = etree.parse(get_test_file_path('data/urn:x-wmo:md:int.wmo.wis::ca.gc.ec.msc-1.1.5.6.xml'))  # noqa
+
+        kpis = WMOCoreMetadataProfileKeyPerformanceIndicators(exml)
+
+        results = kpis.evaluate()
+
+        self.assertEqual(results['totals']['total'], 1)
+        self.assertEqual(results['totals']['score'], 1)
+        self.assertEqual(results['totals']['percentage'], 100.0)
 
 
 if __name__ == '__main__':

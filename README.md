@@ -24,17 +24,22 @@ From command line:
 # fetch version
 pywcmp --version
 
+# abstract test suite
+
 # validate metadata against abstract test suite (file on disk)
-pywcmp validate ats --file /path/to/file.xml
+pywcmp ats validate --file /path/to/file.xml
 
 # validate metadata against abstract test suite (URL)
-pywcmp validate ats --url http://example.org/path/to/file.xml
+pywcmp ats validate --url http://example.org/path/to/file.xml
 
 # adjust debugging messages (CRITICAL, ERROR, WARNING, INFO, DEBUG) to stdout
-pywcmp validate ats --url http://example.org/path/to/file.xml --verbosity DEBUG
+pywcmp ats validate --url http://example.org/path/to/file.xml --verbosity DEBUG
 
 # write results to logfile
-pywcmp validate ats --url http://example.org/path/to/file.xml --verbosity DEBUG --logfile /tmp/foo.txt
+pywcmp ats validate --url http://example.org/path/to/file.xml --verbosity DEBUG --logfile /tmp/foo.txt
+
+# key performance indicators # note: running KPIs automatically runs the ats
+pywcmp kpi validate --url http://example.org/path/to/file.xml --verbosity DEBUG
 ```
 
 ## Using the API
@@ -59,6 +64,9 @@ pywcmp validate ats --url http://example.org/path/to/file.xml --verbosity DEBUG 
 ... except ats.TestSuiteError as err:
 ...    print('\n'.join(err.errors))
 >>> ...
+>>> from pywcmp.kpi import WMOCoreMetadataProfileKeyPerformanceIndicators
+>>> kpis = WMOCoreMetadataProfileKeyPerformanceIndicators(exml)
+>>> kpis['totals']
 ```
 
 ## Development

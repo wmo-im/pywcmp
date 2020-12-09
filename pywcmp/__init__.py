@@ -18,7 +18,7 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2019 Government of Canada
+# Copyright (c) 2020 Government of Canada
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -46,16 +46,9 @@
 import click
 
 from pywcmp.ats import ats
+from pywcmp.kpi import kpi
 
 __version__ = '0.2.dev0'
-
-
-@click.group()
-def validate():
-    pass
-
-
-validate.add_command(ats)
 
 
 @click.group()
@@ -64,4 +57,5 @@ def cli():
     pass
 
 
-cli.add_command(validate)
+cli.add_command(ats)
+cli.add_command(kpi)

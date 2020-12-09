@@ -18,7 +18,7 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2019 Government of Canada
+# Copyright (c) 2020 Government of Canada
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -97,7 +97,7 @@ def get_codelists():
     return codelists
 
 
-def get_userdir():
+def get_userdir() -> str:
     """
     Helper function to get userdir
 
@@ -107,7 +107,7 @@ def get_userdir():
     return '{}{}{}'.format(os.path.expanduser('~'), os.sep, '.pywcmp')
 
 
-def nspath_eval(xpath):
+def nspath_eval(xpath: str) -> str:
     """
     Return an etree friendly xpath based expanding namespace
     into namespace URIs
@@ -124,7 +124,7 @@ def nspath_eval(xpath):
     return '/'.join(out)
 
 
-def setup_logger(loglevel=None, logfile=None):
+def setup_logger(loglevel: str = None, logfile: str = None):
     """
     Setup logging
 
@@ -164,7 +164,7 @@ def setup_logger(loglevel=None, logfile=None):
         LOGGER.debug('Logging initialized')
 
 
-def urlopen_(url):
+def urlopen_(url: str):
     """
     Helper function for downloading a URL
 
