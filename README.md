@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/wmo-im/pywcmp.png?branch=master)](https://travis-ci.org/wmo-im/pywcmp)
+[![Build Status](https://github.com/wmo-im/pywcmp/workflows/build%20%E2%9A%99%EF%B8%8F/badge.svg)](https://github.com/wmo-im/pywcmp/actions)
 
 # WMO Core Metadata Profile Test Suite
 
