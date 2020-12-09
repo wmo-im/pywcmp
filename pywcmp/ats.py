@@ -18,7 +18,7 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2019 Government of Canada
+# Copyright (c) 2020 Government of Canada
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -59,7 +59,7 @@ LOGGER = logging.getLogger(__name__)
 CODELIST_PREFIX = 'http://wis.wmo.int/2012/codelists/WMOCodeLists.xml'
 
 
-def msg(test_id, test_description):
+def msg(test_id: str, test_description: str) -> str:
     """
     Convenience function to print test props
 
@@ -73,7 +73,7 @@ def msg(test_id, test_description):
     return 'Requirement {}:\n    {}'.format(requirement, test_description)
 
 
-def gen_test_id(test_id):
+def gen_test_id(test_id: str) -> str:
     """
     Convenience function to print test identifier as URI
 
@@ -85,7 +85,7 @@ def gen_test_id(test_id):
     return 'http://wis.wmo.int/2012/metadata/conf/{}'.format(test_id)
 
 
-class WMOCoreMetadataProfileTestSuite13(object):
+class WMOCoreMetadataProfileTestSuite13:
     """Test suite for WMO Core Metadata Profile assertions"""
 
     def __init__(self, exml):
@@ -94,7 +94,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
 
         :param exml: `etree.ElementTree` object
 
-        :returns: `pywcmp.WMOCoreMetadataProfileTestSuite13`
+        :returns: `pywcmp.ats.WMOCoreMetadataProfileTestSuite13`
         """
 
         self.test_id = None
@@ -270,7 +270,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
                 count += 1
         assert(count == 1), self.test_requirement_9_3_2.__doc__
 
-    def _get_wmo_keyword_lists(self, code='WMO_CategoryCode'):
+    def _get_wmo_keyword_lists(self, code: str = 'WMO_CategoryCode') -> list:
         """
         Helper function to retrieve all keyword sets by code
 
@@ -297,7 +297,7 @@ class WMOCoreMetadataProfileTestSuite13(object):
                         wmo_cats.append(kwd)
         return wmo_cats
 
-    def _get_keyword_values(self, keyword_nodes):
+    def _get_keyword_values(self, keyword_nodes: list) -> list:
         values = []
         for keyword_node in keyword_nodes:
             anchor_node = keyword_node.find(nspath_eval('gmx:Anchor'))
@@ -319,6 +319,12 @@ class TestSuiteError(Exception):
         self.errors = errors
 
 
+@click.group()
+def ats():
+    """abstract test suite"""
+    pass
+
+
 @click.command()
 @click.pass_context
 @get_cli_common_options
@@ -327,8 +333,8 @@ class TestSuiteError(Exception):
               help='Path to XML file')
 @click.option('--url', '-u',
               help='URL of XML file')
-def ats(ctx, file_, url, logfile, verbosity):
-    """command line interface"""
+def validate(ctx, file_, url, logfile, verbosity):
+    """validate against the abstract test suite"""
 
     if file_ is None and url is None:
         raise click.UsageError('Missing --file or --url options')
@@ -354,3 +360,6 @@ def ats(ctx, file_, url, logfile, verbosity):
     except TestSuiteError as err:
         msg = '\n'.join(err.errors)
         print(msg)
+
+
+ats.add_command(validate)
