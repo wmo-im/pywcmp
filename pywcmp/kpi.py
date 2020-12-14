@@ -46,7 +46,7 @@
 # WMO Core Metadata Profile Key Performance Indicators (KPIs)
 
 import logging
-from io import StringIO
+from io import BytesIO
 
 import click
 from lxml import etree
@@ -153,7 +153,7 @@ def validate(ctx, file_, url, logfile, verbosity):
         LOGGER.info(msg)
         click.echo(msg)
     elif url is not None:
-        content = StringIO(urlopen_(content).read())
+        content = BytesIO(urlopen_(url).read())
 
     exml = etree.parse(content)
 

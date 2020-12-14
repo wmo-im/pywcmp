@@ -45,7 +45,7 @@
 
 # abstract test suite as per WMO Core Metadata Profile 1.3, Part 2
 
-from io import StringIO
+from io import BytesIO
 import logging
 
 import click
@@ -347,7 +347,7 @@ def validate(ctx, file_, url, logfile, verbosity):
         LOGGER.info(msg)
         click.echo(msg)
     elif url is not None:
-        content = StringIO(urlopen_(content).read())
+        content = BytesIO(urlopen_(url).read())
 
     exml = etree.parse(content)
 
