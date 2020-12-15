@@ -53,7 +53,7 @@ from lxml import etree
 
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
 from pywcmp.util import (get_cli_common_options, get_codelists, setup_logger,
-                         urlopen_)
+                         urlopen_, nspath_eval, check_url)
 
 LOGGER = logging.getLogger(__name__)
 # round percentages to x decimal places
@@ -92,24 +92,77 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         return total, score
 
+    def _get_link_lists(self) -> set:
+        """
+        Helper function to retrieve all link elements (gmx:Anchor, gmd:URL, ...)
+
+        :returns: `set` containing strings (URLs)
+        """
+
+        links = []
+
+        # add possibly missing namespace
+        xpath_namespaces = self.namespaces
+        if xpath_namespaces.get('gmx') == None:
+            xpath_namespaces['gmx'] = 'http://www.isotc211.org/2005/gmx'
+        if xpath_namespaces.get('xlink') == None:
+            xpath_namespaces['xlink'] = 'http://www.w3.org/1999/xlink'
+
+        xpaths = ['//gmd:URL/text()',
+                  '//gmx:Anchor/@xlink:href',
+                  '//gmd:CI_DateTypeCode/@codeList',
+                  '//gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString/text()'
+                 ]
+        for xpath in xpaths:
+            new_links = self.exml.xpath(xpath, namespaces = xpath_namespaces)
+            LOGGER.debug('Found {} links with {}'.format(len(new_links), xpath))
+            links += new_links
+
+        return set(links)
+
+    def kpi_j(self) -> tuple:
+        """URLs are expected to point to accessible resources, preferably over HTTPS."""
+        links = self._get_link_lists()
+        LOGGER.info('Found {} unique links.'.format(len(links)))
+        LOGGER.debug('{}'.format(links))
+        total = 0
+        score = 0
+        for link in links:
+            LOGGER.debug('checking: {}'.format(link))
+            result = check_url(link, False)
+            total = total + 2
+            if result['accessible']:
+                score = score + 1
+                if result.get('resolved-URL') != link:
+                    LOGGER.debug('"%s" resolves to "%s"' % (link, result['resolved-URL']))
+                if result.get('SSL') == True:
+                    score = score + 1
+                    LOGGER.debug('"{}" is a valid HTTPS link'.format(result['resolved-URL']))
+                else:
+                    LOGGER.debug('"{}" is a valid link'.format(result['resolved-URL']))
+            else:
+                LOGGER.info('"{}" cannot be resolved!'.format(link))
+        return total, score
+
     def evaluate(self) -> dict:
         """Convenience function to run all tests"""
 
-        kpis_to_run = ['kpi_a']
+        kpis_to_run = ['kpi_a', 'kpi_j']
 
         results = {}
 
-        for k in kpis_to_run:
-            LOGGER.debug('Running {}'.format(k))
-            result = getattr(self, k)()
+        for kpi in kpis_to_run:
+            LOGGER.debug('Running {}'.format(kpi))
+            result = getattr(self, kpi)()
             LOGGER.debug('Calculating result')
             percentage = round(float((result[1] / result[0]) * 100), ROUND)
 
-            results[k] = {
+            results[kpi] = {
                 'total': result[0],
                 'score': result[1],
                 'percentage': percentage
             }
+            LOGGER.debug('{}: {} / {} = {}'.format(kpi, result[0], result[1], percentage))
 
         LOGGER.debug('Calculating total results')
         sum_total = sum(v['total'] for k, v in results.items())

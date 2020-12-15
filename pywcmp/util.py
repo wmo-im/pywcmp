@@ -185,6 +185,42 @@ def urlopen_(url: str):
     return response
 
 
+def check_url(url: str, no_ssl: bool) -> dict:
+    """
+    Helper function to check link (URL) accessability
+
+    :returns: `dict` with details about the link
+    """
+
+    result = {}
+    response = None
+    result["original-URL"] = url;
+    try:
+        if no_ssl:
+            LOGGER.debug('Creating unverified context')
+            result["SSL"] = False
+            context = ssl._create_unverified_context()
+            response = urlopen(url, context=context)
+        else:
+            response = urlopen(url)
+    except (ssl.SSLError, URLError) as err:
+        LOGGER.debug(err)
+
+    if response == None and no_ssl == False:
+        return check_url(url, True)
+
+    if response != None:
+        result["resolved-URL"] = response.url
+        if response.status > 300:
+            LOGGER.debug('Request failed: {}'.format(response))
+        result["accessible"] = response.status < 300
+        if response.url.startswith("https") and no_ssl == False:
+            result["SSL"] = True
+    else:
+        result["accessible"] = False
+    return result;
+
+
 def validate_iso_xml(xml):
     """
     Perform XML Schema validation of ISO XML Metadata
