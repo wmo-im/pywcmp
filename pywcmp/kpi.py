@@ -53,7 +53,7 @@ from lxml import etree
 
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
 from pywcmp.util import (get_cli_common_options, get_codelists, setup_logger,
-                         urlopen_, nspath_eval, check_url)
+                         urlopen_, check_url)
 
 LOGGER = logging.getLogger(__name__)
 # round percentages to x decimal places
@@ -103,18 +103,19 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         # add possibly missing namespace
         xpath_namespaces = self.namespaces
-        if xpath_namespaces.get('gmx') == None:
+        if xpath_namespaces.get('gmx') is None:
             xpath_namespaces['gmx'] = 'http://www.isotc211.org/2005/gmx'
-        if xpath_namespaces.get('xlink') == None:
+        if xpath_namespaces.get('xlink') is None:
             xpath_namespaces['xlink'] = 'http://www.w3.org/1999/xlink'
 
-        xpaths = ['//gmd:URL/text()',
-                  '//gmx:Anchor/@xlink:href',
-                  '//gmd:CI_DateTypeCode/@codeList',
-                  '//gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString/text()'
-                 ]
+        xpaths = [
+            '//gmd:URL/text()',
+            '//gmx:Anchor/@xlink:href',
+            '//gmd:CI_DateTypeCode/@codeList',
+            '//gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString/text()'
+        ]
         for xpath in xpaths:
-            new_links = self.exml.xpath(xpath, namespaces = xpath_namespaces)
+            new_links = self.exml.xpath(xpath, namespaces=xpath_namespaces)
             LOGGER.debug('Found {} links with {}'.format(len(new_links), xpath))
             links += new_links
 
@@ -135,7 +136,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 score = score + 1
                 if result.get('resolved-URL') != link:
                     LOGGER.debug('"%s" resolves to "%s"' % (link, result['resolved-URL']))
-                if result.get('SSL') == True:
+                if result.get('SSL') is True:
                     score = score + 1
                     LOGGER.debug('"{}" is a valid HTTPS link'.format(result['resolved-URL']))
                 else:
