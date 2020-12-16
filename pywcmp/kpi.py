@@ -122,7 +122,12 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         return set(links)
 
     def kpi_j(self) -> tuple:
-        """URLs are expected to point to accessible resources, preferably over HTTPS."""
+        """
+        Extracts URLs from various types of "links" in the metadata document and tries
+        to download the linked resources. Resources are expected to be accessible, preferably over HTTPS.
+
+        :returns: `tuple` containing achieved score and total score
+        """
         links = self._get_link_lists()
         LOGGER.info('Found {} unique links.'.format(len(links)))
         LOGGER.debug('{}'.format(links))
@@ -131,16 +136,16 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         for link in links:
             LOGGER.debug('checking: {}'.format(link))
             result = check_url(link, False)
-            total = total + 2
+            total += 2
             if result['accessible']:
-                score = score + 1
-                if result.get('resolved-URL') != link:
-                    LOGGER.debug('"%s" resolves to "%s"' % (link, result['resolved-URL']))
-                if result.get('SSL') is True:
-                    score = score + 1
-                    LOGGER.debug('"{}" is a valid HTTPS link'.format(result['resolved-URL']))
+                score += 1
+                if result.get('url-resolved') != link:
+                    LOGGER.debug('"%s" resolves to "%s"' % (link, result['url-resolved']))
+                if result.get('ssl') is True:
+                    score += 1
+                    LOGGER.debug('"{}" is a valid HTTPS link'.format(result['url-resolved']))
                 else:
-                    LOGGER.debug('"{}" is a valid link'.format(result['resolved-URL']))
+                    LOGGER.debug('"{}" is a valid link'.format(result['url-resolved']))
             else:
                 LOGGER.info('"{}" cannot be resolved!'.format(link))
         return total, score

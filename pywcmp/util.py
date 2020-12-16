@@ -185,20 +185,23 @@ def urlopen_(url: str):
     return response
 
 
-def check_url(url: str, no_ssl: bool) -> dict:
+def check_url(url: str, check_ssl: bool) -> dict:
     """
-    Helper function to check link (URL) accessability
+    Helper function to check link (URL) accessibility
+
+    :param url: The URL to check
+    :param check_ssl: Whether the SSL/TLS layer verification shall be made
 
     :returns: `dict` with details about the link
     """
 
     result = {}
     response = None
-    result['original-URL'] = url
+    result['url-original'] = url
     try:
-        if no_ssl:
+        if check_ssl is False:
             LOGGER.debug('Creating unverified context')
-            result['SSL'] = False
+            result['ssl'] = False
             context = ssl._create_unverified_context()
             response = urlopen(url, context=context)
         else:
@@ -206,16 +209,16 @@ def check_url(url: str, no_ssl: bool) -> dict:
     except (ssl.SSLError, URLError) as err:
         LOGGER.debug(err)
 
-    if response is None and no_ssl is False:
-        return check_url(url, True)
+    if response is None and check_ssl is True:
+        return check_url(url, False)
 
     if response is not None:
-        result['resolved-URL'] = response.url
+        result['url-resolved'] = response.url
         if response.status > 300:
             LOGGER.debug('Request failed: {}'.format(response))
         result['accessible'] = response.status < 300
-        if response.url.startswith("https") and no_ssl is False:
-            result['SSL'] = True
+        if response.url.startswith("https") and check_ssl is True:
+            result['ssl'] = True
     else:
         result['accessible'] = False
     return result
