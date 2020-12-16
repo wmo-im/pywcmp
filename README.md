@@ -12,9 +12,9 @@ cd pywcmp
 . bin/activate
 git clone https://github.com/wmo-im/pywcmp.git
 cd pywcmp
-pip install -r requirements.txt
-python setup.py build
-python setup.py install
+pip3 install -r requirements.txt
+python3 setup.py build
+python3 setup.py install
 ```
 
 ## Running
@@ -76,24 +76,24 @@ python3 -m venv pywcmp
 cd pywcmp
 source bin/activate
 git clone https://github.com/wmo-im/pywcmp.git
-pip install -r requirements.txt
-pip install -r requirements-dev.txt
-python setup.py install
+pip3 install -r requirements.txt
+pip3 install -r requirements-dev.txt
+python3 setup.py install
 ```
 
 ### Running tests
 
 ```bash
 # via setuptools
-python setup.py test
+python3 setup.py test
 # manually
-python tests/run_tests.py
+python3 tests/run_tests.py
 ```
 
 ## Releasing
 
 ```bash
-python setup.py sdist bdist_wheel --universal
+python3 setup.py sdist bdist_wheel --universal
 twine upload dist/*
 ```
 

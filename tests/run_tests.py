@@ -18,7 +18,7 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2019-2020 Government of Canada
+# Copyright (c) 2020 Government of Canada
 # Copyright (c) 2020, IBL Software Engineering spol. s r. o.
 #
 # Permission is hereby granted, free of charge, to any person
