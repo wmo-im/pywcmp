@@ -19,6 +19,7 @@
 # referenced with those assets.
 #
 # Copyright (c) 2020 Government of Canada
+# Copyright (c) 2020 IBL Software Engineering spol. s r. o.
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
