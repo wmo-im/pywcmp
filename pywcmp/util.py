@@ -106,11 +106,11 @@ def get_string_or_anchor_values(element_tree, parent_xpath: str) -> list:
     :param parent_xpath : Path to the parent element of the CharacterString or Anchor.
     """
     values = []
-    other_constraints = element_tree.findall(nspath_eval(parent_xpath))
-    for constr in other_constraints:
-        constrValues = constr.findall(nspath_eval('gco:CharacterString')) + constr.findall(nspath_eval('gmx:Anchor'))
-        for constrValue in constrValues:
-            values.append(constrValue.text)
+    parent_elements = element_tree.findall(nspath_eval(parent_xpath))
+    for parent in parent_elements:
+        value_elements = parent.findall(nspath_eval('gco:CharacterString')) + constr.findall(nspath_eval('gmx:Anchor'))
+        for element in value_elements:
+            values.append(element.text)
     return values
 
 
