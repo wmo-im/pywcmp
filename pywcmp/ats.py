@@ -53,7 +53,7 @@ import click
 from lxml import etree
 
 from pywcmp.util import (get_cli_common_options, get_codelists, NAMESPACES,
-                         nspath_eval, setup_logger, urlopen_, validate_iso_xml, get_contraints_values)
+                         nspath_eval, setup_logger, urlopen_, validate_iso_xml, get_string_or_anchor_values)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -255,7 +255,7 @@ class WMOCoreMetadataProfileTestSuite13:
 
         count = 0
 
-        other_constraints = get_contraints_values(self.exml, 'gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints')
+        other_constraints = get_string_or_anchor_values(self.exml, 'gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints')
         for constr in other_constraints:
             if constr in self.codelists['WMO_DataLicenseCode']:
                 count += 1
@@ -266,7 +266,7 @@ class WMOCoreMetadataProfileTestSuite13:
         self.test_id = gen_test_id('GTS-priority-for-globally-exchanged-data')
 
         count = 0
-        other_constraints = get_contraints_values(self.exml, 'gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints')
+        other_constraints = get_string_or_anchor_values(self.exml, 'gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints')
         for constr in other_constraints:
             if constr in self.codelists['WMO_GTSProductCategoryCode']:
                 count += 1

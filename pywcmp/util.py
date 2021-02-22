@@ -98,9 +98,15 @@ def get_codelists():
     return codelists
 
 
-def get_contraints_values(exml: etree, parentXpath: str) ->[]:
+def get_string_or_anchor_values(element_tree, parent_xpath: str) -> list:
+    """
+    Returns list of strings (texts) from CharacterString or Anchor child elements of given Xpath
+
+    :param element_tree : XML element tree (parsed document).
+    :param parent_xpath : Path to the parent element of the CharacterString or Anchor.
+    """
     values = []
-    other_constraints = exml.findall(nspath_eval(parentXpath))
+    other_constraints = element_tree.findall(nspath_eval(parent_xpath))
     for constr in other_constraints:
         constrValues = constr.findall(nspath_eval('gco:CharacterString')) + constr.findall(nspath_eval('gmx:Anchor'))
         for constrValue in constrValues:
