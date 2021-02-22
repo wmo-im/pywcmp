@@ -254,6 +254,7 @@
           </gmd:role>
         </gmd:CI_ResponsibleParty>
       </gmd:pointOfContact>
+
       <gmd:resourceMaintenance>
         <gmd:MD_MaintenanceInformation>
           <gmd:maintenanceAndUpdateFrequency>
@@ -272,6 +273,15 @@
           </gmd:maintenanceNote>
         </gmd:MD_MaintenanceInformation>
       </gmd:resourceMaintenance>
+
+      <gmd:graphicOverview>
+        <gmd:MD_BrowseGraphic>
+           <gmd:fileName>
+              <gmx:Anchor xlink:href="https://navigator.eumetsat.int/preview/meteosat-msg_naturalenhncd.jpg">Meteosat MSG Natural Enhanced Color</gmx:Anchor>
+           </gmd:fileName>
+        </gmd:MD_BrowseGraphic>
+      </gmd:graphicOverview>
+
       <gmd:descriptiveKeywords>
         <gmd:MD_Keywords>
           <gmd:keyword>
@@ -659,18 +669,27 @@
       </gmd:resourceConstraints>
       <gmd:resourceConstraints>
         <gmd:MD_LegalConstraints>
+
           <gmd:accessConstraints>
-            <gmd:MD_RestrictionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
+            <gmd:MD_RestrictionCode codeList="https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
           </gmd:accessConstraints>
+
           <gmd:useConstraints>
-            <gmd:MD_RestrictionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
+            <gmd:MD_RestrictionCode codeList="https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
           </gmd:useConstraints>
+
           <gmd:otherConstraints>
             <gmx:Anchor xlink:href="https://wis.wmo.int/2012/codelists/WMOCodeLists.xml#WMO_DataLicenseCode_WMOEssential">WMOEssential</gmx:Anchor>
           </gmd:otherConstraints>
-          <gmd:otherConstraints>
-            <gco:CharacterString>GTSPriority2</gco:CharacterString>
-          </gmd:otherConstraints>
+
+         <gmd:otherConstraints>
+            <gmx:Anchor xlink:href="https://wis.wmo.int/2012/codelists/WMOCodeLists.xml#WMO_GTSProductCategoryCode_GTSPriority3">GTSPriority3</gmx:Anchor>
+         </gmd:otherConstraints>
+
+         <gmd:otherConstraints>
+           <gco:CharacterString>Cite as: WMO/GAW Ozone Monitoring Community, World Meteorological Organization-Global Atmosphere Watch Program (WMO-GAW)/World Ozone and Ultraviolet Radiation Data Centre (WOUDC) [Data]. Retrieved [YYYY-MM-DD], from https://woudc.org. A list of all contributors is available on the website. doi:10.14287/10000004</gco:CharacterString> 
+         </gmd:otherConstraints>
+
         </gmd:MD_LegalConstraints>
       </gmd:resourceConstraints>
       <gmd:language>
@@ -762,6 +781,7 @@
       </gmd:transferOptions>
     </gmd:MD_Distribution>
   </gmd:distributionInfo>
+
   <gmd:dataQualityInfo>
     <gmd:DQ_DataQuality>
       <gmd:scope>
