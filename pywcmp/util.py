@@ -108,7 +108,7 @@ def get_string_or_anchor_values(element_tree, parent_xpath: str) -> list:
     values = []
     parent_elements = element_tree.findall(nspath_eval(parent_xpath))
     for parent in parent_elements:
-        value_elements = parent.findall(nspath_eval('gco:CharacterString')) + constr.findall(nspath_eval('gmx:Anchor'))
+        value_elements = parent.findall(nspath_eval('gco:CharacterString')) + parent.findall(nspath_eval('gmx:Anchor'))
         for element in value_elements:
             values.append(element.text)
     return values
