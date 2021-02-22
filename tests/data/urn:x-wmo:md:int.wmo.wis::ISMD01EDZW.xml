@@ -666,7 +666,7 @@
             <gmd:MD_RestrictionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
           </gmd:useConstraints>
           <gmd:otherConstraints>
-            <gco:CharacterString>WMOEssential</gco:CharacterString>
+            <gmx:Anchor xlink:href="https://wis.wmo.int/2012/codelists/WMOCodeLists.xml#WMO_DataLicenseCode_WMOEssential">WMOEssential</gmx:Anchor>
           </gmd:otherConstraints>
           <gmd:otherConstraints>
             <gco:CharacterString>GTSPriority2</gco:CharacterString>

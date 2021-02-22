@@ -98,6 +98,16 @@ def get_codelists():
     return codelists
 
 
+def get_contraints_values(exml: etree, parentXpath: str) ->[]:
+    values = []
+    other_constraints = exml.findall(nspath_eval(parentXpath))
+    for constr in other_constraints:
+        constrValues = constr.findall(nspath_eval('gco:CharacterString')) + constr.findall(nspath_eval('gmx:Anchor'))
+        for constrValue in constrValues:
+            values.append(constrValue.text)
+    return values
+
+
 def get_userdir() -> str:
     """
     Helper function to get userdir
