@@ -98,6 +98,22 @@ def get_codelists():
     return codelists
 
 
+def get_string_or_anchor_values(element_tree, parent_xpath: str) -> list:
+    """
+    Returns list of strings (texts) from CharacterString or Anchor child elements of given Xpath
+
+    :param element_tree : XML element tree (parsed document).
+    :param parent_xpath : Path to the parent element of the CharacterString or Anchor.
+    """
+    values = []
+    parent_elements = element_tree.findall(nspath_eval(parent_xpath))
+    for parent in parent_elements:
+        value_elements = parent.findall(nspath_eval('gco:CharacterString')) + parent.findall(nspath_eval('gmx:Anchor'))
+        for element in value_elements:
+            values.append(element.text)
+    return values
+
+
 def get_userdir() -> str:
     """
     Helper function to get userdir
