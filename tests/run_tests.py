@@ -58,7 +58,7 @@ def get_test_file_path(filename):
     if os.path.isfile(filename):
         return filename
     else:
-        return 'tests/{}'.format(filename)
+        return f'tests/{filename}'
 
 
 class WCMPATSTest(unittest.TestCase):

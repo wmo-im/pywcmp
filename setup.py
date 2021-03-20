@@ -104,8 +104,7 @@ DESCRIPTION = 'A Python implementation of the test suite for WMO Core Metadata P
 if (os.path.exists('MANIFEST')):
     os.unlink('MANIFEST')
 
-print('Downloading WMO ISO XML Schemas and Codelists.xml to {}'.format(
-    USERDIR))
+print(f'Downloading WMO ISO XML Schemas and Codelists.xml to {USERDIR}')
 
 if not os.path.exists(USERDIR):
     os.mkdir(USERDIR)
@@ -115,7 +114,7 @@ if not os.path.exists(USERDIR):
         z.extractall(USERDIR)
     CODELIST_URL = 'https://wis.wmo.int/2012/codelists/WMOCodeLists.xml'
 
-    schema_filename = '{}{}WMOCodeLists.xml'.format(USERDIR, os.sep)
+    schema_filename = f'{USERDIR}{os.sep}WMOCodeLists.xml'
 
     with open(schema_filename, 'wb') as f:
         f.write(urlopen_(CODELIST_URL).read())
@@ -127,19 +126,19 @@ if not os.path.exists(USERDIR):
                            version='1.0.0',
                            nsmap={None: 'http://www.w3.org/2001/XMLSchema'})
 
-    schema_wrapper_filename = '{}{}iso-all.xsd'.format(USERDIR, os.sep)
+    schema_wrapper_filename = f'{USERDIR}{os.sep}iso-all.xsd'
 
     with open(schema_wrapper_filename, 'wb') as f:
         for uri in ['gmd', 'gmx']:
-            namespace = 'http://www.isotc211.org/2005/{}'.format(uri)
-            schema_location = 'schema/{}/{}.xsd'.format(uri, uri)
+            namespace = f'http://www.isotc211.org/2005/{uri}'
+            schema_location = f'schema/{uri}/{uri}.xsd'
 
             etree.SubElement(SCHEMA, 'import',
                              namespace=namespace,
                              schemaLocation=schema_location)
         f.write(etree.tostring(SCHEMA, pretty_print=True))
 else:
-    print('Directory {} exists'.format(USERDIR))
+    print(f'Directory {USERDIR} exists')
 
 
 setup(

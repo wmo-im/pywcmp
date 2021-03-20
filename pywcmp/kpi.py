@@ -117,7 +117,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         ]
         for xpath in xpaths:
             new_links = self.exml.xpath(xpath, namespaces=xpath_namespaces)
-            LOGGER.debug('Found {} links with {}'.format(len(new_links), xpath))
+            LOGGER.debug(f'Found {len(new_links)} links with {xpath}')
             links += new_links
 
         return set(links)
@@ -130,25 +130,25 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         :returns: `tuple` containing achieved score and total score
         """
         links = self._get_link_lists()
-        LOGGER.info('Found {} unique links.'.format(len(links)))
-        LOGGER.debug('{}'.format(links))
+        LOGGER.info(f'Found {len(links)} unique links.')
+        LOGGER.debug(f'{links}')
         total = 0
         score = 0
         for link in links:
-            LOGGER.debug('checking: {}'.format(link))
+            LOGGER.debug(f'checking: {link}')
             result = check_url(link, False)
             total += 2
             if result['accessible']:
                 score += 1
                 if result.get('url-resolved') != link:
-                    LOGGER.debug('"%s" resolves to "%s"' % (link, result['url-resolved']))
+                    LOGGER.debug(f'"{link}" resolves to "{result["url-resolved"]}"')
                 if result.get('ssl') is True:
                     score += 1
-                    LOGGER.debug('"{}" is a valid HTTPS link'.format(result['url-resolved']))
+                    LOGGER.debug(f'"{result["url-resolved"]}" is a valid HTTPS link')
                 else:
-                    LOGGER.debug('"{}" is a valid link'.format(result['url-resolved']))
+                    LOGGER.debug(f'"{result["url-resolved"]}" is a valid link')
             else:
-                LOGGER.info('"{}" cannot be resolved!'.format(link))
+                LOGGER.info(f'"{link}" cannot be resolved!')
         return total, score
 
     def evaluate(self) -> dict:
@@ -159,7 +159,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         results = {}
 
         for kpi in kpis_to_run:
-            LOGGER.debug('Running {}'.format(kpi))
+            LOGGER.debug(f'Running {kpi}')
             result = getattr(self, kpi)()
             LOGGER.debug('Calculating result')
             percentage = round(float((result[1] / result[0]) * 100), ROUND)
@@ -169,7 +169,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 'score': result[1],
                 'percentage': percentage
             }
-            LOGGER.debug('{}: {} / {} = {}'.format(kpi, result[0], result[1], percentage))
+            LOGGER.debug(f'{kpi}: {result[0]} / {result[1]} = {percentage}')
 
         LOGGER.debug('Calculating total results')
         sum_total = sum(v['total'] for k, v in results.items())
@@ -209,7 +209,7 @@ def validate(ctx, file_, url, logfile, verbosity):
 
     if file_ is not None:
         content = file_
-        msg = 'Validating file {}'.format(file_)
+        msg = f'Validating file {file_}'
         LOGGER.info(msg)
         click.echo(msg)
     elif url is not None:
