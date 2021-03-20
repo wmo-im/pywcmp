@@ -18,7 +18,7 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2020 Government of Canada
+# Copyright (c) 2021 Government of Canada
 # Copyright (c) 2020 IBL Software Engineering spol. s r. o.
 #
 # Permission is hereby granted, free of charge, to any person
@@ -79,7 +79,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         # generate dict of codelists
         self.codelists = get_codelists()
 
-    def kpi_a(self) -> tuple:
+    def kpi_000(self) -> tuple:
         ts = WMOCoreMetadataProfileTestSuite13(self.exml)
 
         total = 1
@@ -122,7 +122,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         return set(links)
 
-    def kpi_j(self) -> tuple:
+    def kpi_008(self) -> tuple:
         """
         Extracts URLs from various types of "links" in the metadata document and tries
         to download the linked resources. Resources are expected to be accessible, preferably over HTTPS.
@@ -154,7 +154,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
     def evaluate(self) -> dict:
         """Convenience function to run all tests"""
 
-        kpis_to_run = ['kpi_a', 'kpi_j']
+        kpis_to_run = ['kpi_000', 'kpi_008']
 
         results = {}
 
