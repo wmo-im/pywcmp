@@ -6,6 +6,18 @@ This library implements validation against [WMO Core Metadata Profile 1.3](http:
 
 ## Installation
 
+### pip
+
+Install latest stable version from [PyPI](https://pypi.org/project/pywcmp).
+
+```bash
+pip install pywcmp
+```
+
+### From source
+
+Install latest development version.
+
 ```bash
 python3 -m venv pywcmp
 cd pywcmp
@@ -108,3 +120,4 @@ Issues are managed at https://github.com/wmo-im/pywcmp/issues
 ## Contact
 
 * [Tom Kralidis](https://github.com/tomkralidis)
+* [Ján Osuský](https://github.com/josusky)

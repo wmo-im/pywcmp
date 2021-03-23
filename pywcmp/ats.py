@@ -71,7 +71,8 @@ def msg(test_id: str, test_description: str) -> str:
     """
 
     requirement = test_id.split('test_requirement_')[-1].replace('_', '.')
-    return 'Requirement {}:\n    {}'.format(requirement, test_description)
+
+    return f'Requirement {requirement}:\n    {test_description}'
 
 
 def gen_test_id(test_id: str) -> str:
@@ -83,7 +84,7 @@ def gen_test_id(test_id: str) -> str:
     :returns: test identifier as URI
     """
 
-    return 'http://wis.wmo.int/2012/metadata/conf/{}'.format(test_id)
+    return f'http://wis.wmo.int/2012/metadata/conf/{test_id}'
 
 
 class WMOCoreMetadataProfileTestSuite13:
@@ -114,15 +115,15 @@ class WMOCoreMetadataProfileTestSuite13:
 
         error_stack = []
         for i in tests:
-            test_name = 'test_requirement_{}'.format(i)
+            test_name = f'test_requirement_{i}'
             try:
                 getattr(self, test_name)()
             except AssertionError as err:
-                message = 'ASSERTION ERROR: {}'.format(err)
+                message = f'ASSERTION ERROR: {err}'
                 LOGGER.info(message)
                 error_stack.append(message)
             except Exception as err:
-                message = 'OTHER ERROR: {}'.format(err)
+                message = f'OTHER ERROR: {err}'
                 LOGGER.info(message)
                 error_stack.append(message)
 
@@ -291,7 +292,7 @@ class WMOCoreMetadataProfileTestSuite13:
                 node2 = node.find(nspath_eval('gmx:Anchor'))
                 if node2 is not None:  # search gmx:Anchor
                     value = node2.get(nspath_eval('xlink:href'))
-                    if value == '%s#%s' % (CODELIST_PREFIX, code):
+                    if value == f'{CODELIST_PREFIX}#{code}':
                         wmo_cats.append(kwd)
                 else:  # gmd:title should be code var
                     value = node.find(nspath_eval('gco:CharacterString')).text
@@ -345,7 +346,7 @@ def validate(ctx, file_, url, logfile, verbosity):
 
     if file_ is not None:
         content = file_
-        msg = 'Validating file {}'.format(file_)
+        msg = f'Validating file {file_}'
         LOGGER.info(msg)
         click.echo(msg)
     elif url is not None:

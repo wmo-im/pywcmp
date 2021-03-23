@@ -89,7 +89,7 @@ def get_codelists():
     """
     codelists = {}
     userdir = get_userdir()
-    xml = etree.parse('{}{}WMOCodeLists.xml'.format(userdir, os.sep))
+    xml = etree.parse(f'{userdir}{os.sep}WMOCodeLists.xml')
     for cld in xml.xpath('gmx:codelistItem/gmx:CodeListDictionary', namespaces=NAMESPACES):
         identifier = cld.get(nspath_eval('gml:id'))
         codelists[identifier] = []
@@ -121,7 +121,7 @@ def get_userdir() -> str:
     :returns: user's home directory
     """
 
-    return '{}{}{}'.format(os.path.expanduser('~'), os.sep, '.pywcmp')
+    return f'{os.path.expanduser("~")}{os.sep}.pywcmp'
 
 
 def nspath_eval(xpath: str) -> str:
@@ -137,7 +137,7 @@ def nspath_eval(xpath: str) -> str:
     out = []
     for chunks in xpath.split('/'):
         namespace, element = chunks.split(':')
-        out.append('{{{}}}{}'.format(NAMESPACES[namespace], element))
+        out.append(f'{{{NAMESPACES[namespace]}}}{element}')
     return '/'.join(out)
 
 
@@ -232,7 +232,7 @@ def check_url(url: str, check_ssl: bool) -> dict:
     if response is not None:
         result['url-resolved'] = response.url
         if response.status > 300:
-            LOGGER.debug('Request failed: {}'.format(response))
+            LOGGER.debug(f'Request failed: {response}')
         result['accessible'] = response.status < 300
         if response.url.startswith("https") and check_ssl is True:
             result['ssl'] = True
@@ -252,10 +252,10 @@ def validate_iso_xml(xml):
 
     userdir = get_userdir()
     if not os.path.exists(userdir):
-        raise IOError('{} does not exist'.format(userdir))
+        raise IOError(f'{userdir} does not exist')
     if isinstance(xml, str):
         xml = etree.fromstring(xml)
     xsd = os.path.join(userdir, 'iso-all.xsd')
-    LOGGER.debug('Validating {} against schema {}'.format(xml, xsd))
+    LOGGER.debug(f'Validating {xml} against schema {xsd}')
     schema = etree.XMLSchema(etree.parse(xsd))
     schema.assertValid(xml)

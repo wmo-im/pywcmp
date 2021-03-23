@@ -46,6 +46,7 @@
 
 # WMO Core Metadata Profile Key Performance Indicators (KPIs)
 
+from itertools import chain
 import logging
 from io import BytesIO
 
@@ -79,20 +80,6 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         # generate dict of codelists
         self.codelists = get_codelists()
 
-    def kpi_000(self) -> tuple:
-        ts = WMOCoreMetadataProfileTestSuite13(self.exml)
-
-        total = 1
-
-        # run the tests
-        try:
-            ts.run_tests()
-            score = 1
-        except TestSuiteError:
-            score = 0
-
-        return total, score
-
     def _get_link_lists(self) -> set:
         """
         Helper function to retrieve all link elements (gmx:Anchor, gmd:URL, ...)
@@ -117,49 +104,85 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         ]
         for xpath in xpaths:
             new_links = self.exml.xpath(xpath, namespaces=xpath_namespaces)
-            LOGGER.debug('Found {} links with {}'.format(len(new_links), xpath))
+            LOGGER.debug(f'Found {len(new_links)} links with {xpath}')
             links += new_links
 
         return set(links)
 
+    def kpi_001(self) -> tuple:
+        """
+        Implements KPI-1: WCMP 1.3, Part 2 Compliance
+
+        :returns: `tuple` containing achieved score, total score, and comments
+        """
+
+        ts = WMOCoreMetadataProfileTestSuite13(self.exml)
+
+        total = 1
+        comments = []
+
+        # run the tests
+        try:
+            ts.run_tests()
+            score = 1
+        except TestSuiteError as err:
+            score = 0
+            comments = err.errors
+
+        return total, score, comments
+
     def kpi_008(self) -> tuple:
         """
+        Implements KPI-8: Links health
+
         Extracts URLs from various types of "links" in the metadata document and tries
         to download the linked resources. Resources are expected to be accessible, preferably over HTTPS.
 
-        :returns: `tuple` containing achieved score and total score
+        :returns: `tuple` containing achieved score, total score, and comments
         """
-        links = self._get_link_lists()
-        LOGGER.info('Found {} unique links.'.format(len(links)))
-        LOGGER.debug('{}'.format(links))
+
         total = 0
         score = 0
+        comments = []
+
+        links = self._get_link_lists()
+
+        LOGGER.info(f'Found {len(links)} unique links.')
+        LOGGER.debug(f'{links}')
+
         for link in links:
-            LOGGER.debug('checking: {}'.format(link))
+            LOGGER.debug(f'checking: {link}')
             result = check_url(link, False)
             total += 2
             if result['accessible']:
                 score += 1
                 if result.get('url-resolved') != link:
-                    LOGGER.debug('"%s" resolves to "%s"' % (link, result['url-resolved']))
+                    LOGGER.debug(f'"{link}" resolves to "{result["url-resolved"]}"')
                 if result.get('ssl') is True:
                     score += 1
-                    LOGGER.debug('"{}" is a valid HTTPS link'.format(result['url-resolved']))
+                    LOGGER.debug(f'"{result["url-resolved"]}" is a valid HTTPS link')
                 else:
-                    LOGGER.debug('"{}" is a valid link'.format(result['url-resolved']))
+                    LOGGER.debug(f'"{result["url-resolved"]}" is a valid link')
             else:
-                LOGGER.info('"{}" cannot be resolved!'.format(link))
-        return total, score
+                msg = f'"{link}" cannot be resolved!'
+                LOGGER.info(msg)
+                comments.append(msg)
+
+        return total, score, comments
 
     def evaluate(self) -> dict:
-        """Convenience function to run all tests"""
+        """
+        Convenience function to run all tests
 
-        kpis_to_run = ['kpi_000', 'kpi_008']
+        :returns: `dict` of overall test report
+        """
+
+        kpis_to_run = ['kpi_001', 'kpi_008']
 
         results = {}
 
         for kpi in kpis_to_run:
-            LOGGER.debug('Running {}'.format(kpi))
+            LOGGER.debug(f'Running {kpi}')
             result = getattr(self, kpi)()
             LOGGER.debug('Calculating result')
             percentage = round(float((result[1] / result[0]) * 100), ROUND)
@@ -167,18 +190,22 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             results[kpi] = {
                 'total': result[0],
                 'score': result[1],
+                'comments': result[2],
                 'percentage': percentage
             }
-            LOGGER.debug('{}: {} / {} = {}'.format(kpi, result[0], result[1], percentage))
+            LOGGER.debug(f'{kpi}: {result[0]} / {result[1]} = {percentage}')
 
         LOGGER.debug('Calculating total results')
-        sum_total = sum(v['total'] for k, v in results.items())
-        sum_score = sum(v['score'] for k, v in results.items())
+        sum_total = sum(v['total'] for v in results.values())
+        sum_score = sum(v['score'] for v in results.values())
+        comments = [v['comments'] for v in results.values() if v['comments']]
+        comments = list(chain(comments))
         sum_percentage = round(float((sum_score / sum_total) * 100), ROUND)
 
         results['totals'] = {
             'total': sum_total,
             'score': sum_score,
+            'comments': comments,
             'percentage': sum_percentage
         }
 
@@ -209,7 +236,7 @@ def validate(ctx, file_, url, logfile, verbosity):
 
     if file_ is not None:
         content = file_
-        msg = 'Validating file {}'.format(file_)
+        msg = f'Validating file {file_}'
         LOGGER.info(msg)
         click.echo(msg)
     elif url is not None:
