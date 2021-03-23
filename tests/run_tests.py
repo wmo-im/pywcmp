@@ -108,10 +108,10 @@ class WCMPKPITest(unittest.TestCase):
         results = kpis.evaluate()
 
         # total is 7 (1 for validation + 3x2 for links)
-        self.assertEqual(results['totals']['total'], 7)
+        self.assertEqual(results['summary']['total'], 7)
         # score is 3 (1 for validation + 2 for two valid HTTP only links)
-        self.assertEqual(results['totals']['score'], 3)
-        self.assertEqual(results['totals']['percentage'], 42.857)
+        self.assertEqual(results['summary']['score'], 3)
+        self.assertEqual(results['summary']['percentage'], 42.857)
 
 
 if __name__ == '__main__':

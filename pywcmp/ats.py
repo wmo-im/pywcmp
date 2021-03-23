@@ -53,7 +53,8 @@ import click
 from lxml import etree
 
 from pywcmp.util import (get_cli_common_options, get_codelists, NAMESPACES,
-                         nspath_eval, setup_logger, urlopen_, validate_iso_xml, get_string_or_anchor_values)
+                         nspath_eval, setup_logger, urlopen_, validate_iso_xml,
+                         get_string_or_anchor_values)
 
 LOGGER = logging.getLogger(__name__)
 
