@@ -514,7 +514,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             try:
                 percentage = round(float((result[2] / result[1]) * 100), ROUND)
             except ZeroDivisionError:
-                percentage = 0
+                percentage = None
 
             results[kpi] = {
                 'name': result[0],
