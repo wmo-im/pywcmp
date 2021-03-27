@@ -272,6 +272,59 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         return name, total, score, comments
 
+    def kpi_007(self) -> tuple:
+        """
+        Implements KPI-7: Graphic overview for non bulletins metadata records
+
+        :returns: `tuple` of KPI name, achieved score, total score, and comments
+        """
+
+        name = 'KPI-7: Graphic overview for non bulletins metadata records'
+
+        LOGGER.info(f'Running {name}')
+
+        total = 0
+        score = 0
+        comments = []
+
+        web_image_mime_types = [
+            'image/apng',
+            'image/avif',
+            'image/gif',
+            'image/jpeg',
+            'image/png',
+            'image/svg+xml',
+            'image/webp'
+        ]
+
+        xpath = '//gmd:identificationInfo/gmd:MD_DataIdentification/gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gmx:Anchor'
+
+        LOGGER.debug(f'Testing all graphic overviews at {xpath}')
+
+        graphic_overviews = [x for x in self.exml.xpath(xpath, namespaces=self.namespaces)]
+
+        for graphic_overview in graphic_overviews:
+            LOGGER.debug('Graphic overview is present')
+            total += 3
+            score += 1
+
+            link = graphic_overview.get(nspath_eval('xlink:href'))
+            result = check_url(link, False)
+
+            LOGGER.debug('Testing whether link resolves successfully')
+            if result['accessible']:
+                score += 1
+            else:
+                comments.append(f'URL not accessible: {link}')
+
+            LOGGER.debug('Testing whether link is a web image file type')
+            if result['mime-type'] in web_image_mime_types:
+                score += 1
+            else:
+                comments.append(f'MIME type not a web image: {result["mime-type"]}')
+
+        return name, total, score, comments
+
     def kpi_008(self) -> tuple:
         """
         Implements KPI-8: Links health
@@ -292,7 +345,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         links = self._get_link_lists()
 
-        LOGGER.info(f'Found {len(links)} unique links.')
+        LOGGER.debug(f'Found {len(links)} unique links.')
         LOGGER.debug(f'{links}')
 
         for link in links:
@@ -312,6 +365,73 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 msg = f'"{link}" cannot be resolved!'
                 LOGGER.info(msg)
                 comments.append(msg)
+
+        return name, total, score, comments
+
+    def kpi_010(self) -> tuple:
+        """
+        Implements KPI-10: Distribution information
+
+        :returns: `tuple` of KPI name, achieved score, total score, and comments
+        """
+
+        name = 'KPI-10: Distribution information'
+
+        LOGGER.info(f'Running {name}')
+
+        total = 5
+        score = 0
+        comments = []
+
+        xpath = '//gmd:distributionInfo'
+
+        LOGGER.debug('Testing for distribution format')
+        xpath = '//gmd:distributionInfo//gmd:distributionFormat/gmd:MD_Format'
+        if self.exml.xpath(xpath, namespaces=self.namespaces):
+            score += 1
+        else:
+            comments.append('Distribution format not found')
+
+        LOGGER.debug('Testing for a valid format specification')
+        xpath = '//gmd:distributionInfo//gmd:distributionFormat/gmd:MD_Format//gmd:specification/gmx:Anchor'
+        specification_url = self.exml.xpath(xpath, namespaces=self.namespaces)
+        if specification_url:
+            link = specification_url.get(nspath_eval('xlink:href'))
+            result = check_url(link, False)
+
+            if result['accessible']:
+                score += 1
+            else:
+                comments.append(f'Specification URL not accessible: {link}')
+        else:
+            comments.append('Specification URL does not exist')
+
+        LOGGER.debug('Testing for distributor contact organization')
+        xpath = '//gmd:distributionInfo//gmd:MD_Distributor//gmd:organisationName/gco:CharacterString'
+        organization_name = self.exml.xpath(xpath, namespaces=self.namespaces)
+        if organization_name:
+            LOGGER.debug(f'Distribution contact organization found: {organization_name.text}')
+            score += 1
+        else:
+            comments.append('Distribution contact organization not found')
+
+        LOGGER.debug('Testing for distributor contact email')
+        xpath = '//gmd:distributionInfo//gmd:MD_Distributor//gmd:contactInfo//gmd:electronicMailAddress/gco:CharacterString'
+        organization_email = self.exml.xpath(xpath, namespaces=self.namespaces)
+        if organization_email:
+            LOGGER.debug(f'Distribution contact email found: {organization_email.text}')
+            score += 1
+        else:
+            comments.append('Distribution contact email not found')
+
+        LOGGER.debug('Testing for transfer options')
+        xpath = '//gmd:distributionInfo//gmd:MD_DigitalTransferOptions//gmd:onLine//gmd:URL'
+        transfer_options = [x for x in self.exml.xpath(xpath, namespaces=self.namespaces)]
+        if len(transfer_options) > 0:
+            LOGGER.debug(f'Transfer options found: {len(transfer_options)}')
+            score += 1
+        else:
+            comments.append('No transfer options found')
 
         return name, total, score, comments
 
@@ -376,7 +496,9 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             'kpi_001',
             'kpi_002',
             'kpi_003',
+            'kpi_007',
             'kpi_008',
+            'kpi_010',
             'kpi_012'
         ]
 
