@@ -410,7 +410,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         xpath = '//gmd:distributionInfo//gmd:MD_Distributor//gmd:organisationName/gco:CharacterString'
         organization_name = self.exml.xpath(xpath, namespaces=self.namespaces)
         if organization_name:
-            LOGGER.debug(f'Distribution contact organization found: {organization_name.text}')
+            LOGGER.debug(f'Distribution contact organization found: {organization_name[0].text}')
             score += 1
         else:
             comments.append('Distribution contact organization not found')
@@ -419,7 +419,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         xpath = '//gmd:distributionInfo//gmd:MD_Distributor//gmd:contactInfo//gmd:electronicMailAddress/gco:CharacterString'
         organization_email = self.exml.xpath(xpath, namespaces=self.namespaces)
         if organization_email:
-            LOGGER.debug(f'Distribution contact email found: {organization_email.text}')
+            LOGGER.debug(f'Distribution contact email found: {organization_email[0].text}')
             score += 1
         else:
             comments.append('Distribution contact email not found')
@@ -509,8 +509,12 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         for kpi in kpis_to_run:
             LOGGER.debug(f'Running {kpi}')
             result = getattr(self, kpi)()
+            LOGGER.debug(f'Raw result: {result}')
             LOGGER.debug('Calculating result')
-            percentage = round(float((result[2] / result[1]) * 100), ROUND)
+            try:
+                percentage = round(float((result[2] / result[1]) * 100), ROUND)
+            except ZeroDivisionError:
+                percentage = 0
 
             results[kpi] = {
                 'name': result[0],
