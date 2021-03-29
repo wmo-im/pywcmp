@@ -212,9 +212,12 @@ def check_url(url: str, check_ssl: bool) -> dict:
     :returns: `dict` with details about the link
     """
 
-    result = {}
     response = None
-    result['url-original'] = url
+    result = {
+        'mime-type': None,
+        'url-original': url
+    }
+
     try:
         if check_ssl is False:
             LOGGER.debug('Creating unverified context')
@@ -234,6 +237,7 @@ def check_url(url: str, check_ssl: bool) -> dict:
         if response.status > 300:
             LOGGER.debug(f'Request failed: {response}')
         result['accessible'] = response.status < 300
+        result['mime-type'] = response.headers.get_content_type()
         if response.url.startswith("https") and check_ssl is True:
             result['ssl'] = True
     else:
