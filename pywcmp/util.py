@@ -18,8 +18,8 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2020 Government of Canada
-# Copyright (c) 2020 IBL Software Engineering spol. s r. o.
+# Copyright (c) 2020-2021 Government of Canada
+# Copyright (c) 2020-2021 IBL Software Engineering spol. s r. o.
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -48,6 +48,8 @@ import logging
 import os
 import ssl
 import sys
+from datetime import datetime, timezone, timedelta
+from dateutil.parser import parse
 from urllib.error import URLError
 from urllib.request import urlopen
 
@@ -112,6 +114,33 @@ def get_string_or_anchor_values(element_tree, parent_xpath: str) -> list:
         for element in value_elements:
             values.append(element.text)
     return values
+
+
+def parse_time_position(element) -> datetime:
+    """
+    Returns datetime extracted from the given GML element or None if parsing failed.
+    The parsing is rather benevolent here to allow mixing of "Zulu" and "naive" time strings (and other oddities),
+    in the hope that all meteorological data refer to UTC.
+
+    :param element : XML / GML element (e.g. gml:beginPosition)
+    """
+    indeterminate_pos = element.get('indeterminatePosition')
+    if indeterminate_pos is not None:
+        if indeterminate_pos == "now" or indeterminate_pos == "unknown":
+            return datetime.now(timezone.utc)
+        elif indeterminate_pos == "before":
+            return datetime.now(timezone.utc) - timedelta(hours=24)
+        elif indeterminate_pos == "after":
+            return datetime.now(timezone.utc) + timedelta(hours=24)
+        else:
+            LOGGER.debug(f'Time point has unexpected value of indeterminatePosition: {indeterminate_pos}')
+    elif element.text is not None:
+        text_to_parse = element.text
+        if text_to_parse.endswith('Z'):
+            text_to_parse = text_to_parse[0:-1]
+        dtg = parse(text_to_parse, fuzzy=True, ignoretz=True).replace(tzinfo=timezone.utc)
+        return dtg
+    return None
 
 
 def get_userdir() -> str:

@@ -2,3 +2,4 @@ beautifulsoup4
 click
 lxml
 pyspellchecker
+python-dateutil

@@ -18,8 +18,8 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2021 Government of Canada
-# Copyright (c) 2020 IBL Software Engineering spol. s r. o.
+# Copyright (c) 2020-2021 Government of Canada
+# Copyright (c) 2020-2021 IBL Software Engineering spol. s r. o.
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -59,7 +59,7 @@ from spellchecker import SpellChecker
 
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
 from pywcmp.util import (get_cli_common_options, get_codelists, nspath_eval,
-                         setup_logger, urlopen_, check_url)
+                         parse_time_position, setup_logger, urlopen_, check_url)
 
 LOGGER = logging.getLogger(__name__)
 # round percentages to x decimal places
@@ -269,6 +269,81 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 score += 1
             else:
                 comments.append(f'{xpath} contains spelling errors {misspelled}')
+
+        return name, total, score, comments
+
+    def kpi_004(self) -> tuple:
+        """
+        Implements KPI-4: Temporal information
+
+        :returns: `tuple` of KPI name, achieved score, total score, and comments
+        """
+
+        total = 0
+        score = 0
+        comments = []
+
+        name = 'KPI-4: Temporal information'
+
+        LOGGER.info(f'Running {name}')
+
+        time_period_xpath = '/gmd:MD_Metadata/gmd:identificationInfo//gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod'
+        LOGGER.debug(f'Testing for temporal information at "{time_period_xpath}"')
+        time_periods = self.exml.xpath(time_period_xpath, namespaces=self.namespaces)
+        if len(time_periods) > 0:
+            for time_period in time_periods:
+                total += 3
+                score += 1
+                begin_position = time_period.find(nspath_eval('gml:beginPosition'))
+                end_position = time_period.find(nspath_eval('gml:endPosition'))
+                if begin_position is not None and end_position is not None:
+                    score += 1
+                    dt_begin = parse_time_position(begin_position)
+                    dt_end = parse_time_position(end_position)
+                    if dt_begin is not None and dt_end is not None:
+                        if dt_begin < dt_end:
+                            score += 1
+                            LOGGER.debug(f'Temporal information is valid ({dt_begin} < {dt_end}).')
+                        else:
+                            comments.append(f'Temporal information is invalid ({dt_begin} < {dt_end} = False).')
+                    elif dt_begin is None:
+                        comments.append('Temporal information - begin time has unknown format')
+                    elif dt_end is None:
+                        comments.append('Temporal information - end time has unknown format')
+                elif begin_position is None:
+                    comments.append('Temporal information - begin time not found')
+                elif end_position is None:
+                    comments.append('Temporal information - end time not found')
+        else:
+            total += 3
+            comments.append('Temporal information not found')
+        # I would be a bit confused by a product that spans multiple time_periods
+        if len(time_periods) > 1:
+            LOGGER.debug(f'Temporal information - multiple ({len(time_period)}) elements found.')
+
+        update_frequency_xpath = '/gmd:MD_Metadata/gmd:identificationInfo//gmd:resourceMaintenance//gmd:maintenanceAndUpdateFrequency'
+        LOGGER.debug(f'Testing for update frequency at "{update_frequency_xpath}"')
+        total += 1
+        update_frequency = self.exml.xpath(update_frequency_xpath, namespaces=self.namespaces)
+        if len(update_frequency) > 0:
+            score += 1
+        else:
+            comments.append('Update frequency not found')
+        # grumble about extra elements
+        if len(update_frequency) > 1:
+            comments.append(f'Multiple ({len(update_frequency)}) update frequency elements found.')
+
+        data_status_xpath = '/gmd:MD_Metadata/gmd:identificationInfo//gmd:status'
+        LOGGER.debug(f'Testing for data status at "{data_status_xpath}"')
+        total += 1
+        data_status = self.exml.xpath(data_status_xpath, namespaces=self.namespaces)
+        if len(data_status) > 0:
+            score += 1
+        else:
+            comments.append('Data status not found')
+        # I would be a bit confused by a product that has multiple data statuses
+        if len(data_status) > 1:
+            LOGGER.debug(f'Multiple ({len(data_status)}) data status elements found.')
 
         return name, total, score, comments
 
@@ -496,6 +571,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             'kpi_001',
             'kpi_002',
             'kpi_003',
+            'kpi_004',
             'kpi_007',
             'kpi_008',
             'kpi_010',
