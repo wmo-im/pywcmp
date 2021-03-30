@@ -18,8 +18,8 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2020 Government of Canada
-# Copyright (c) 2020 IBL Software Engineering spol. s r. o.
+# Copyright (c) 2020-2021 Government of Canada
+# Copyright (c) 2020-2021 IBL Software Engineering spol. s r. o.
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -48,6 +48,8 @@ import logging
 import os
 import ssl
 import sys
+from datetime import datetime, timezone
+from dateutil.parser import parse
 from urllib.error import URLError
 from urllib.request import urlopen
 
@@ -112,6 +114,30 @@ def get_string_or_anchor_values(element_tree, parent_xpath: str) -> list:
         for element in value_elements:
             values.append(element.text)
     return values
+
+
+def parse_time_position(element) -> datetime:
+    """
+    Returns datetime extracted from the given GML element or None if parsing failed.
+    The parsing is rather benevolent here to allow mixing of "Zulu" and "naive" time strings (and other oddities),
+    in the hope that all meteorological data refer to UTC.
+
+    :param element : XML / GML element (e.g. gml:beginPosition)
+    """
+    if element.text is not None:
+        text_to_parse = element.text
+        if text_to_parse.endswith('Z'):
+            text_to_parse = text_to_parse[0:-1]
+        dtg = parse(text_to_parse, fuzzy=True, ignoretz=True).replace(tzinfo=timezone.utc)
+        return dtg
+    else:
+        indeterminatePos = element.get('indeterminatePosition')
+        if indeterminatePos is not None:
+            if indeterminatePos == "now" or indeterminatePos == "unknown":
+                return datetime.now(timezone.utc)
+            else:
+                LOGGER.debug(f'Time point has unexpected value of indeterminatePos: {indeterminatePos}')
+    return None
 
 
 def get_userdir() -> str:
@@ -212,9 +238,12 @@ def check_url(url: str, check_ssl: bool) -> dict:
     :returns: `dict` with details about the link
     """
 
-    result = {}
     response = None
-    result['url-original'] = url
+    result = {
+        'mime-type': None,
+        'url-original': url
+    }
+
     try:
         if check_ssl is False:
             LOGGER.debug('Creating unverified context')
@@ -234,6 +263,7 @@ def check_url(url: str, check_ssl: bool) -> dict:
         if response.status > 300:
             LOGGER.debug(f'Request failed: {response}')
         result['accessible'] = response.status < 300
+        result['mime-type'] = response.headers.get_content_type()
         if response.url.startswith("https") and check_ssl is True:
             result['ssl'] = True
     else:
