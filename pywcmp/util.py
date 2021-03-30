@@ -124,19 +124,18 @@ def parse_time_position(element) -> datetime:
 
     :param element : XML / GML element (e.g. gml:beginPosition)
     """
-    if element.text is not None:
+    indeterminatePos = element.get('indeterminatePosition')
+    if indeterminatePos is not None:
+        if indeterminatePos == "now" or indeterminatePos == "unknown":
+            return datetime.now(timezone.utc)
+        else:
+            LOGGER.debug(f'Time point has unexpected value of indeterminatePos: {indeterminatePos}')
+    elif element.text is not None:
         text_to_parse = element.text
         if text_to_parse.endswith('Z'):
             text_to_parse = text_to_parse[0:-1]
         dtg = parse(text_to_parse, fuzzy=True, ignoretz=True).replace(tzinfo=timezone.utc)
         return dtg
-    else:
-        indeterminatePos = element.get('indeterminatePosition')
-        if indeterminatePos is not None:
-            if indeterminatePos == "now" or indeterminatePos == "unknown":
-                return datetime.now(timezone.utc)
-            else:
-                LOGGER.debug(f'Time point has unexpected value of indeterminatePos: {indeterminatePos}')
     return None
 
 
