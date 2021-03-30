@@ -111,6 +111,5 @@ class WCMPKPITest(unittest.TestCase):
         self.assertEqual(results['summary']['score'], 18)
         self.assertEqual(results['summary']['percentage'], 58.065)
 
-
 if __name__ == '__main__':
     unittest.main()
