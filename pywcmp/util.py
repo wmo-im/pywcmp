@@ -164,9 +164,12 @@ def nspath_eval(xpath: str) -> str:
     """
 
     out = []
-    for chunks in xpath.split('/'):
-        namespace, element = chunks.split(':')
-        out.append(f'{{{NAMESPACES[namespace]}}}{element}')
+    for chunk in xpath.split('/'):
+        if ':' in chunk:
+            namespace, element = chunk.split(':')
+            out.append(f'{{{NAMESPACES[namespace]}}}{element}')
+        else:
+            out.append(chunk)
     return '/'.join(out)
 
 

@@ -59,7 +59,8 @@ from spellchecker import SpellChecker
 
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
 from pywcmp.util import (get_cli_common_options, get_codelists, nspath_eval,
-                         parse_time_position, setup_logger, urlopen_, check_url)
+                         parse_time_position, setup_logger, urlopen_, check_url,
+                         get_string_or_anchor_values)
 
 LOGGER = logging.getLogger(__name__)
 # round percentages to x decimal places
@@ -347,6 +348,38 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         return name, total, score, comments
 
+    def kpi_005(self) -> tuple:
+        """
+        Implements KPI-5: WMOEssential data links
+
+        :returns: `tuple` of KPI name, achieved score, total score, and comments
+        """
+
+        total = 0
+        score = 0
+        comments = []
+
+        name = 'KPI-5: WMOEssential data links'
+
+        LOGGER.info(f'Running {name}')
+
+        constraints_xpath = 'gmd:identificationInfo//gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints'
+        LOGGER.debug(f'Testing for WMOEssential constraints at "{constraints_xpath}"')
+        constraints = get_string_or_anchor_values(self.exml, constraints_xpath)
+        for constraint in constraints:
+            if constraint == 'WMOEssential':
+                LOGGER.debug(f'Is {constraint}')
+                total += 1
+                linkage_xpath = 'gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage'
+                linkages = self.exml.xpath(linkage_xpath, namespaces=self.namespaces)
+                if len(linkages) > 0:
+                    score += 1
+                    LOGGER.debug(f'Found {len(linkages)} online resource linkage(s)')
+                else:
+                    comments.append('Resource transferOption link not found for WMOEssential data.')
+
+        return name, total, score, comments
+
     def kpi_007(self) -> tuple:
         """
         Implements KPI-7: Graphic overview for non bulletins metadata records
@@ -560,23 +593,28 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         return name, total, score, comments
 
-    def evaluate(self) -> dict:
+    def evaluate(self, kpi: str = None) -> dict:
         """
         Convenience function to run all tests
 
         :returns: `dict` of overall test report
         """
 
-        kpis_to_run = [
-            'kpi_001',
-            'kpi_002',
-            'kpi_003',
-            'kpi_004',
-            'kpi_007',
-            'kpi_008',
-            'kpi_010',
-            'kpi_012'
-        ]
+        kpis_to_run = []
+        if kpi is None:
+            kpis_to_run = [
+                'kpi_001',
+                'kpi_002',
+                'kpi_003',
+                'kpi_004',
+                'kpi_005',
+                'kpi_007',
+                'kpi_008',
+                'kpi_010',
+                'kpi_012'
+            ]
+        else:
+            kpis_to_run = [f'kpi_{kpi}']
 
         LOGGER.info(f'Evaluating KPIs: {kpis_to_run}')
 
@@ -634,7 +672,9 @@ def kpi():
               help='Provide summary of KPI test results')
 @click.option('--url', '-u',
               help='URL of XML file')
-def validate(ctx, file_, summary, url, logfile, verbosity):
+@click.option('--kpi', '-k',
+              help='KPI to run, default is all')
+def validate(ctx, file_, summary, url, kpi, logfile, verbosity):
     """run key performance indicators"""
 
     if file_ is None and url is None:
@@ -654,7 +694,7 @@ def validate(ctx, file_, summary, url, logfile, verbosity):
 
     kpis = WMOCoreMetadataProfileKeyPerformanceIndicators(exml)
 
-    kpis_results = kpis.evaluate()
+    kpis_results = kpis.evaluate(kpi)
 
     if not summary:
         click.echo(json.dumps(kpis_results, indent=4))
