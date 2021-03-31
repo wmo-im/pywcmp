@@ -613,10 +613,13 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         ]
 
         kpis_to_run = known_kpis
+
         if kpi != 0:
             selected_kpi = f'kpi_{kpi:03}'
             if selected_kpi not in known_kpis:
-                raise click.UsageError(f'Invalid KPI number - {selected_kpi} is not in {known_kpis}')
+                msg = f'Invalid KPI number: {selected_kpi} is not in {known_kpis}'
+                LOGGER.error(msg)
+                raise ValueError(msg)
             else:
                 kpis_to_run = [selected_kpi]
 
@@ -674,10 +677,8 @@ def kpi():
               help='Path to XML file')
 @click.option('--summary', '-s', is_flag=True, default=False,
               help='Provide summary of KPI test results')
-@click.option('--url', '-u',
-              help='URL of XML file')
-@click.option('--kpi', '-k', default=0,
-              help='KPI to run, default is all')
+@click.option('--url', '-u', help='URL of XML file')
+@click.option('--kpi', '-k', default=0, help='KPI to run, default is all')
 def validate(ctx, file_, summary, url, kpi, logfile, verbosity):
     """run key performance indicators"""
 
@@ -698,7 +699,10 @@ def validate(ctx, file_, summary, url, kpi, logfile, verbosity):
 
     kpis = WMOCoreMetadataProfileKeyPerformanceIndicators(exml)
 
-    kpis_results = kpis.evaluate(kpi)
+    try:
+        kpis_results = kpis.evaluate(kpi)
+    except ValueError:
+        raise click.UsageError(f'Invalid KPI {kpi}')
 
     if not summary:
         click.echo(json.dumps(kpis_results, indent=4))
