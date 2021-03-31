@@ -418,11 +418,13 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             keywords = main_keyword.findall(nspath_eval('gmd:keyword'))
             keyword_count += len(keywords)
             type_element = main_keyword.findall(nspath_eval('gmd:type'))
+            # all keywords in this group have the same type
             if len(type_element) > 0:
-                keyword_with_type_count += len(keywords)  # all keywords in this group have this type
+                keyword_with_type_count += len(keywords)
             thesauruses = main_keyword.findall(nspath_eval('gmd:thesaurusName'))
+            # all keywords in this group have the same thesaurus
             if len(thesauruses) > 0:
-                keyword_with_thesaurus_count += len(keywords)  # all keywords in this group have this thesaurus
+                keyword_with_thesaurus_count += len(keywords)
             bare_charstring_values = []
             for keyword in keywords:
                 if len(type_element) == 0:
@@ -769,6 +771,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         ]
 
         kpis_to_run = known_kpis
+
         if kpi != 0:
             selected_kpi = f'kpi_{kpi:03}'
             if selected_kpi not in known_kpis:
@@ -858,7 +861,7 @@ def validate(ctx, file_, summary, url, kpi, logfile, verbosity):
         kpis_results = kpis.evaluate(kpi)
     except ValueError:
         raise click.UsageError(f'Invalid KPI {kpi}')
-  
+
     if not summary:
         click.echo(json.dumps(kpis_results, indent=4))
     else:
