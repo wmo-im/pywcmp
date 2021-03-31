@@ -101,6 +101,7 @@ def get_codelists():
     }
 
     for key, value in codelist_files.items():
+        print(f'loading {value}')
         codelists[key] = {}
         xml = etree.parse(value)
         for cld in xml.xpath('gmx:codelistItem/gmx:CodeListDictionary', namespaces=NAMESPACES):
@@ -136,6 +137,38 @@ def get_string_or_anchor_values(element_tree, parent_xpath: str) -> list:
     parent_elements = element_tree.findall(nspath_eval(parent_xpath))
     for parent in parent_elements:
         values += get_string_or_anchor_value(parent)
+    return values
+
+
+def get_keyword_info(main_keyword_element) -> tuple:
+    """
+    Returns tuple with keywords, type value(s) and thesaurus(es) for given "MD_Keywords" element
+
+    :param main_keyword_element : The element to check
+    """
+
+    keywords = main_keyword_element.findall(nspath_eval('gmd:keyword'))
+    type_element = get_codelist_values(main_keyword_element.findall(nspath_eval('gmd:type/gmd:MD_KeywordTypeCode')))
+    thesauruses = []
+    for thesaurus_element in main_keyword_element.findall(nspath_eval('gmd:thesaurusName/gmd:CI_Citation/gmd:title')):
+        thesauruses += get_string_or_anchor_value(thesaurus_element)
+    return keywords, type_element, thesauruses
+
+
+def get_codelist_values(elements: list) -> list:
+    """
+    Returns list of code list values as strings for all elements (except the ones with no value)
+    The value can be in the element attribute or text node.
+
+    :param elements : The elements to check
+    """
+    values = []
+    for element in elements:
+        value = element.get('codeListValue')
+        if value is None:
+            value = element.text
+        if value is not None:
+            values.append(value)
     return values
 
 

@@ -60,6 +60,7 @@ from spellchecker import SpellChecker
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
 from pywcmp.util import (get_cli_common_options, get_codelists, nspath_eval,
                          parse_time_position, setup_logger, urlopen_, check_url,
+                         get_keyword_info,
                          get_string_or_anchor_value, get_string_or_anchor_values)
 
 LOGGER = logging.getLogger(__name__)
@@ -415,19 +416,17 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         keyword_toplevel_xpath = '//gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords'
         main_keyword_elements = self.exml.xpath(keyword_toplevel_xpath, namespaces=self.namespaces)
         for main_keyword in main_keyword_elements:
-            keywords = main_keyword.findall(nspath_eval('gmd:keyword'))
+            keywords, types, thesauruses = get_keyword_info(main_keyword)
             keyword_count += len(keywords)
-            type_element = main_keyword.findall(nspath_eval('gmd:type'))
             # all keywords in this group have the same type
-            if len(type_element) > 0:
+            if len(types) > 0:
                 keyword_with_type_count += len(keywords)
-            thesauruses = main_keyword.findall(nspath_eval('gmd:thesaurusName'))
             # all keywords in this group have the same thesaurus
             if len(thesauruses) > 0:
                 keyword_with_thesaurus_count += len(keywords)
             bare_charstring_values = []
             for keyword in keywords:
-                if len(type_element) == 0:
+                if len(types) == 0:
                     keywords_values = get_string_or_anchor_value(keyword)
                     LOGGER.debug(f'Found keyword without type: {keywords_values}')
                 if len(thesauruses) == 0:
@@ -557,6 +556,71 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 msg = f'"{link}" cannot be resolved!'
                 LOGGER.info(msg)
                 comments.append(msg)
+
+        return name, total, score, comments
+
+    def kpi_009(self) -> tuple:
+        """
+        Implements KPI-9: Data policy
+
+        :returns: `tuple` of KPI name, achieved score, total score, and comments
+        """
+
+        name = 'KPI-9: Data policy'
+
+        LOGGER.info(f'Running {name}')
+
+        total = 0
+        score = 0
+        comments = []
+        data_policy_xpath = 'gmd:identificationInfo//gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints'
+        license_codes = self.codelists['wmo']['WMO_DataLicenseCode']
+        LOGGER.debug('Checking if data policy is a known value')
+        total += 1
+        constraints = get_string_or_anchor_values(self.exml, data_policy_xpath)
+        for constraint in constraints:
+            if constraint in license_codes:
+                score += 1
+                LOGGER.debug(f'Found {constraint}')
+        if score == 0:
+            comments.append(f'None of {constraints} is a known WMO_DataLicenseCode value')
+
+        total += 1
+        constraints_base_xpath = 'gmd:identificationInfo//gmd:resourceConstraints/gmd:MD_LegalConstraints/'
+        constraints_elements = ['gmd:accessConstraints', 'gmd:useConstraints']
+        other_restrictions_count = 0
+        for elemment_name in constraints_elements:
+            xpath = constraints_base_xpath + elemment_name + '/gmd:MD_RestrictionCode'
+            LOGGER.debug(f'Checking if {elemment_name} is "otherRestrictions"')
+            constraints = self.exml.xpath(xpath, namespaces=self.namespaces)
+            if len(constraints) > 0:
+                for constraint in constraints:
+                    if constraint.text == 'otherRestrictions':
+                        other_restrictions_count += 1
+                        LOGGER.debug(f'Found {constraint.text}')
+                    else:
+                        comments.append(f'Unexpected value at {xpath}: {constraint.text}')
+            else:
+                comments.append(f'Legal constraint {elemment_name} not found')
+        if other_restrictions_count == len(constraints_elements):
+            score += 1
+
+        LOGGER.debug('Checking definition of the scope of distribution')
+        total += 1
+        keyword_toplevel_xpath = '//gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords'
+        main_keyword_elements = self.exml.xpath(keyword_toplevel_xpath, namespaces=self.namespaces)
+        distribution_defined = False
+        for main_keyword in main_keyword_elements:
+            keywords, types, thesauruses = get_keyword_info(main_keyword)
+            LOGGER.debug(f'Found {types}: {thesauruses}')
+            if len(types) == 1 and len(thesauruses) == 1:
+                if 'dataCenter' == types[0] and 'WMO_DistributionScopeCode' == thesauruses[0]:
+                    LOGGER.debug(f'Found {types[0]}: {thesauruses[0]}')
+                    distribution_defined = True
+        if distribution_defined:
+            score += 1
+        else:
+            comments.append(f'No definiton of distribution scope found')
 
         return name, total, score, comments
 
@@ -765,6 +829,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             'kpi_006',
             'kpi_007',
             'kpi_008',
+            'kpi_009',
             'kpi_010',
             'kpi_011',
             'kpi_012'
