@@ -593,28 +593,32 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         return name, total, score, comments
 
-    def evaluate(self, kpi: str = None) -> dict:
+    def evaluate(self, kpi: int = 0) -> dict:
         """
         Convenience function to run all tests
 
         :returns: `dict` of overall test report
         """
 
-        kpis_to_run = []
-        if kpi is None:
-            kpis_to_run = [
-                'kpi_001',
-                'kpi_002',
-                'kpi_003',
-                'kpi_004',
-                'kpi_005',
-                'kpi_007',
-                'kpi_008',
-                'kpi_010',
-                'kpi_012'
-            ]
-        else:
-            kpis_to_run = [f'kpi_{kpi}']
+        known_kpis = [
+            'kpi_001',
+            'kpi_002',
+            'kpi_003',
+            'kpi_004',
+            'kpi_005',
+            'kpi_007',
+            'kpi_008',
+            'kpi_010',
+            'kpi_012'
+        ]
+
+        kpis_to_run = known_kpis
+        if kpi != 0:
+            selected_kpi = f'kpi_{kpi:03}'
+            if selected_kpi not in known_kpis:
+                raise click.UsageError(f'Invalid KPI number - {selected_kpi} is not in {known_kpis}')
+            else:
+                kpis_to_run = [selected_kpi]
 
         LOGGER.info(f'Evaluating KPIs: {kpis_to_run}')
 
@@ -672,7 +676,7 @@ def kpi():
               help='Provide summary of KPI test results')
 @click.option('--url', '-u',
               help='URL of XML file')
-@click.option('--kpi', '-k',
+@click.option('--kpi', '-k', default=0,
               help='KPI to run, default is all')
 def validate(ctx, file_, summary, url, kpi, logfile, verbosity):
     """run key performance indicators"""
