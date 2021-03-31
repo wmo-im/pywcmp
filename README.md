@@ -50,8 +50,11 @@ pywcmp ats validate --url http://example.org/path/to/file.xml --verbosity DEBUG
 # write results to logfile
 pywcmp ats validate --url http://example.org/path/to/file.xml --verbosity DEBUG --logfile /tmp/foo.txt
 
-# key performance indicators # note: running KPIs automatically runs the ats
+# all key performance indicators at once # note: running KPIs automatically runs the ats
 pywcmp kpi validate --url http://example.org/path/to/file.xml --verbosity DEBUG
+
+# selected key performance indicator
+pywcmp kpi validate --kpi 4 -f /path/to/file.xml -v INFO
 ```
 
 ## Using the API
