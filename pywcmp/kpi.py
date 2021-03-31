@@ -571,9 +571,9 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         }
 
         xpaths2 = [
-                '//gmd:resourceConstraints//gmd:otherConstraints',
-                '//gmd:resourceConstraints//gmd:otherConstraints',
-                '//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword'
+            '//gmd:resourceConstraints//gmd:otherConstraints',
+            '//gmd:resourceConstraints//gmd:otherConstraints',
+            '//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword'
         ]
 
         for key, values in xpaths.items():
@@ -601,9 +601,9 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             else:
                 comments.append(f'Invalid codelist value: {xpath2.text} not in MD_TopicCategoryCode')
 
-        codelists2 = (self.codelists['wmo']['WMO_GTSProductCategoryCode'] +
-                      self.codelists['wmo']['WMO_CategoryCode'] +
-                      self.codelists['wmo']['WMO_DistributionScopeCode'])
+        codelists2 = self.codelists['wmo']['WMO_GTSProductCategoryCode'] + \
+            self.codelists['wmo']['WMO_CategoryCode'] + \
+            self.codelists['wmo']['WMO_DistributionScopeCode']
 
         for xpath2 in xpaths2:
             LOGGER.debug(f'Evaluating {xpath2}')
