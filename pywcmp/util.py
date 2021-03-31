@@ -84,19 +84,31 @@ def get_cli_common_options(function):
 
 def get_codelists():
     """
-    Helper function to assemble dict of WMO codelists
+    Helper function to assemble dict of ISO and WMO codelists
 
-    :returns: `dict` of WMO codelists
+    :param authority: code list authority (iso or wmo)
+
+    :returns: `dict` of ISO and WMO codelists
 
     """
+
     codelists = {}
     userdir = get_userdir()
-    xml = etree.parse(f'{userdir}{os.sep}WMOCodeLists.xml')
-    for cld in xml.xpath('gmx:codelistItem/gmx:CodeListDictionary', namespaces=NAMESPACES):
-        identifier = cld.get(nspath_eval('gml:id'))
-        codelists[identifier] = []
-        for centry in cld.findall(nspath_eval('gmx:codeEntry/gmx:CodeDefinition/gml:identifier')):
-            codelists[identifier].append(centry.text)
+
+    codelist_files = {
+        'iso': f'{userdir}/schema/resources/Codelist/gmxCodelists.xml',
+        'wmo': f'{userdir}{os.sep}WMOCodeLists.xml'
+    }
+
+    for key, value in codelist_files.items():
+        codelists[key] = {}
+        xml = etree.parse(value)
+        for cld in xml.xpath('gmx:codelistItem/gmx:CodeListDictionary', namespaces=NAMESPACES):
+            identifier = cld.get(nspath_eval('gml:id'))
+            codelists[key][identifier] = []
+            for centry in cld.findall(nspath_eval('gmx:codeEntry/gmx:CodeDefinition/gml:identifier')):
+                codelists[key][identifier].append(centry.text)
+
     return codelists
 
 
@@ -126,7 +138,7 @@ def parse_time_position(element) -> datetime:
     """
     indeterminate_pos = element.get('indeterminatePosition')
     if indeterminate_pos is not None:
-        if indeterminate_pos == "now" or indeterminate_pos == "unknown":
+        if indeterminate_pos in ["now", "unknown"]:
             return datetime.now(timezone.utc)
         elif indeterminate_pos == "before":
             return datetime.now(timezone.utc) - timedelta(hours=24)

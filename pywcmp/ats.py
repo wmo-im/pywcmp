@@ -175,7 +175,7 @@ class WMOCoreMetadataProfileTestSuite13:
         for cat in wmo_cats:
             keyword_values = self._get_keyword_values(cat.findall(nspath_eval('gmd:keyword')))
             for keyword_value in keyword_values:
-                if keyword_value in self.codelists['WMO_CategoryCode']:
+                if keyword_value in self.codelists['wmo']['WMO_CategoryCode']:
                     found = True
                     break
 
@@ -259,7 +259,7 @@ class WMOCoreMetadataProfileTestSuite13:
 
         other_constraints = get_string_or_anchor_values(self.exml, 'gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints')
         for constr in other_constraints:
-            if constr in self.codelists['WMO_DataLicenseCode']:
+            if constr in self.codelists['wmo']['WMO_DataLicenseCode']:
                 count += 1
         assert(count == 1), self.test_requirement_9_3_1.__doc__
 
@@ -270,7 +270,7 @@ class WMOCoreMetadataProfileTestSuite13:
         count = 0
         other_constraints = get_string_or_anchor_values(self.exml, 'gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints')
         for constr in other_constraints:
-            if constr in self.codelists['WMO_GTSProductCategoryCode']:
+            if constr in self.codelists['wmo']['WMO_GTSProductCategoryCode']:
                 count += 1
         assert(count == 1), self.test_requirement_9_3_2.__doc__
 

@@ -107,9 +107,9 @@ class WCMPKPITest(unittest.TestCase):
 
         results = kpis.evaluate()
 
-        self.assertEqual(results['summary']['total'], 32)
-        self.assertEqual(results['summary']['score'], 18)
-        self.assertEqual(results['summary']['percentage'], 56.25)
+        self.assertEqual(results['summary']['total'], 42)
+        self.assertEqual(results['summary']['score'], 26)
+        self.assertEqual(results['summary']['percentage'], 61.905)
 
 
 if __name__ == '__main__':
