@@ -625,6 +625,78 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         return name, total, score, comments
 
+    def kpi_011(self) -> tuple:
+        """
+        Implements KPI-11: Codelists validation
+
+        :returns: `tuple` of KPI name, achieved score, total score, and comments
+        """
+
+        total = 0
+        score = 0
+        comments = []
+
+        name = 'KPI-11: Codelists validation'
+
+        LOGGER.info(f'Running {name}')
+
+        xpaths = {
+            'wmo': [
+                '//gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode',
+                '//gmd:MD_Keywords/gmd:type/gmd:MD_KeywordTypeCode'
+            ],
+            'iso': [
+                '//gmd:CI_ResponsibleParty/gmd:role/gmd:CI_RoleCode',
+                '//gmd:resourceConstraints//gmd:MD_RestrictionCode',
+                '//gmd:scope//gmd:MD_ScopeCode',
+            ]
+        }
+
+        xpaths2 = [
+            '//gmd:resourceConstraints//gmd:otherConstraints',
+            '//gmd:resourceConstraints//gmd:otherConstraints',
+            '//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword'
+        ]
+
+        for key, values in xpaths.items():
+            LOGGER.debug(f'Evaluating {key} codelist values')
+            for xpath in values:
+                LOGGER.debug(f'Evaluating {xpath}')
+                for xpath2 in self.exml.xpath(xpath, namespaces=self.namespaces):
+                    total += 1
+                    try:
+                        codelist = xpath2.attrib.get('codeList').split('#')[-1]
+                        if xpath2.text in self.codelists[key][codelist]:
+                            score += 1
+                        else:
+                            comments.append(f'Invalid codelist value: {xpath2.text} not in {codelist}')
+                    except AttributeError:
+                        comments.append(f'Missing codeList attribute: {xpath2.text}')
+
+        xpath = '//gmd:topicCategory/gmd:MD_TopicCategoryCode'
+
+        LOGGER.debug(f'Evaluating {xpath}')
+        for xpath2 in self.exml.xpath(xpath, namespaces=self.namespaces):
+            total += 1
+            if xpath2.text in self.codelists['iso']['MD_TopicCategoryCode']:
+                score += 1
+            else:
+                comments.append(f'Invalid codelist value: {xpath2.text} not in MD_TopicCategoryCode')
+
+        codelists2 = self.codelists['wmo']['WMO_GTSProductCategoryCode'] + \
+            self.codelists['wmo']['WMO_CategoryCode'] + \
+            self.codelists['wmo']['WMO_DistributionScopeCode']
+
+        for xpath2 in xpaths2:
+            LOGGER.debug(f'Evaluating {xpath2}')
+            values = get_string_or_anchor_values(self.exml, xpath2)
+            for value in values:
+                if value in codelists2:
+                    total += 1
+                    score += 1
+
+        return name, total, score, comments
+
     def kpi_012(self) -> tuple:
         """
         Implements KPI-12: DOI citation
@@ -692,6 +764,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             'kpi_007',
             'kpi_008',
             'kpi_010',
+            'kpi_011',
             'kpi_012'
         ]
 
@@ -699,7 +772,9 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         if kpi != 0:
             selected_kpi = f'kpi_{kpi:03}'
             if selected_kpi not in known_kpis:
-                raise click.UsageError(f'Invalid KPI number - {selected_kpi} is not in {known_kpis}')
+                msg = f'Invalid KPI number: {selected_kpi} is not in {known_kpis}'
+                LOGGER.error(msg)
+                raise ValueError(msg)
             else:
                 kpis_to_run = [selected_kpi]
 
@@ -757,10 +832,8 @@ def kpi():
               help='Path to XML file')
 @click.option('--summary', '-s', is_flag=True, default=False,
               help='Provide summary of KPI test results')
-@click.option('--url', '-u',
-              help='URL of XML file')
-@click.option('--kpi', '-k', default=0,
-              help='KPI to run, default is all')
+@click.option('--url', '-u', help='URL of XML file')
+@click.option('--kpi', '-k', default=0, help='KPI to run, default is all')
 def validate(ctx, file_, summary, url, kpi, logfile, verbosity):
     """run key performance indicators"""
 
@@ -781,8 +854,11 @@ def validate(ctx, file_, summary, url, kpi, logfile, verbosity):
 
     kpis = WMOCoreMetadataProfileKeyPerformanceIndicators(exml)
 
-    kpis_results = kpis.evaluate(kpi)
-
+    try:
+        kpis_results = kpis.evaluate(kpi)
+    except ValueError:
+        raise click.UsageError(f'Invalid KPI {kpi}')
+  
     if not summary:
         click.echo(json.dumps(kpis_results, indent=4))
     else:
