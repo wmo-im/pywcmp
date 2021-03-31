@@ -60,7 +60,7 @@ from spellchecker import SpellChecker
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
 from pywcmp.util import (get_cli_common_options, get_codelists, nspath_eval,
                          parse_time_position, setup_logger, urlopen_, check_url,
-                         get_string_or_anchor_values)
+                         get_string_or_anchor_value, get_string_or_anchor_values)
 
 LOGGER = logging.getLogger(__name__)
 # round percentages to x decimal places
@@ -376,7 +376,91 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                     score += 1
                     LOGGER.debug(f'Found {len(linkages)} online resource linkage(s)')
                 else:
-                    comments.append('Resource transferOption link not found for WMOEssential data.')
+                    comments.append('Resource transferOption link not found for WMOEssential data')
+
+        return name, total, score, comments
+
+    def kpi_006(self) -> tuple:
+        """
+        Implements KPI-6: Keywords
+
+        :returns: `tuple` of KPI name, achieved score, total score, and comments
+        """
+
+        total = 0
+        score = 0
+        comments = []
+
+        name = 'KPI-6: Keywords'
+
+        LOGGER.info(f'Running {name}')
+
+        LOGGER.debug('Testing whether any keyword is present')
+        keywords_xpath = '//gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword'
+        keywords = self.exml.xpath(keywords_xpath, namespaces=self.namespaces)
+        total += 1
+        if len(keywords) > 0:
+            score += 1
+            LOGGER.debug(f'Found {len(keywords)} keywords')
+        else:
+            comments.append('No keywords found')
+
+        LOGGER.debug('Evaluating keywords')
+        total += 3
+        keyword_count = 0
+        anchor_keyword_count = 0
+        string_keyword_count = 0
+        keyword_with_type_count = 0
+        keyword_with_thesaurus_count = 0
+        keyword_toplevel_xpath = '//gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords'
+        main_keyword_elements = self.exml.xpath(keyword_toplevel_xpath, namespaces=self.namespaces)
+        for main_keyword in main_keyword_elements:
+            keywords = main_keyword.findall(nspath_eval('gmd:keyword'))
+            keyword_count += len(keywords)
+            type_element = main_keyword.findall(nspath_eval('gmd:type'))
+            # all keywords in this group have the same type
+            if len(type_element) > 0:
+                keyword_with_type_count += len(keywords)
+            thesauruses = main_keyword.findall(nspath_eval('gmd:thesaurusName'))
+            # all keywords in this group have the same thesaurus
+            if len(thesauruses) > 0:
+                keyword_with_thesaurus_count += len(keywords)
+            bare_charstring_values = []
+            for keyword in keywords:
+                if len(type_element) == 0:
+                    keywords_values = get_string_or_anchor_value(keyword)
+                    LOGGER.debug(f'Found keyword without type: {keywords_values}')
+                if len(thesauruses) == 0:
+                    keywords_values = get_string_or_anchor_value(keyword)
+                    LOGGER.debug(f'Found keyword without thesaurus: {keywords_values}')
+                string_elements = keyword.findall(nspath_eval('gco:CharacterString'))
+                anchor_elements = keyword.findall(nspath_eval('gmx:Anchor'))
+                if len(string_elements) == 0 and len(anchor_elements) >= 0:
+                    anchor_keyword_count += 1
+                else:
+                    string_keyword_count += 1
+                    bare_charstring_values += [x.text for x in string_elements]
+            if len(bare_charstring_values) > 0:
+                LOGGER.debug(f'Found keywords that are bare character strings: {bare_charstring_values}')
+        # final evaluation
+        LOGGER.debug(f'Found {string_keyword_count} string and {anchor_keyword_count} anchor keywords')
+        if anchor_keyword_count >= keyword_count:
+            score += 1
+            LOGGER.debug('All keywords are anchors')
+        else:
+            comments.append('Consider using gmx:Anchor elements for keywords')
+
+        if keyword_with_type_count >= keyword_count:
+            score += 1
+            LOGGER.debug('All keywords have a type definition')
+        else:
+            comments.append('Found keywords without type definition')
+
+        if keyword_with_thesaurus_count >= keyword_count:
+            score += 1
+            LOGGER.debug('All keywords have a thesaurus definition')
+        else:
+            comments.append('Found keywords without thesaurus')
 
         return name, total, score, comments
 
@@ -678,6 +762,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             'kpi_003',
             'kpi_004',
             'kpi_005',
+            'kpi_006',
             'kpi_007',
             'kpi_008',
             'kpi_010',
