@@ -590,7 +590,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                     if 'Anchor' in element.tag:
                         data_license_code_is_anchor = True
                     else:
-                        comments.append(f'WMO_DataLicenseCode is not defined as an anchor')
+                        comments.append('WMO_DataLicenseCode is not defined as an anchor')
                 else:
                     checked_values += element.text
         if score == 0:
@@ -651,22 +651,22 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                                 if 'Anchor' in element.tag:
                                     product_category_code_is_anchor = True
                                 else:
-                                    comments.append(f'WMO_DistributionScopeCode is not defined as an anchor')
+                                    comments.append('WMO_DistributionScopeCode is not defined as an anchor')
                                 break
                     thesaurus_title_anchors = main_keyword.findall(nspath_eval('gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor'))
                     if len(thesaurus_title_anchors) == 0:
-                        comments.append(f'WMO_DistributionScopeCode thesaurus title is not defined as an anchor')
+                        comments.append('WMO_DistributionScopeCode thesaurus title is not defined as an anchor')
                     else:
                         distribution_scope_code_thesaurus_is_anchor = True
         if distribution_defined:
             score += 1
         else:
-            comments.append(f'No definition of the distribution scope found')
+            comments.append('No definition of the distribution scope found')
 
         if product_category_code_defined:
             score += 1
         else:
-            comments.append(f'No product category code defined for globaly or regionally exchanged data')
+            comments.append('No product category code defined for globaly or regionally exchanged data')
 
         if data_license_code_is_anchor and product_category_code_is_anchor and distribution_scope_code_thesaurus_is_anchor:
             score += 1
