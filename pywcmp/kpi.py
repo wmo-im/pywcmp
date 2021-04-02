@@ -366,7 +366,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         constraints_xpath = 'gmd:identificationInfo//gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints'
         LOGGER.debug(f'Testing for WMOEssential constraints at "{constraints_xpath}"')
-        constraints = get_string_or_anchor_values(self.exml, constraints_xpath)
+        constraints = get_string_or_anchor_values(self.exml.findall(nspath_eval(constraints_xpath)))
         for constraint in constraints:
             if constraint == 'WMOEssential':
                 LOGGER.debug(f'Is {constraint}')
@@ -577,13 +577,24 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         license_codes = self.codelists['wmo']['WMO_DataLicenseCode']
         LOGGER.debug('Checking if data policy is a known value')
         total += 1
-        constraints = get_string_or_anchor_values(self.exml, data_policy_xpath)
+        data_license_code_is_anchor = False
+        constraints = self.exml.findall(nspath_eval(data_policy_xpath))
+        checked_values = []
         for constraint in constraints:
-            if constraint in license_codes:
-                score += 1
-                LOGGER.debug(f'Found {constraint}')
+            value_elements = constraint.findall(nspath_eval('gco:CharacterString')) \
+                + constraint.findall(nspath_eval('gmx:Anchor'))
+            for element in value_elements:
+                if element.text in license_codes:
+                    score += 1
+                    LOGGER.debug(f'Found {element.text}')
+                    if 'Anchor' in element.tag:
+                        data_license_code_is_anchor = True
+                    else:
+                        comments.append(f'WMO_DataLicenseCode is not defined as an anchor')
+                else:
+                    checked_values += element.text
         if score == 0:
-            comments.append(f'None of {constraints} is a known WMO_DataLicenseCode value')
+            comments.append(f'None of {checked_values} is a known WMO_DataLicenseCode value')
 
         total += 1
         constraints_base_xpath = 'gmd:identificationInfo//gmd:resourceConstraints/gmd:MD_LegalConstraints/'
@@ -605,22 +616,60 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         if other_restrictions_count == len(constraints_elements):
             score += 1
 
-        LOGGER.debug('Checking definition of the scope of distribution')
-        total += 1
+        LOGGER.debug('Testing for definition of the distribution scope and product category')
+        total += 3
         keyword_toplevel_xpath = '//gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords'
         main_keyword_elements = self.exml.xpath(keyword_toplevel_xpath, namespaces=self.namespaces)
         distribution_defined = False
+        product_category_code_defined = False
+        product_category_code_is_anchor = False
+        distribution_scope_code_thesaurus_is_anchor = False
         for main_keyword in main_keyword_elements:
             keywords, types, thesauruses = get_keyword_info(main_keyword)
-            LOGGER.debug(f'Found {types}: {thesauruses}')
-            if len(types) == 1 and len(thesauruses) == 1:
-                if 'dataCenter' == types[0] and 'WMO_DistributionScopeCode' == thesauruses[0]:
-                    LOGGER.debug(f'Found {types[0]}: {thesauruses[0]}')
+            # LOGGER.debug(f'Found {types}: {thesauruses}')
+            if len(types) > 1 or len(thesauruses) > 1:
+                comments.append(f'Ambiguous definition of keyword type ({types}) and/or thesaurus ({thesauruses})')
+            elif len(types) == 0 or len(thesauruses) == 0:
+                continue
+            if types[0] in self.codelists['wmo']['MD_KeywordTypeCode'] or types[0] in self.codelists['iso']['MD_KeywordTypeCode']:
+                if types[0] in ['dataCenter', 'dataCentre'] and 'WMO_DistributionScopeCode' == thesauruses[0]:
+                    LOGGER.debug(f'Found {types[0]} of {thesauruses[0]}')
                     distribution_defined = True
+                if 'WMO_DistributionScopeCode' == thesauruses[0]:
+                    for keyword in keywords:
+                        value_elements = keyword.findall(nspath_eval('gco:CharacterString')) + keyword.findall(nspath_eval('gmx:Anchor'))
+                        for element in value_elements:
+                            value = element.text
+                            if value in self.codelists['wmo']['WMO_DistributionScopeCode']:
+                                if value in ['GlobalExchange', 'RegionalExchange']:
+                                    constraints_xpath = 'gmd:identificationInfo//gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints'
+                                    constraints = get_string_or_anchor_values(self.exml.findall(nspath_eval(constraints_xpath)))
+                                    for constraint in constraints:
+                                        if constraint in self.codelists['wmo']['WMO_GTSProductCategoryCode']:
+                                            LOGGER.debug(f'Found {value} with product category "{constraint}"')
+                                            product_category_code_defined = True
+                                if 'Anchor' in element.tag:
+                                    product_category_code_is_anchor = True
+                                else:
+                                    comments.append(f'WMO_DistributionScopeCode is not defined as an anchor')
+                                break
+                    thesaurus_title_anchors = main_keyword.findall(nspath_eval('gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor'))
+                    if len(thesaurus_title_anchors) == 0:
+                        comments.append(f'WMO_DistributionScopeCode thesaurus title is not defined as an anchor')
+                    else:
+                        distribution_scope_code_thesaurus_is_anchor = True
         if distribution_defined:
             score += 1
         else:
-            comments.append(f'No definiton of distribution scope found')
+            comments.append(f'No definition of the distribution scope found')
+
+        if product_category_code_defined:
+            score += 1
+        else:
+            comments.append(f'No product category code defined for globaly or regionally exchanged data')
+
+        if data_license_code_is_anchor and product_category_code_is_anchor and distribution_scope_code_thesaurus_is_anchor:
+            score += 1
 
         return name, total, score, comments
 
@@ -755,7 +804,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         for xpath2 in xpaths2:
             LOGGER.debug(f'Evaluating {xpath2}')
-            values = get_string_or_anchor_values(self.exml, xpath2)
+            values = get_string_or_anchor_values(self.exml.findall(nspath_eval(xpath2)))
             for value in values:
                 if value in codelists2:
                     total += 1
@@ -924,8 +973,8 @@ def validate(ctx, file_, summary, url, kpi, logfile, verbosity):
 
     try:
         kpis_results = kpis.evaluate(kpi)
-    except ValueError:
-        raise click.UsageError(f'Invalid KPI {kpi}')
+    except ValueError as err:
+        raise click.UsageError(f'Invalid KPI {kpi}: {err}')
 
     if not summary:
         click.echo(json.dumps(kpis_results, indent=4))

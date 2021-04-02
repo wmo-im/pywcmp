@@ -126,15 +126,13 @@ def get_string_or_anchor_value(parent) -> list:
     return values
 
 
-def get_string_or_anchor_values(element_tree, parent_xpath: str) -> list:
+def get_string_or_anchor_values(parent_elements: list) -> list:
     """
-    Returns list of strings (texts) from CharacterString or Anchor child elements of given Xpath
+    Returns list of strings (texts) from CharacterString or Anchor child elements of given parent_elements
 
-    :param element_tree : XML element tree (parsed document).
-    :param parent_xpath : Path to the parent element of the CharacterString or Anchor.
+    :param parent_elements : List of parent elements of the CharacterString or Anchor to read.
     """
     values = []
-    parent_elements = element_tree.findall(nspath_eval(parent_xpath))
     for parent in parent_elements:
         values += get_string_or_anchor_value(parent)
     return values
