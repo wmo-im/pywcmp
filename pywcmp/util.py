@@ -101,7 +101,6 @@ def get_codelists():
     }
 
     for key, value in codelist_files.items():
-        print(f'loading {value}')
         codelists[key] = {}
         xml = etree.parse(value)
         for cld in xml.xpath('gmx:codelistItem/gmx:CodeListDictionary', namespaces=NAMESPACES):

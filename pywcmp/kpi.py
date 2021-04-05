@@ -148,15 +148,15 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         LOGGER.debug('Running ATS tests')
         ts = WMOCoreMetadataProfileTestSuite13(self.exml)
 
-        total = 1
+        total = 13
         comments = []
 
         # run the tests
         try:
             ts.run_tests()
-            score = 1
+            score = 13
         except TestSuiteError as err:
-            score = 0
+            score = total - len(err.errors)
             comments = err.errors
 
         return name, total, score, comments
