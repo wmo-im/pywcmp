@@ -157,7 +157,7 @@ setup(
     url='https://github.com/wmo-im/pywcmp',
     install_requires=read('requirements.txt').splitlines(),
     packages=find_packages(),
-    # package_data=PACKAGE_DATA,
+    package_data={'pywcmp': ['dictionary.txt']},
     entry_points={
         'console_scripts': [
             'pywcmp=pywcmp:cli'
