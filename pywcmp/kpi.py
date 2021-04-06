@@ -49,6 +49,7 @@
 from itertools import chain
 from io import BytesIO
 import json
+import os
 import logging
 import re
 
@@ -63,8 +64,11 @@ from pywcmp.util import (get_cli_common_options, get_codelists, nspath_eval,
                          get_string_or_anchor_value, get_string_or_anchor_values)
 
 LOGGER = logging.getLogger(__name__)
+
 # round percentages to x decimal places
 ROUND = 3
+
+THISDIR = os.path.dirname(os.path.realpath(__file__))
 
 
 class WMOCoreMetadataProfileKeyPerformanceIndicators:
@@ -84,6 +88,22 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         # generate dict of codelists
         self.codelists = get_codelists()
+
+    def _check_spelling(self, text: str) -> list:
+        """
+        Helper function to spell check a string
+
+        :returns: `list` of unknown / mispelled words
+        """
+
+        LOGGER.debug(f'Spellchecking {text}')
+        spell = SpellChecker()
+
+        dictionary = f'{THISDIR}/dictionary.txt'
+        LOGGER.debug(f'Loading custom dictionary {dictionary}')
+        spell.word_frequency.load_text_file(f'{dictionary}')
+
+        return list(spell.unknown(spell.split_words(text)))
 
     def _get_link_lists(self) -> set:
         """
@@ -206,8 +226,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 comments.append(f'{xpath} contains bulletin header')
 
             LOGGER.debug('Testing for spelling')
-            spell = SpellChecker()
-            misspelled = spell.unknown(title_words)
+            misspelled = self._check_spelling(title)
 
             if not misspelled:
                 score += 1
@@ -263,8 +282,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 comments.append(f'{xpath} contains bulletin header')
 
             LOGGER.debug('Testing for spelling')
-            spell = SpellChecker()
-            misspelled = spell.unknown(abstract.split())
+            misspelled = self._check_spelling(abstract)
 
             if not misspelled:
                 score += 1
