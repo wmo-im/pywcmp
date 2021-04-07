@@ -362,10 +362,10 @@ def validate(ctx, file_, url, logfile, verbosity):
     # run the tests
     try:
         ts.run_tests()
-        print('Success!')
+        click.echo('Success!')
     except TestSuiteError as err:
         msg = '\n'.join(err.errors)
-        print(msg)
+        click.echo(msg)
 
 
 ats.add_command(validate)
