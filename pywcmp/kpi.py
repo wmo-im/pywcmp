@@ -128,6 +128,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             '//gmd:CI_DateTypeCode/@codeList',
             '//gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString/text()'
         ]
+
         for xpath in xpaths:
             new_links = self.exml.xpath(xpath, namespaces=xpath_namespaces)
             LOGGER.debug(f'Found {len(new_links)} links with {xpath}')
@@ -180,9 +181,10 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         LOGGER.debug(f'Testing all titles at {xpath}')
 
-        titles = [x.text for x in self.exml.xpath(xpath, namespaces=self.namespaces)]
+        titles = self.exml.xpath(xpath, namespaces=self.namespaces)
 
-        for title in titles:
+        for t in titles:
+            title = t.text
             LOGGER.debug('Title is present')
             total += 8
             score += 1
@@ -192,31 +194,31 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             if len(title_words) >= 3:
                 score += 1
             else:
-                comments.append(f'{xpath} has less than 3 words')
+                comments.append(f'Line {t.sourceline}: title has less than 3 words')
 
             LOGGER.debug('Testing number of characters')
             if len(title) <= 150:
                 score += 1
             else:
-                comments.append(f'{xpath} has more than 150 characters')
+                comments.append(f'Line {t.sourceline}: title has more than 150 characters')
 
             LOGGER.debug('Testing for alphanumeric characters')
             if title.isalnum():
                 score += 1
             else:
-                comments.append(f'{xpath} contains non-printable characters')
+                comments.append(f'Line {t.sourceline}: title contains non-printable characters')
 
             LOGGER.debug('Testing for title case')
             if title.istitle():
                 score += 1
             else:
-                comments.append(f'{xpath} is not title case')
+                comments.append(f'Line {t.sourceline}: title is not title case')
 
             LOGGER.debug('Testing for acronyms')
             if len(re.findall(r'([A-Z]\.*){2,}s?', title)) <= 3:
                 score += 1
             else:
-                comments.append(f'{xpath} has more than 3 acronyms')
+                comments.append(f'Line {t.sourceline}: title has more than 3 acronyms')
 
             LOGGER.debug('Testing for bulletin headers')
             has_bulletin_header = re.search(r'[A-Z]{4}\d{2}[\s_]*[A-Z]{4}', title)
@@ -224,7 +226,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 score += 1
             else:
                 score -= 1
-                comments.append(f'{xpath} contains bulletin header')
+                comments.append(f'Line {t.sourceline}: title contains bulletin header')
 
             LOGGER.debug('Testing for spelling')
             misspelled = self._check_spelling(title)
@@ -232,7 +234,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             if not misspelled:
                 score += 1
             else:
-                comments.append(f'{xpath} contains spelling errors {misspelled}')
+                comments.append(f'Line {t.sourceline}: title contains spelling errors {misspelled}')
 
         return name, total, score, comments
 
@@ -255,32 +257,30 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         LOGGER.debug(f'Testing all abstracts at {xpath}')
 
-        abstracts = [x.text for x in self.exml.xpath(xpath, namespaces=self.namespaces)]
+        abstracts = self.exml.xpath(xpath, namespaces=self.namespaces)
 
-        for abstract in abstracts:
+        for a in abstracts:
+            abstract = a.text
             LOGGER.debug('Abstract is present')
             total += 3
-            score += 1
 
             LOGGER.debug('Testing number of characters')
             if 16 <= len(abstract) <= 2048:
                 score += 1
             else:
-                comments.append(f'{xpath} is not between 16 and 2048 characters')
+                comments.append(f'Line {a.sourceline}: is not between 16 and 2048 characters')
 
             LOGGER.debug('Testing for HTML detection')
             if not bool(BeautifulSoup(abstract, "html.parser").find()):
                 score += 1
             else:
-                comments.append(f'{xpath} contains markup')
+                comments.append(f'Line {a.sourceline}: contains markup')
 
             LOGGER.debug('Testing for bulletin headers')
             has_bulletin_header = re.search(r'[A-Z]{4}\d{2}[\s_]*[A-Z]{4}', abstract)
-            if not has_bulletin_header:
-                score += 1
-            else:
+            if has_bulletin_header:
                 score -= 1
-                comments.append(f'{xpath} contains bulletin header')
+                comments.append(f'Line {a.sourceline}: contains bulletin header')
 
             LOGGER.debug('Testing for spelling')
             misspelled = self._check_spelling(abstract)
@@ -288,7 +288,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             if not misspelled:
                 score += 1
             else:
-                comments.append(f'{xpath} contains spelling errors {misspelled}')
+                comments.append(f'Line {a.sourceline}: contains spelling errors {misspelled}')
 
         return name, total, score, comments
 
@@ -308,8 +308,10 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         LOGGER.info(f'Running {name}')
 
         time_period_xpath = '/gmd:MD_Metadata/gmd:identificationInfo//gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod'
+
         LOGGER.debug(f'Testing for temporal information at "{time_period_xpath}"')
         time_periods = self.exml.xpath(time_period_xpath, namespaces=self.namespaces)
+
         if len(time_periods) > 0:
             for time_period in time_periods:
                 total += 3
@@ -325,15 +327,15 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                             score += 1
                             LOGGER.debug(f'Temporal information is valid ({dt_begin} < {dt_end}).')
                         else:
-                            comments.append(f'Temporal information is invalid ({dt_begin} < {dt_end} = False).')
+                            comments.append(f'Line {begin_position.sourceline}-{end_position.sourceline}: Temporal information is invalid ({dt_begin} < {dt_end} = False).')
                     elif dt_begin is None:
-                        comments.append('Temporal information - begin time has unknown format')
+                        comments.append(f'Line {begin_position.sourceline}: Temporal information - begin time has unknown format')
                     elif dt_end is None:
-                        comments.append('Temporal information - end time has unknown format')
+                        comments.append(f'Line {end_position.sourceline}: Temporal information - end time has unknown format')
                 elif begin_position is None:
-                    comments.append('Temporal information - begin time not found')
+                    comments.append(f'Line {begin_position.sourceline}: Temporal information - begin time not found')
                 elif end_position is None:
-                    comments.append('Temporal information - end time not found')
+                    comments.append(f'Line {end_position.sourceline}: Temporal information - end time not found')
         else:
             total += 3
             comments.append('Temporal information not found')
@@ -383,8 +385,10 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         LOGGER.info(f'Running {name}')
 
         constraints_xpath = 'gmd:identificationInfo//gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints'
+
         LOGGER.debug(f'Testing for WMOEssential constraints at "{constraints_xpath}"')
         constraints = get_string_or_anchor_values(self.exml.findall(nspath_eval(constraints_xpath)))
+
         for constraint in constraints:
             if constraint == 'WMOEssential':
                 LOGGER.debug(f'Is {constraint}')
@@ -417,7 +421,9 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         LOGGER.debug('Testing whether any keyword is present')
         keywords_xpath = '//gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword'
         keywords = self.exml.xpath(keywords_xpath, namespaces=self.namespaces)
+
         total += 1
+
         if len(keywords) > 0:
             score += 1
             LOGGER.debug(f'Found {len(keywords)} keywords')
@@ -431,8 +437,10 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         string_keyword_count = 0
         keyword_with_type_count = 0
         keyword_with_thesaurus_count = 0
+
         keyword_toplevel_xpath = '//gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords'
         main_keyword_elements = self.exml.xpath(keyword_toplevel_xpath, namespaces=self.namespaces)
+
         for main_keyword in main_keyword_elements:
             keywords, types, thesauruses = get_keyword_info(main_keyword)
             keyword_count += len(keywords)
@@ -510,7 +518,9 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         LOGGER.debug(f'Testing all graphic overviews at {xpath}')
 
-        graphic_overviews = [x for x in self.exml.xpath(xpath, namespaces=self.namespaces)]
+        graphic_overviews = self.exml.xpath(xpath, namespaces=self.namespaces)
+
+        LOGGER.info(graphic_overviews)
 
         for graphic_overview in graphic_overviews:
             LOGGER.debug('Graphic overview is present')
@@ -524,13 +534,13 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             if result['accessible']:
                 score += 1
             else:
-                comments.append(f'URL not accessible: {link}')
+                comments.append(f'Line {graphic_overview.sourceline}: URL not accessible: {link}')
 
             LOGGER.debug('Testing whether link is a web image file type')
             if result['mime-type'] in web_image_mime_types:
                 score += 1
             else:
-                comments.append(f'MIME type not a web image: {result["mime-type"]}')
+                comments.append(f'Line {graphic_overview.sourceline}: MIME type not a web image: {result["mime-type"]}')
 
         return name, total, score, comments
 
@@ -591,13 +601,18 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         total = 0
         score = 0
         comments = []
+
         data_policy_xpath = 'gmd:identificationInfo//gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints'
         license_codes = self.codelists['wmo']['WMO_DataLicenseCode']
+
         LOGGER.debug('Checking if data policy is a known value')
+
         total += 1
+
         data_license_code_is_anchor = False
         constraints = self.exml.findall(nspath_eval(data_policy_xpath))
         checked_values = []
+
         for constraint in constraints:
             value_elements = constraint.findall(nspath_eval('gco:CharacterString')) \
                 + constraint.findall(nspath_eval('gmx:Anchor'))
@@ -608,9 +623,10 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                     if 'Anchor' in element.tag:
                         data_license_code_is_anchor = True
                     else:
-                        comments.append('WMO_DataLicenseCode is not defined as an anchor')
+                        comments.append(f'Line {element.sourceline}: WMO_DataLicenseCode is not defined as an anchor')
                 else:
                     checked_values += element.text
+
         if score == 0:
             comments.append(f'None of {checked_values} is a known WMO_DataLicenseCode value')
 
@@ -618,6 +634,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         constraints_base_xpath = 'gmd:identificationInfo//gmd:resourceConstraints/gmd:MD_LegalConstraints/'
         constraints_elements = ['gmd:accessConstraints', 'gmd:useConstraints']
         other_restrictions_count = 0
+
         for elemment_name in constraints_elements:
             xpath = constraints_base_xpath + elemment_name + '/gmd:MD_RestrictionCode'
             LOGGER.debug(f'Checking if {elemment_name} is "otherRestrictions"')
@@ -628,7 +645,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                         other_restrictions_count += 1
                         LOGGER.debug(f'Found {constraint.text}')
                     else:
-                        comments.append(f'Unexpected value at {xpath}: {constraint.text}')
+                        comments.append(f'Line {constraint.sourceline}: Unexpected value at {xpath}: {constraint.text}')
             else:
                 comments.append(f'Legal constraint {elemment_name} not found')
         if other_restrictions_count == len(constraints_elements):
@@ -636,12 +653,14 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         LOGGER.debug('Testing for definition of the distribution scope and product category')
         total += 3
+
         keyword_toplevel_xpath = '//gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords'
         main_keyword_elements = self.exml.xpath(keyword_toplevel_xpath, namespaces=self.namespaces)
         distribution_defined = False
         product_category_code_defined = False
         product_category_code_is_anchor = False
         distribution_scope_code_thesaurus_is_anchor = False
+
         for main_keyword in main_keyword_elements:
             keywords, types, thesauruses = get_keyword_info(main_keyword)
             # LOGGER.debug(f'Found {types}: {thesauruses}')
@@ -649,7 +668,8 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 comments.append(f'Ambiguous definition of keyword type ({types}) and/or thesaurus ({thesauruses})')
             elif len(types) == 0 or len(thesauruses) == 0:
                 continue
-            if types[0] in self.codelists['wmo']['MD_KeywordTypeCode'] or types[0] in self.codelists['iso']['MD_KeywordTypeCode']:
+
+            if types[0] in self.codelists['wmo']['MD_KeywordTypeCode'] + self.codelists['iso']['MD_KeywordTypeCode']:
                 if types[0] in ['dataCenter', 'dataCentre'] and 'WMO_DistributionScopeCode' == thesauruses[0]:
                     LOGGER.debug(f'Found {types[0]} of {thesauruses[0]}')
                     distribution_defined = True
@@ -725,7 +745,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             if result['accessible']:
                 score += 1
             else:
-                comments.append(f'Specification URL not accessible: {link}')
+                comments.append(f'Line {specification_url.sourceline}: Specification URL not accessible: {link}')
         else:
             comments.append('Specification URL does not exist')
 
@@ -802,9 +822,9 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                         if xpath2.text in self.codelists[key][codelist]:
                             score += 1
                         else:
-                            comments.append(f'Invalid codelist value: {xpath2.text} not in {codelist}')
+                            comments.append(f'Line {xpath2.sourceline}: Invalid codelist value: {xpath2.text} not in {codelist}')
                     except AttributeError:
-                        comments.append(f'Missing codeList attribute: {xpath2.text}')
+                        comments.append(f'Line {xpath2.sourceline}: Missing codeList attribute: {xpath2.text}')
 
         xpath = '//gmd:topicCategory/gmd:MD_TopicCategoryCode'
 
@@ -814,7 +834,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             if xpath2.text in self.codelists['iso']['MD_TopicCategoryCode']:
                 score += 1
             else:
-                comments.append(f'Invalid codelist value: {xpath2.text} not in MD_TopicCategoryCode')
+                comments.append(f'Line {xpath2.sourceline}: Invalid codelist value: {xpath2.text} not in MD_TopicCategoryCode')
 
         codelists2 = self.codelists['wmo']['WMO_GTSProductCategoryCode'] + \
             self.codelists['wmo']['WMO_CategoryCode'] + \
@@ -864,19 +884,20 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             if doi_title is not None and doi_title == 'DOI':
                 score += 1
             else:
-                comments.append('DOI title is not equal to "DOI"')
+                comments.append('Line {doi_anchor.sourceline}: DOI title is not equal to "DOI"')
 
             xpath2 = '//gmd:identificationInfo//gmd:resourceConstraints//gmd:otherConstraints/gco:CharacterString'
 
             LOGGER.debug(f'Testing all DOIs in constraints at {xpath2}')
 
-            doi_constraints = [x.text for x in self.exml.xpath(xpath2, namespaces=self.namespaces)]
+            doi_constraints = self.exml.xpath(xpath2, namespaces=self.namespaces)
 
-            for doi_constraint in doi_constraints:
+            for d in doi_constraints:
+                doi_constraint = d.text
                 if 'Cite as:' in doi_constraint and doi_text in doi_constraint:
                     score += 1
                 else:
-                    comments.append('citation should start with "Cite as" and have matching DOI')
+                    comments.append('Line {d.sourceline}: citation should start with "Cite as" and have matching DOI')
 
         return name, total, score, comments
 
@@ -941,7 +962,11 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         sum_score = sum(v['score'] for v in results.values())
         comments = [v['comments'] for v in results.values() if v['comments']]
         comments = list(chain(comments))
-        sum_percentage = round(float((sum_score / sum_total) * 100), ROUND)
+
+        try:
+            sum_percentage = round(float((sum_score / sum_total) * 100), ROUND)
+        except ZeroDivisionError:
+            sum_percentage = None
 
         results['summary'] = {
             'total': sum_total,
