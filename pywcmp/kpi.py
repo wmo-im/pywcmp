@@ -46,7 +46,6 @@
 
 # WMO Core Metadata Profile Key Performance Indicators (KPIs)
 
-from itertools import chain
 from io import BytesIO
 import json
 import os
@@ -89,6 +88,18 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         # generate dict of codelists
         self.codelists = get_codelists()
+
+    @property
+    def identifier(self):
+        """
+        Helper function to derive a metadata record identifier
+
+        :returns: metadata record identifier
+        """
+
+        xpath = '//gmd:fileIdentifier/gco:CharacterString/text()'
+
+        return self.exml.xpath(xpath, namespaces=self.namespaces)[0]
 
     def _check_spelling(self, text: str) -> list:
         """
@@ -960,8 +971,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         LOGGER.debug('Calculating total results')
         sum_total = sum(v['total'] for v in results.values())
         sum_score = sum(v['score'] for v in results.values())
-        comments = [v['comments'] for v in results.values() if v['comments']]
-        comments = list(chain(comments))
+        comments = {k: v['comments'] for k, v in results.items() if v['comments']}
 
         try:
             sum_percentage = round(float((sum_score / sum_total) * 100), ROUND)
@@ -969,6 +979,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             sum_percentage = None
 
         results['summary'] = {
+            'identifier': self.identifier,
             'total': sum_total,
             'score': sum_score,
             'comments': comments,
