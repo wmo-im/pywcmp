@@ -50,6 +50,7 @@ import unittest
 from lxml import etree
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
 from pywcmp.kpi import WMOCoreMetadataProfileKeyPerformanceIndicators
+from pywcmp.util import parse_wcmp
 
 
 def get_test_file_path(filename):
@@ -110,6 +111,29 @@ class WCMPKPITest(unittest.TestCase):
         self.assertEqual(results['summary']['total'], 63)
         self.assertEqual(results['summary']['score'], 40)
         self.assertEqual(results['summary']['percentage'], 63.492)
+
+
+class WCMPUtilTest(unittest.TestCase):
+    """WCMP utility tests"""
+
+    def setUp(self):
+        """setup test fixtures, etc."""
+        pass
+
+    def tearDown(self):
+        """return to pristine state"""
+        pass
+
+    def test_parse_wcmp(self):
+        """test invalid input"""
+
+        exml = parse_wcmp(get_test_file_path('data/urn:x-wmo:md:int.wmo.wis::ca.gc.ec.msc-1.1.5.6.xml'))  # noqa
+
+        with self.assertRaises(RuntimeError):
+            _ = parse_wcmp(get_test_file_path('data/not-wcmp.xml'))
+
+        with self.assertRaises(RuntimeError):
+            _ = parse_wcmp(get_test_file_path('data/not-xml.csv'))
 
 
 if __name__ == '__main__':

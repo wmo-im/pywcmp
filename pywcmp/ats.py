@@ -50,11 +50,11 @@ from io import BytesIO
 import logging
 
 import click
-from lxml import etree
 
-from pywcmp.util import (get_cli_common_options, get_codelists, NAMESPACES,
-                         nspath_eval, setup_logger, urlopen_, validate_iso_xml,
-                         get_string_or_anchor_values)
+from pywcmp.util import (get_cli_common_options, get_codelists,
+                         get_string_or_anchor_values, NAMESPACES,
+                         nspath_eval, parse_wcmp, setup_logger,
+                         urlopen_, validate_iso_xml)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -355,7 +355,10 @@ def validate(ctx, file_, url, logfile, verbosity):
     elif url is not None:
         content = BytesIO(urlopen_(url).read())
 
-    exml = etree.parse(content)
+    try:
+        exml = parse_wcmp(content)
+    except Exception as err:
+        raise click.ClickException(err)
 
     ts = WMOCoreMetadataProfileTestSuite13(exml)
 

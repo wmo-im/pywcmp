@@ -348,3 +348,26 @@ def validate_iso_xml(xml):
     LOGGER.debug(f'Validating {xml} against schema {xsd}')
     schema = etree.XMLSchema(etree.parse(xsd))
     schema.assertValid(xml)
+
+
+def parse_wcmp(content):
+    """
+    Parse a buffer into an etree ElementTree
+
+    :param content: str of xml content
+
+    :returns: `lxml.etree._ElementTree` object of WCMP
+    """
+
+    try:
+        exml = etree.parse(content)
+    except etree.XMLSyntaxError as err:
+        LOGGER.error(err)
+        raise RuntimeError('Syntax error')
+
+    root_tag = exml.getroot().tag
+
+    if root_tag != '{http://www.isotc211.org/2005/gmd}MD_Metadata':
+        raise RuntimeError('Does not look like a WCMP document!')
+
+    return exml

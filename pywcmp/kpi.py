@@ -54,14 +54,13 @@ import re
 
 from bs4 import BeautifulSoup
 import click
-from lxml import etree
 from spellchecker import SpellChecker
 
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
-from pywcmp.util import (get_cli_common_options, get_codelists, nspath_eval,
-                         parse_time_position, setup_logger, urlopen_, check_url,
-                         get_keyword_info,
-                         get_string_or_anchor_value, get_string_or_anchor_values)
+from pywcmp.util import (get_cli_common_options, get_codelists, get_keyword_info,
+                         get_string_or_anchor_value, get_string_or_anchor_values,
+                         nspath_eval, parse_time_position, parse_wcmp,
+                         setup_logger, urlopen_, check_url)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -1021,7 +1020,10 @@ def validate(ctx, file_, summary, url, kpi, logfile, verbosity):
     elif url is not None:
         content = BytesIO(urlopen_(url).read())
 
-    exml = etree.parse(content)
+    try:
+        exml = parse_wcmp(content)
+    except Exception as err:
+        raise click.ClickException(err)
 
     kpis = WMOCoreMetadataProfileKeyPerformanceIndicators(exml)
 
