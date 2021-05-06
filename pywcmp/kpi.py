@@ -104,7 +104,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         """
         Helper function to spell check a string
 
-        :returns: `list` of unknown / mispelled words
+        :returns: `list` of unknown / misspelled words
         """
 
         LOGGER.debug(f'Spellchecking {text}')
@@ -483,7 +483,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             score += 1
             LOGGER.debug('All keywords are anchors')
         else:
-            comments.append(f'Found {keyword_count - anchor_keyword_count} keywords that are not gmx:Anchor but a bare character strings')
+            comments.append(f'Found {keyword_count - anchor_keyword_count} keywords that are not gmx:Anchor but a bare character string')
 
         if keyword_with_type_count >= keyword_count:
             score += 1
@@ -716,7 +716,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         if product_category_code_defined:
             score += 1
         else:
-            comments.append('No product category code defined for globaly or regionally exchanged data (keyword from WMO_GTSProductCategoryCode code list)')
+            comments.append('No product category code defined for globally or regionally exchanged data (keyword from WMO_GTSProductCategoryCode code list)')
 
         if data_license_code_is_anchor and product_category_code_is_anchor and distribution_scope_code_thesaurus_is_anchor:
             score += 1
