@@ -146,9 +146,7 @@ def get_keyword_info(main_keyword_element) -> tuple:
 
     keywords = main_keyword_element.findall(nspath_eval('gmd:keyword'))
     type_element = get_codelist_values(main_keyword_element.findall(nspath_eval('gmd:type/gmd:MD_KeywordTypeCode')))
-    thesauruses = []
-    for thesaurus_element in main_keyword_element.findall(nspath_eval('gmd:thesaurusName/gmd:CI_Citation/gmd:title')):
-        thesauruses += get_string_or_anchor_value(thesaurus_element)
+    thesauruses = main_keyword_element.findall(nspath_eval('gmd:thesaurusName/gmd:CI_Citation/gmd:title'))
     return keywords, type_element, thesauruses
 
 
