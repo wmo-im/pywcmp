@@ -464,10 +464,10 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             for keyword in keywords:
                 if len(types) == 0:
                     keywords_values = get_string_or_anchor_value(keyword)
-                    LOGGER.debug(f'Found keyword without type: {keywords_values}')
+                    LOGGER.debug(f'Line {keyword.sourceline}: Found keyword without type: {keywords_values}')
                 if len(thesauruses) == 0:
                     keywords_values = get_string_or_anchor_value(keyword)
-                    LOGGER.debug(f'Found keyword without thesaurus: {keywords_values}')
+                    LOGGER.debug(f'Line {keyword.sourceline}: Found keyword without thesaurus: {keywords_values}')
                 string_elements = keyword.findall(nspath_eval('gco:CharacterString'))
                 anchor_elements = keyword.findall(nspath_eval('gmx:Anchor'))
                 if len(string_elements) == 0 and len(anchor_elements) >= 0:
@@ -483,19 +483,19 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             score += 1
             LOGGER.debug('All keywords are anchors')
         else:
-            comments.append('Consider using gmx:Anchor elements for keywords')
+            comments.append(f'Found {keyword_count - anchor_keyword_count} keywords that are not gmx:Anchor but a bare character strings')
 
         if keyword_with_type_count >= keyword_count:
             score += 1
             LOGGER.debug('All keywords have a type definition')
         else:
-            comments.append('Found keywords without type definition')
+            comments.append(f'Found {keyword_count - keyword_with_type_count} keywords without type definition')
 
         if keyword_with_thesaurus_count >= keyword_count:
             score += 1
             LOGGER.debug('All keywords have a thesaurus definition')
         else:
-            comments.append('Found keywords without thesaurus')
+            comments.append(f'Found {keyword_count - keyword_with_thesaurus_count} keywords without thesaurus')
 
         return name, total, score, comments
 
@@ -673,17 +673,19 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         for main_keyword in main_keyword_elements:
             keywords, types, thesauruses = get_keyword_info(main_keyword)
-            # LOGGER.debug(f'Found {types}: {thesauruses}')
+            LOGGER.debug(f'Found {types}: {thesauruses}')
             if len(types) > 1 or len(thesauruses) > 1:
                 comments.append(f'Ambiguous definition of keyword type ({types}) and/or thesaurus ({thesauruses})')
             elif len(types) == 0 or len(thesauruses) == 0:
                 continue
 
             if types[0] in self.codelists['wmo']['MD_KeywordTypeCode'] + self.codelists['iso']['MD_KeywordTypeCode']:
-                if types[0] in ['dataCenter', 'dataCentre'] and 'WMO_DistributionScopeCode' == thesauruses[0]:
-                    LOGGER.debug(f'Found {types[0]} of {thesauruses[0]}')
+                thesaurus_name = get_string_or_anchor_value(thesauruses[0])[0]
+                LOGGER.debug(f'{thesaurus_name}')
+                if types[0] in ['dataCenter', 'dataCentre'] and 'WMO_DistributionScopeCode' == thesaurus_name:
+                    LOGGER.debug(f'Found {types[0]} of {thesaurus_name}')
                     distribution_defined = True
-                if 'WMO_DistributionScopeCode' == thesauruses[0]:
+                if 'WMO_DistributionScopeCode' == thesaurus_name:
                     for keyword in keywords:
                         value_elements = keyword.findall(nspath_eval('gco:CharacterString')) + keyword.findall(nspath_eval('gmx:Anchor'))
                         for element in value_elements:
@@ -699,22 +701,22 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                                 if 'Anchor' in element.tag:
                                     product_category_code_is_anchor = True
                                 else:
-                                    comments.append('WMO_DistributionScopeCode is not defined as an anchor')
+                                    comments.append(f'Line {element.sourceline}: WMO_DistributionScopeCode is not defined as an anchor')
                                 break
                     thesaurus_title_anchors = main_keyword.findall(nspath_eval('gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor'))
                     if len(thesaurus_title_anchors) == 0:
-                        comments.append('WMO_DistributionScopeCode thesaurus title is not defined as an anchor')
+                        comments.append(f'Line {thesauruses[0].sourceline}: WMO_DistributionScopeCode thesaurus title is not defined as an anchor')
                     else:
                         distribution_scope_code_thesaurus_is_anchor = True
         if distribution_defined:
             score += 1
         else:
-            comments.append('No definition of the distribution scope found')
+            comments.append('No definition of the distribution scope found (keyword from WMO_DistributionScopeCode thesaurus)')
 
         if product_category_code_defined:
             score += 1
         else:
-            comments.append('No product category code defined for globaly or regionally exchanged data')
+            comments.append('No product category code defined for globaly or regionally exchanged data (keyword from WMO_GTSProductCategoryCode code list)')
 
         if data_license_code_is_anchor and product_category_code_is_anchor and distribution_scope_code_thesaurus_is_anchor:
             score += 1
@@ -736,28 +738,25 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         score = 0
         comments = []
 
-        xpath = '//gmd:distributionInfo'
-
         LOGGER.debug('Testing for distribution format')
-        xpath = '//gmd:distributionInfo//gmd:distributionFormat/gmd:MD_Format'
-        if self.exml.xpath(xpath, namespaces=self.namespaces):
+        format_xpath = '//gmd:distributionInfo//gmd:distributionFormat/gmd:MD_Format'
+        if self.exml.xpath(format_xpath, namespaces=self.namespaces):
             score += 1
-        else:
-            comments.append('Distribution format not found')
+            LOGGER.debug('Testing for a valid format specification')
+            xpath = '//gmd:distributionInfo//gmd:distributionFormat/gmd:MD_Format//gmd:specification/gmx:Anchor'
+            specification_url = self.exml.xpath(xpath, namespaces=self.namespaces)
+            if specification_url:
+                link = specification_url.get(nspath_eval('xlink:href'))
+                result = check_url(link, False)
 
-        LOGGER.debug('Testing for a valid format specification')
-        xpath = '//gmd:distributionInfo//gmd:distributionFormat/gmd:MD_Format//gmd:specification/gmx:Anchor'
-        specification_url = self.exml.xpath(xpath, namespaces=self.namespaces)
-        if specification_url:
-            link = specification_url.get(nspath_eval('xlink:href'))
-            result = check_url(link, False)
-
-            if result['accessible']:
-                score += 1
+                if result['accessible']:
+                    score += 1
+                else:
+                    comments.append(f'Line {specification_url.sourceline}: The format specification URL is not accessible: {link}')
             else:
-                comments.append(f'Line {specification_url.sourceline}: Specification URL not accessible: {link}')
+                comments.append(f'Format URL is missing (expected at {xpath})')
         else:
-            comments.append('Specification URL does not exist')
+            comments.append(f'Distribution format not found (expected at {format_xpath})')
 
         LOGGER.debug('Testing for distributor contact organization')
         xpath = '//gmd:distributionInfo//gmd:MD_Distributor//gmd:organisationName/gco:CharacterString'
@@ -766,7 +765,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             LOGGER.debug(f'Distribution contact organization found: {organization_name[0].text}')
             score += 1
         else:
-            comments.append('Distribution contact organization not found')
+            comments.append(f'Distribution contact organization not found (expected at {xpath})')
 
         LOGGER.debug('Testing for distributor contact email')
         xpath = '//gmd:distributionInfo//gmd:MD_Distributor//gmd:contactInfo//gmd:electronicMailAddress/gco:CharacterString'
@@ -775,7 +774,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             LOGGER.debug(f'Distribution contact email found: {organization_email[0].text}')
             score += 1
         else:
-            comments.append('Distribution contact email not found')
+            comments.append(f'Distribution contact email not found (expected at {xpath})')
 
         LOGGER.debug('Testing for transfer options')
         xpath = '//gmd:distributionInfo//gmd:MD_DigitalTransferOptions//gmd:onLine//gmd:URL'
@@ -784,7 +783,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             LOGGER.debug(f'Transfer options found: {len(transfer_options)}')
             score += 1
         else:
-            comments.append('No transfer options found')
+            comments.append(f'No transfer options found (expected at {xpath})')
 
         return name, total, score, comments
 
