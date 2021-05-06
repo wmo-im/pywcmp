@@ -966,23 +966,40 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             }
             LOGGER.debug(f'{kpi}: {result[1]} / {result[2]} = {percentage}')
 
-        LOGGER.debug('Calculating total results')
-        sum_total = sum(v['total'] for v in results.values())
-        sum_score = sum(v['score'] for v in results.values())
-        comments = {k: v['comments'] for k, v in results.items() if v['comments']}
+        # summary only if more than one KPI was evaluated
+        if len(kpis_to_run) > 1:
+            LOGGER.debug('Calculating total results')
+            sum_total = sum(v['total'] for v in results.values())
+            sum_score = sum(v['score'] for v in results.values())
+            comments = {k: v['comments'] for k, v in results.items() if v['comments']}
 
-        try:
-            sum_percentage = round(float((sum_score / sum_total) * 100), ROUND)
-        except ZeroDivisionError:
-            sum_percentage = None
+            try:
+                sum_percentage = round(float((sum_score / sum_total) * 100), ROUND)
+            except ZeroDivisionError:
+                sum_percentage = None
 
-        results['summary'] = {
-            'identifier': self.identifier,
-            'total': sum_total,
-            'score': sum_score,
-            'comments': comments,
-            'percentage': sum_percentage
-        }
+            overal_grade = "F"
+            if results['kpi_001']['percentage'] != 100:
+                overal_grade = "U"
+            elif sum_percentage >= 80:
+                overal_grade = "A"
+            elif sum_percentage >= 65:
+                overal_grade = "B"
+            elif sum_percentage >= 50:
+                overal_grade = "C"
+            elif sum_percentage >= 35:
+                overal_grade = "D"
+            elif sum_percentage >= 20:
+                overal_grade = "E"
+
+            results['summary'] = {
+                'identifier': self.identifier,
+                'total': sum_total,
+                'score': sum_score,
+                'comments': comments,
+                'percentage': sum_percentage,
+                'grade': overal_grade
+            }
 
         return results
 
@@ -1031,7 +1048,7 @@ def validate(ctx, file_, summary, url, kpi, logfile, verbosity):
     except ValueError as err:
         raise click.UsageError(f'Invalid KPI {kpi}: {err}')
 
-    if not summary:
+    if not summary or kpi != 0:
         click.echo(json.dumps(kpis_results, indent=4))
     else:
         click.echo(json.dumps(kpis_results['summary'], indent=4))
