@@ -18,7 +18,7 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2020-2021 Government of Canada
+# Copyright (c) 2021 Government of Canada
 # Copyright (c) 2020-2021 IBL Software Engineering spol. s r. o.
 #
 # Permission is hereby granted, free of charge, to any person
@@ -978,19 +978,12 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             except ZeroDivisionError:
                 sum_percentage = None
 
-            overal_grade = "F"
+            overall_grade = 'F'
+
             if results['kpi_001']['percentage'] != 100:
-                overal_grade = "U"
-            elif sum_percentage >= 80:
-                overal_grade = "A"
-            elif sum_percentage >= 65:
-                overal_grade = "B"
-            elif sum_percentage >= 50:
-                overal_grade = "C"
-            elif sum_percentage >= 35:
-                overal_grade = "D"
-            elif sum_percentage >= 20:
-                overal_grade = "E"
+                overall_grade = 'U'
+            else:
+                overall_grade = calculate_grade(sum_percentage)
 
             results['summary'] = {
                 'identifier': self.identifier,
@@ -998,10 +991,35 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 'score': sum_score,
                 'comments': comments,
                 'percentage': sum_percentage,
-                'grade': overal_grade
+                'grade': overall_grade
             }
 
         return results
+
+
+def calculate_grade(percentage: float) -> str:
+    """
+    Calculates letter grade from numerical score
+
+    :param percentage: float between 0-100
+    """
+
+    if percentage is None:
+        grade = None
+    elif percentage > 100 or percentage < 0:
+        raise ValueError('Invalid percentage')
+    elif percentage >= 80:
+        grade = 'A'
+    elif percentage >= 65:
+        grade = 'B'
+    elif percentage >= 50:
+        grade = 'C'
+    elif percentage >= 35:
+        grade = 'D'
+    elif percentage >= 20:
+        grade = 'E'
+
+    return grade
 
 
 @click.group()

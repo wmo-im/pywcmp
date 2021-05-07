@@ -18,7 +18,7 @@
 # those files. Users are asked to read the 3rd Party Licenses
 # referenced with those assets.
 #
-# Copyright (c) 2020 Government of Canada
+# Copyright (c) 2021 Government of Canada
 # Copyright (c) 2020, IBL Software Engineering spol. s r. o.
 #
 # Permission is hereby granted, free of charge, to any person
@@ -49,7 +49,8 @@ import unittest
 
 from lxml import etree
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
-from pywcmp.kpi import WMOCoreMetadataProfileKeyPerformanceIndicators
+from pywcmp.kpi import (calculate_grade,
+                        WMOCoreMetadataProfileKeyPerformanceIndicators)
 from pywcmp.util import parse_wcmp
 
 
@@ -111,6 +112,19 @@ class WCMPKPITest(unittest.TestCase):
         self.assertEqual(results['summary']['total'], 63)
         self.assertEqual(results['summary']['score'], 40)
         self.assertEqual(results['summary']['percentage'], 63.492)
+        self.assertEqual(results['summary']['grade'], "C")
+
+    def test_calculate_grade(self):
+        self.assertEqual(calculate_grade(98), 'A')
+        self.assertEqual(calculate_grade(77), 'B')
+        self.assertEqual(calculate_grade(66), 'B')
+        self.assertEqual(calculate_grade(52), 'C')
+        self.assertEqual(calculate_grade(41), 'D')
+        self.assertEqual(calculate_grade(33), 'E')
+        self.assertIsNone(calculate_grade(None))
+
+        with self.assertRaises(ValueError):
+            calculate_grade(101)
 
 
 class WCMPUtilTest(unittest.TestCase):
