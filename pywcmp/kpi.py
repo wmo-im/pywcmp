@@ -635,7 +635,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                     else:
                         comments.append(f'Line {element.sourceline}: WMO_DataLicenseCode is not defined as an anchor')
                 else:
-                    checked_values += element.text
+                    checked_values.append(element.text)
 
         if score == 0:
             comments.append(f'None of {checked_values} is a known WMO_DataLicenseCode value')
@@ -883,7 +883,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         for doi_anchor in doi_anchors:
             LOGGER.debug('DOI anchor is present')
             # TODO: KPI def does not check for actual value
-            score += 3
+            total += 3
             score += 1
 
             LOGGER.debug('testing for DOI title')
@@ -903,10 +903,11 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
             for d in doi_constraints:
                 doi_constraint = d.text
-                if 'Cite as:' in doi_constraint and doi_text in doi_constraint:
-                    score += 1
-                else:
-                    comments.append('Line {d.sourceline}: citation should start with "Cite as" and have matching DOI')
+                if doi_constraint is not None:
+                    if 'Cite as:' in doi_constraint and doi_text in doi_constraint:
+                        score += 1
+                    else:
+                        comments.append(f'Line {d.sourceline}: citation should start with "Cite as" and have matching DOI')
 
         return name, total, score, comments
 
