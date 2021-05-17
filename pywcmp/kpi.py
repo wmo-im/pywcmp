@@ -673,17 +673,25 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         for main_keyword in main_keyword_elements:
             keywords, types, thesauruses = get_keyword_info(main_keyword)
-            LOGGER.debug(f'Found {types}: {thesauruses}')
-            if len(types) > 1 or len(thesauruses) > 1:
-                comments.append(f'Ambiguous definition of keyword type ({types}) and/or thesaurus ({thesauruses})')
+            if len(types) > 1:
+                comments.append(f'Line {types[0].sourceline}: Ambiguous definition of keyword type ({types})')
+            elif len(thesauruses) > 1:
+                comments.append(f'Line {thesauruses[0].sourceline}: Ambiguous definition of thesaurus ({len(thesauruses)})')
             elif len(types) == 0 or len(thesauruses) == 0:
                 continue
 
+            thesaurus_title_values = get_string_or_anchor_value(thesauruses[0])
+            if len(thesaurus_title_values) > 1:
+                comments.append(f'Line {thesauruses[0].sourceline}: Ambiguous definition of thesaurus title ({thesaurus_title_values})')
+            elif len(thesaurus_title_values) == 0:
+                LOGGER.debug(f'Unnamed thesaurus of type {types[0]} at {thesauruses[0].sourceline}')
+                continue
+
             if types[0] in self.codelists['wmo']['MD_KeywordTypeCode'] + self.codelists['iso']['MD_KeywordTypeCode']:
-                thesaurus_name = get_string_or_anchor_value(thesauruses[0])[0]
-                LOGGER.debug(f'{thesaurus_name}')
+                thesaurus_name = thesaurus_title_values[0]
+                LOGGER.debug(f'Found keyword type "{types[0]}" of "{thesaurus_name}"')
                 if types[0] in ['dataCenter', 'dataCentre'] and 'WMO_DistributionScopeCode' == thesaurus_name:
-                    LOGGER.debug(f'Found {types[0]} of {thesaurus_name}')
+                    LOGGER.debug(f'Found WMO_DistributionScopeCode {thesaurus_name}')
                     distribution_defined = True
                 if 'WMO_DistributionScopeCode' == thesaurus_name:
                     for keyword in keywords:
@@ -708,6 +716,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                         comments.append(f'Line {thesauruses[0].sourceline}: WMO_DistributionScopeCode thesaurus title is not defined as an anchor')
                     else:
                         distribution_scope_code_thesaurus_is_anchor = True
+
         if distribution_defined:
             score += 1
         else:
