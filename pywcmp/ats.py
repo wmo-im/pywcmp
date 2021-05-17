@@ -298,8 +298,8 @@ class WMOCoreMetadataProfileTestSuite13:
                     if value == f'{CODELIST_PREFIX}#{code}':
                         wmo_cats.append(kwd)
                 else:  # gmd:title should be code var
-                    value = node.find(nspath_eval('gco:CharacterString')).text
-                    if value == code:
+                    value = node.find(nspath_eval('gco:CharacterString'))
+                    if value is not None and value.text == code:
                         wmo_cats.append(kwd)
         return wmo_cats
 
