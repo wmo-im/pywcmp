@@ -976,35 +976,46 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             }
             LOGGER.debug(f'{kpi}: {result[1]} / {result[2]} = {percentage}')
 
-        # summary only if more than one KPI was evaluated
+        # the summary only if more than one KPI was evaluated
         if len(kpis_to_run) > 1:
             LOGGER.debug('Calculating total results')
-            sum_total = sum(v['total'] for v in results.values())
-            sum_score = sum(v['score'] for v in results.values())
-            comments = {k: v['comments'] for k, v in results.items() if v['comments']}
-
-            try:
-                sum_percentage = round(float((sum_score / sum_total) * 100), ROUND)
-            except ZeroDivisionError:
-                sum_percentage = None
-
+            results['summary'] = generate_summary(results)
+            # this total summary needs extra elements
+            results['summary']['identifier'] = self.identifier,
             overall_grade = 'F'
-
             if results['kpi_001']['percentage'] != 100:
                 overall_grade = 'U'
             else:
-                overall_grade = calculate_grade(sum_percentage)
-
-            results['summary'] = {
-                'identifier': self.identifier,
-                'total': sum_total,
-                'score': sum_score,
-                'comments': comments,
-                'percentage': sum_percentage,
-                'grade': overall_grade
-            }
+                overall_grade = calculate_grade(results['summary']['percentage'])
+            results['summary']['grade'] = overall_grade
 
         return results
+
+
+def generate_summary(results: dict) -> dict:
+    """
+    Genrerates a summary entry for given group of results
+
+    :param results: results to generate the summary from
+    """
+
+    sum_total = sum(v['total'] for v in results.values())
+    sum_score = sum(v['score'] for v in results.values())
+    comments = {k: v['comments'] for k, v in results.items() if v['comments']}
+
+    try:
+        sum_percentage = round(float((sum_score / sum_total) * 100), ROUND)
+    except ZeroDivisionError:
+        sum_percentage = None
+
+    summary = {
+        'total': sum_total,
+        'score': sum_score,
+        'comments': comments,
+        'percentage': sum_percentage,
+    }
+
+    return summary
 
 
 def calculate_grade(percentage: float) -> str:
@@ -1032,6 +1043,35 @@ def calculate_grade(percentage: float) -> str:
     return grade
 
 
+def group_kpi_results(kpis_results: dict) -> dict:
+    """
+    Groups KPI results by category
+
+    :param kpis_results: the results to be grouped
+    """
+
+    grouped_kpi_results = {}
+    grouped_kpi_results['mandatory'] = {k: kpis_results[k] for k in ['kpi_001']}
+
+    content_information = {f'kpi_{k:03}': kpis_results[f'kpi_{k:03}'] for k in [2, 3, 4, 6, 7, 12]}
+    grouped_kpi_results['content information'] = content_information
+    grouped_kpi_results['content information']['summary'] = generate_summary(content_information)
+
+    distribution_information = {f'kpi_{k:03}': kpis_results[f'kpi_{k:03}'] for k in [5, 9, 10]}
+    grouped_kpi_results['distribution information'] = distribution_information
+    grouped_kpi_results['distribution information']['summary'] = generate_summary(distribution_information)
+
+    enhancements = {f'kpi_{k:03}': kpis_results[f'kpi_{k:03}'] for k in [8, 11]}
+    grouped_kpi_results['enhancements'] = enhancements
+    grouped_kpi_results['enhancements']['summary'] = generate_summary(enhancements)
+
+    # copy the total summary as-is
+    if kpis_results['summary']:
+        grouped_kpi_results['summary'] = kpis_results['summary']
+
+    return grouped_kpi_results
+
+
 @click.group()
 def kpi():
     """key performance indicators"""
@@ -1046,9 +1086,11 @@ def kpi():
               help='Path to XML file')
 @click.option('--summary', '-s', is_flag=True, default=False,
               help='Provide summary of KPI test results')
+@click.option('--group', '-g', is_flag=True, default=False,
+              help='Group KPIs by into categories')
 @click.option('--url', '-u', help='URL of XML file')
 @click.option('--kpi', '-k', default=0, help='KPI to run, default is all')
-def validate(ctx, file_, summary, url, kpi, logfile, verbosity):
+def validate(ctx, file_, summary, group, url, kpi, logfile, verbosity):
     """run key performance indicators"""
 
     if file_ is None and url is None:
@@ -1075,6 +1117,9 @@ def validate(ctx, file_, summary, url, kpi, logfile, verbosity):
         kpis_results = kpis.evaluate(kpi)
     except ValueError as err:
         raise click.UsageError(f'Invalid KPI {kpi}: {err}')
+
+    if group and kpi == 0:
+        kpis_results = group_kpi_results(kpis_results)
 
     if not summary or kpi != 0:
         click.echo(json.dumps(kpis_results, indent=4))
