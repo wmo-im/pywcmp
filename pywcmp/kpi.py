@@ -1054,12 +1054,12 @@ def group_kpi_results(kpis_results: dict) -> dict:
     grouped_kpi_results['mandatory'] = {k: kpis_results[k] for k in ['kpi_001']}
 
     content_information = {f'kpi_{k:03}': kpis_results[f'kpi_{k:03}'] for k in [2, 3, 4, 6, 7, 12]}
-    grouped_kpi_results['content information'] = content_information
-    grouped_kpi_results['content information']['summary'] = generate_summary(content_information)
+    grouped_kpi_results['content_information'] = content_information
+    grouped_kpi_results['content_information']['summary'] = generate_summary(content_information)
 
     distribution_information = {f'kpi_{k:03}': kpis_results[f'kpi_{k:03}'] for k in [5, 9, 10]}
-    grouped_kpi_results['distribution information'] = distribution_information
-    grouped_kpi_results['distribution information']['summary'] = generate_summary(distribution_information)
+    grouped_kpi_results['distribution_information'] = distribution_information
+    grouped_kpi_results['distribution_information']['summary'] = generate_summary(distribution_information)
 
     enhancements = {f'kpi_{k:03}': kpis_results[f'kpi_{k:03}'] for k in [8, 11]}
     grouped_kpi_results['enhancements'] = enhancements

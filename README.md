@@ -50,8 +50,16 @@ pywcmp ats validate --url http://example.org/path/to/file.xml --verbosity DEBUG
 # write results to logfile
 pywcmp ats validate --url http://example.org/path/to/file.xml --verbosity DEBUG --logfile /tmp/foo.txt
 
+# key performance indicators
+
 # all key performance indicators at once # note: running KPIs automatically runs the ats
 pywcmp kpi validate --url http://example.org/path/to/file.xml --verbosity DEBUG
+
+# all key performance indicators at once, in summary
+pywcmp kpi validate --url http://example.org/path/to/file.xml --verbosity DEBUG --summary
+
+# all key performance indicators at once, with scoring rubric grouping
+pywcmp kpi validate --url http://example.org/path/to/file.xml --verbosity DEBUG --group
 
 # selected key performance indicator
 pywcmp kpi validate --kpi 4 -f /path/to/file.xml -v INFO
@@ -59,29 +67,34 @@ pywcmp kpi validate --kpi 4 -f /path/to/file.xml -v INFO
 
 ## Using the API
 ```pycon
-# test a file on disk
+>>> # test a file on disk
 >>> from lxml import etree
 >>> from pywcmp.ats import ats
 >>> exml = etree.parse('/path/to/file.xml')
+>>> # test ATS
 >>> ts = ats.WMOCoreMetadataProfileTestSuite13(exml)
 >>> ts.run_tests()  # raises ValueError error stack on exception
-# test a URL
+>>> # test a URL
 >>> from urllib2 import urlopen
 >>> from StringIO import StringIO
 >>> content = StringIO(urlopen('http://....').read())
 >>> exml = etree.parse(content)
 >>> ts = ats.WMOCoreMetadataProfileTestSuite13(exml)
 >>> ts.run_tests()  # raises ValueError error stack on exception
-# handle ats.TestSuiteError
-# ats.TestSuiteError.errors is a list of errors
+>>> # handle ats.TestSuiteError
+>>> # ats.TestSuiteError.errors is a list of errors
 >>> try:
 ...    ts.run_tests()
 ... except ats.TestSuiteError as err:
 ...    print('\n'.join(err.errors))
 >>> ...
+>>> # test KPI
 >>> from pywcmp.kpi import WMOCoreMetadataProfileKeyPerformanceIndicators
 >>> kpis = WMOCoreMetadataProfileKeyPerformanceIndicators(exml)
->>> kpis['totals']
+>>> results = kpis.evaluate()
+>>> results['summary']
+>>> # scoring rubric
+>>> grouped = group_kpi_results(results)
 ```
 
 ## Development
