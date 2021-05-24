@@ -49,7 +49,7 @@ import unittest
 
 from lxml import etree
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
-from pywcmp.kpi import (calculate_grade,
+from pywcmp.kpi import (calculate_grade, group_kpi_results,
                         WMOCoreMetadataProfileKeyPerformanceIndicators)
 from pywcmp.util import parse_wcmp
 
@@ -125,6 +125,58 @@ class WCMPKPITest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             calculate_grade(101)
+
+    def test_group_kpi_results(self):
+        exml = etree.parse(get_test_file_path('data/urn:x-wmo:md:int.wmo.wis::ca.gc.ec.msc-1.1.5.6.xml'))  # noqa
+
+        kpis = WMOCoreMetadataProfileKeyPerformanceIndicators(exml)
+
+        results = kpis.evaluate()
+        grouped_results = group_kpi_results(results)
+
+        self.assertEqual(len(grouped_results), 5)
+
+        expected_keys = [
+            'content_information',
+            'distribution_information',
+            'enhancements',
+            'mandatory',
+            'summary'
+        ]
+        self.assertEqual(sorted(grouped_results.keys()), expected_keys)
+
+        mandatory_kpis = ['kpi_001']
+        self.assertEqual(sorted(grouped_results['mandatory'].keys()),
+                         mandatory_kpis)
+
+        content_information_kpis = [
+            'kpi_002',
+            'kpi_003',
+            'kpi_004',
+            'kpi_006',
+            'kpi_007',
+            'kpi_012',
+            'summary'
+        ]
+        self.assertEqual(sorted(grouped_results['content_information'].keys()),
+                         content_information_kpis)
+
+        distribution_information_kpis = [
+            'kpi_005',
+            'kpi_009',
+            'kpi_010',
+            'summary'
+        ]
+        self.assertEqual(sorted(grouped_results['distribution_information'].keys()),
+                         distribution_information_kpis)
+
+        enhancements_kpis = [
+            'kpi_008',
+            'kpi_011',
+            'summary'
+        ]
+        self.assertEqual(sorted(grouped_results['enhancements'].keys()),
+                         enhancements_kpis)
 
 
 class WCMPUtilTest(unittest.TestCase):
