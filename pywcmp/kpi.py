@@ -85,6 +85,17 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         self.exml = exml  # serialized already
         self.namespaces = self.exml.getroot().nsmap
 
+        # remove empty (default) namespace to avoid exceptions in exml.xpath
+        if None in self.namespaces:
+            LOGGER.debug('Removing default (None) namespace. This XML is destined to fail.')
+            none_namespace = self.namespaces[None]
+            self.namespaces[none_namespace.split('/')[-1]] = none_namespace
+            self.namespaces.pop(None)
+
+        # add namespace that our Xpath searches depend on but that may not exist in certain documents
+        if 'gmx' not in self.namespaces:
+            self.namespaces['gmx'] = 'http://www.isotc211.org/2005/gmx'
+
         # generate dict of codelists
         self.codelists = get_codelists()
 
@@ -343,9 +354,9 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                     elif dt_end is None:
                         comments.append(f'Line {end_position.sourceline}: Temporal information - end time has unknown format')
                 elif begin_position is None:
-                    comments.append(f'Line {begin_position.sourceline}: Temporal information - begin time not found')
+                    comments.append(f'Line {time_period.sourceline}: Temporal information - begin time not found')
                 elif end_position is None:
-                    comments.append(f'Line {end_position.sourceline}: Temporal information - end time not found')
+                    comments.append(f'Line {time_period.sourceline}: Temporal information - end time not found')
         else:
             total += 3
             comments.append('Temporal information not found')
