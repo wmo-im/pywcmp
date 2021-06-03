@@ -309,7 +309,7 @@ def check_url(url: str, check_ssl: bool) -> dict:
             response = urlopen(url, context=context)
         else:
             response = urlopen(url)
-    except (ssl.SSLError, URLError) as err:
+    except (ssl.SSLError, URLError, ValueError) as err:
         LOGGER.debug(err)
 
     if response is None and check_ssl is True:
