@@ -1,8 +1,15 @@
+# pywcmp
+
 [![Build Status](https://github.com/wmo-im/pywcmp/workflows/build%20%E2%9A%99%EF%B8%8F/badge.svg)](https://github.com/wmo-im/pywcmp/actions)
 
 # WMO Core Metadata Profile Test Suite
 
-This library implements validation against [WMO Core Metadata Profile 1.3](http://wis.wmo.int/2013/metadata/version_1-3-0/WMO_Core_Metadata_Profile_v1.3_Part_1.pdf), specifically [Part 2](http://wis.wmo.int/2013/metadata/version_1-3-0/WMO_Core_Metadata_Profile_v1.3_Part_2.pdf), Section 2.
+pywcmp provides validation and quality assessment capabilities for the [WMO
+WIS](https://community.wmo.int/activity-areas/wis/wis-overview) Core Metadata
+Profile (WCMP).
+
+- validation against [WCMP 1.3](http://wis.wmo.int/2013/metadata/version_1-3-0/WMO_Core_Metadata_Profile_v1.3_Part_1.pdf), specifically [Part 2](http://wis.wmo.int/2013/metadata/version_1-3-0/WMO_Core_Metadata_Profile_v1.3_Part_2.pdf), Section 2, implementing an executable test suite against the ATS
+- quality assessement against the [WCMP Key Performance Indicators](https://community.wmo.int/activity-areas/wis/wis-metadata-kpis)
 
 ## Installation
 
@@ -11,7 +18,7 @@ This library implements validation against [WMO Core Metadata Profile 1.3](http:
 Install latest stable version from [PyPI](https://pypi.org/project/pywcmp).
 
 ```bash
-pip install pywcmp
+pip3 install pywcmp
 ```
 
 ### From source
