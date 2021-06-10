@@ -848,12 +848,15 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                     total += 1
                     try:
                         codelist = xpath2.attrib.get('codeList').split('#')[-1]
+                        LOGGER.debug(f'Checking {codelist}')
                         if xpath2.text in self.codelists[key][codelist]:
                             score += 1
                         else:
-                            comments.append(f'Line {xpath2.sourceline}: Invalid codelist value: {xpath2.text} not in {codelist}')
+                            comments.append(f"Line {xpath2.sourceline}: Invalid codelist value: '{xpath2.text}' not in '{codelist}'")
                     except AttributeError:
-                        comments.append(f'Line {xpath2.sourceline}: Missing codeList attribute: {xpath2.text}')
+                        comments.append(f"Line {xpath2.sourceline}: Missing codeList attribute: '{xpath2.text}'")
+                    except KeyError:
+                        comments.append(f"Line {xpath2.sourceline}: Invalid code list reference: '{codelist}' is not defined in '{key}'")
 
         xpath = '//gmd:topicCategory/gmd:MD_TopicCategoryCode'
 
