@@ -48,7 +48,7 @@ import click
 from pywcmp.ats import ats
 from pywcmp.kpi import kpi
 
-__version__ = '0.3.0'
+__version__ = '0.4.dev0'
 
 
 @click.group()
