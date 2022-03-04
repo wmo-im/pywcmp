@@ -52,6 +52,7 @@ from datetime import datetime, timezone, timedelta
 from dateutil.parser import parse
 from urllib.error import URLError
 from urllib.request import urlopen
+from urllib.parse import urlparse
 
 from lxml import etree
 
@@ -317,11 +318,15 @@ def check_url(url: str, check_ssl: bool) -> dict:
 
     if response is not None:
         result['url-resolved'] = response.url
-        if response.status > 300:
-            LOGGER.debug(f'Request failed: {response}')
-        result['accessible'] = response.status < 300
-        result['mime-type'] = response.headers.get_content_type()
-        if response.url.startswith("https") and check_ssl is True:
+        parsed_uri = urlparse(response.url)
+        if parsed_uri.scheme in ('http', 'https'):
+            if response.status > 300:
+                LOGGER.debug(f'Request failed: {response}')
+            result['accessible'] = response.status < 300
+            result['mime-type'] = response.headers.get_content_type()
+        else:
+            result['accessible'] = True
+        if parsed_uri.scheme in ('https') and check_ssl is True:
             result['ssl'] = True
     else:
         result['accessible'] = False
