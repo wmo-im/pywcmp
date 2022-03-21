@@ -209,9 +209,15 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             LOGGER.debug('Title is present')
             total += 8
             score += 1
+            title_words = []
 
-            LOGGER.debug('Testing number of words')
-            title_words = title.split()
+            try:
+                LOGGER.debug('Testing number of words')
+                title_words = title.split()
+            except Exception as err:
+                LOGGER.debug(err)
+                continue
+
             if len(title_words) >= 3:
                 score += 1
             else:
