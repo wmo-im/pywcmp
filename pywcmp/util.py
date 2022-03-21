@@ -190,8 +190,14 @@ def parse_time_position(element) -> datetime:
         text_to_parse = element.text
         if text_to_parse.endswith('Z'):
             text_to_parse = text_to_parse[0:-1]
-        dtg = parse(text_to_parse, fuzzy=True, ignoretz=True).replace(tzinfo=timezone.utc)
-        return dtg
+
+        try:
+            dtg = parse(text_to_parse, fuzzy=True, ignoretz=True).replace(tzinfo=timezone.utc)
+            return dtg
+        except Exception as err:
+            msg = f'Invalid time string: {err}'
+            LOGGER.debug(msg)
+
     return None
 
 
