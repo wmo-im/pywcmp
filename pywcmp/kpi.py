@@ -230,7 +230,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 comments.append(f'Line {t.sourceline}: title has more than 150 characters')
 
             LOGGER.debug('Testing for alphanumeric characters')
-            if title.isalnum():
+            if title.isascii():
                 score += 1
             else:
                 comments.append(f'Line {t.sourceline}: title contains non-printable characters')
