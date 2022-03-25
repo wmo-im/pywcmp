@@ -218,6 +218,9 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 LOGGER.debug(err)
                 continue
 
+            title_words = title.split()
+
+            LOGGER.debug('Testing number of words')
             if len(title_words) >= 3:
                 score += 1
             else:
@@ -230,7 +233,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 comments.append(f'Line {t.sourceline}: title has more than 150 characters')
 
             LOGGER.debug('Testing for alphanumeric characters')
-            if title.isalnum():
+            if all(x.isalnum() for x in title_words):
                 score += 1
             else:
                 comments.append(f'Line {t.sourceline}: title contains non-printable characters')
