@@ -329,6 +329,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         total = 0
         score = 0
         comments = []
+        time_periods = []
 
         name = 'KPI-4: Temporal information'
 
@@ -336,8 +337,11 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         time_period_xpath = '/gmd:MD_Metadata/gmd:identificationInfo//gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod'
 
-        LOGGER.debug(f'Testing for temporal information at "{time_period_xpath}"')
-        time_periods = self.exml.xpath(time_period_xpath, namespaces=self.namespaces)
+        try:
+            LOGGER.debug(f'Testing for temporal information at "{time_period_xpath}"')
+            time_periods = self.exml.xpath(time_period_xpath, namespaces=self.namespaces)
+        except Exception as err:
+            LOGGER.debug(err)
 
         if len(time_periods) > 0:
             for time_period in time_periods:
