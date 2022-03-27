@@ -294,6 +294,10 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             LOGGER.debug('Abstract is present')
             total += 3
 
+            if abstract is None:
+                comments.append(f'Abstract at line {a.sourceline}: is null')
+                continue
+
             LOGGER.debug('Testing number of characters')
             if 16 <= len(abstract) <= 2048:
                 score += 1
