@@ -242,6 +242,10 @@ class WMOCoreMetadataProfileTestSuite13:
         """Requirement 9.1.1: A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the scope of distribution using the keyword "GlobalExchange" of type "dataCenter" from thesaurus WMO_DistributionScopeCode."""
         self.test_id = gen_test_id('identification-of-globally-exchanged-data')
 
+        LOGGER.debug('Checking if discovery metadata identifies data for global exchange')
+        if not self._is_for_global_exchange():
+            return
+
         dist_cats = self._get_wmo_keyword_lists('WMO_DistributionScopeCode')
         if len(dist_cats) > 0:
             for cat in dist_cats:
@@ -256,6 +260,10 @@ class WMOCoreMetadataProfileTestSuite13:
         """Requirement 9.2.1: A WIS Discovery Metadata record describing data for global exchange via the WIS shall have a gmd:MD_Metadata/gmd:fileIdentifier attribute formatted as follows (where {uid} is a unique identifier derived from the GTS bulletin or file name): urn:x-wmo:md:int.wmo.wis::{uid}."""
         self.test_id = gen_test_id('fileIdentifier-for-globally-exchanged-data')
 
+        LOGGER.debug('Checking if discovery metadata identifies data for global exchange')
+        if not self._is_for_global_exchange():
+            return
+
         mask = 'urn:x-wmo:md:int.wmo.wis::'
         identifier_element = self.exml.find(nspath_eval('gmd:fileIdentifier/gco:CharacterString'))
         identifier = identifier_element.text
@@ -266,6 +274,10 @@ class WMOCoreMetadataProfileTestSuite13:
     def test_requirement_9_3_1(self):
         """Requirement 9.3.1: A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the WMO Data License as Legal Constraint (type: "otherConstraints") using one and only one term from the WMO_DataLicenseCode code list."""
         self.test_id = gen_test_id('WMO-data-policy-for-globally-exchanged-data')
+
+        LOGGER.debug('Checking if discovery metadata identifies data for global exchange')
+        if not self._is_for_global_exchange():
+            return
 
         count = 0
 
@@ -285,6 +297,10 @@ class WMOCoreMetadataProfileTestSuite13:
     def test_requirement_9_3_2(self):
         """Requirement 9.3.2: A WIS Discovery Metadata record describing data for global exchange via the WIS shall indicate the GTS Priority as Legal Constraint (type: "otherConstraints") using one and only one term from the WMO_GTSProductCategoryCode code list."""
         self.test_id = gen_test_id('GTS-priority-for-globally-exchanged-data')
+
+        LOGGER.debug('Checking if discovery metadata identifies data for global exchange')
+        if not self._is_for_global_exchange():
+            return
 
         count = 0
         xpath = 'gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints'
@@ -340,6 +356,13 @@ class WMOCoreMetadataProfileTestSuite13:
                     values.append(value_node.text)
         return values
 
+    def _is_for_global_exchange(self) -> bool:
+        keyword_nodes = self.exml.findall(nspath_eval('gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords//gmd:keyword'))
+
+        keyword_values = self._get_keyword_values(keyword_nodes)
+
+        return 'GlobalExchange' in keyword_values
+
 
 class TestSuiteError(Exception):
     """custom exception handler"""
@@ -361,8 +384,7 @@ def ats():
 @click.option('--file', '-f', 'file_',
               type=click.Path(exists=True, resolve_path=True),
               help='Path to XML file')
-@click.option('--url', '-u',
-              help='URL of XML file')
+@click.option('--url', '-u', help='URL of XML file')
 def validate(ctx, file_, url, logfile, verbosity):
     """validate against the abstract test suite"""
 
