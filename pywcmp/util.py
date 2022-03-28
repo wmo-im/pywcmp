@@ -292,12 +292,13 @@ def urlopen_(url: str):
     return response
 
 
-def check_url(url: str, check_ssl: bool) -> dict:
+def check_url(url: str, check_ssl: bool, timeout: int = 30) -> dict:
     """
     Helper function to check link (URL) accessibility
 
     :param url: The URL to check
     :param check_ssl: Whether the SSL/TLS layer verification shall be made
+    :param timeout: timeout, in seconds (default: 30)
 
     :returns: `dict` with details about the link
     """
@@ -313,10 +314,16 @@ def check_url(url: str, check_ssl: bool) -> dict:
             LOGGER.debug('Creating unverified context')
             result['ssl'] = False
             context = ssl._create_unverified_context()
-            response = urlopen(url, context=context)
+            response = urlopen(url, context=context, timeout=timeout)
         else:
-            response = urlopen(url)
+            response = urlopen(url, timeout=timeout)
+    except TimeoutError as err:
+        LOGGER.debug(f'Timeout error: {err}')
     except (ssl.SSLError, URLError, ValueError) as err:
+        LOGGER.debug(f'SSL/URL error: {err}')
+        LOGGER.debug(err)
+    except Exception as err:
+        LOGGER.debug(f'Other error: {err}')
         LOGGER.debug(err)
 
     if response is None and check_ssl is True:
