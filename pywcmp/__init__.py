@@ -47,6 +47,7 @@ import click
 
 from pywcmp.ats import ats
 from pywcmp.kpi import kpi
+from pywcmp.topics import topics
 
 __version__ = '0.4.dev0'
 
@@ -59,3 +60,4 @@ def cli():
 
 cli.add_command(ats)
 cli.add_command(kpi)
+cli.add_command(topics)

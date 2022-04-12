@@ -104,10 +104,13 @@ DESCRIPTION = 'A Python implementation of the test suite for WMO Core Metadata P
 if (os.path.exists('MANIFEST')):
     os.unlink('MANIFEST')
 
-print(f'Downloading WMO ISO XML Schemas and Codelists.xml to {USERDIR}')
+
+print('Caching schemas, codelists and topic hierarchy')
 
 if not os.path.exists(USERDIR):
     os.mkdir(USERDIR)
+
+    print(f'Downloading WMO ISO XML Schemas and Codelists.xml to {USERDIR}')
     ZIPFILE_URL = 'https://wis.wmo.int/2011/schemata/iso19139_2007/19139.zip'
     FH = io.BytesIO(urlopen_(ZIPFILE_URL).read())
     with zipfile.ZipFile(FH) as z:
@@ -137,6 +140,28 @@ if not os.path.exists(USERDIR):
                              namespace=namespace,
                              schemaLocation=schema_location)
         f.write(etree.tostring(SCHEMA, pretty_print=True))
+
+    print('Downloading topic hierarchies')
+    os.mkdir(f'{USERDIR}{os.sep}wis2-topic-hierarchy')
+
+    csvs = [
+        '01-scope.csv',
+        '02-version.csv',
+        '03-distribution.csv',
+        '04-country.csv',
+        '05-centre-id.csv',
+        '06-resource-type.csv',
+        '07-data-policy.csv',
+        '08-earth-system-domain.csv'
+    ]
+
+    for c in csvs:
+        url = f'https://raw.githubusercontent.com/wmo-cop/wis2-topic-hierarchy/main/topic-hierarchy/{c}'  # noqa
+        th_filename = f'{USERDIR}{os.sep}wis2-topic-hierarchy{os.sep}{c}'
+
+        with open(th_filename, 'wb') as f:
+            f.write(urlopen_(url).read())
+
 else:
     print(f'Directory {USERDIR} exists')
 

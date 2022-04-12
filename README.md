@@ -70,6 +70,15 @@ pywcmp kpi validate --url http://example.org/path/to/file.xml --verbosity DEBUG 
 
 # selected key performance indicator
 pywcmp kpi validate --kpi 4 -f /path/to/file.xml -v INFO
+
+# WIS topic hierarchies
+
+# validate a WIS 2.0 topic hierarchy
+pywcmp topics validate -th wis2.a.cache.CAN
+
+# list children of a given WIS 2.0 topic hierarchy level
+pywcmp topics list -th wis2.a
+
 ```
 
 ## Using the API
