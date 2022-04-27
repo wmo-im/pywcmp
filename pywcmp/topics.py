@@ -55,18 +55,23 @@ from pywcmp.util import get_userdir
 
 LOGGER = logging.getLogger(__name__)
 
+topic_csvs = [
+    'root',
+    'version',
+    'distribution',
+    'country',
+    'centre-id',
+    'resource-type',
+    'data-policy',
+    'earth-system-domain'
+]
+
 
 @dataclass
 class Topic:
-    code: int
     name: str
     description: str
-    comments: str
-
-
-@dataclass
-class CentreTopic(Topic):
-    country: str
+    child: str
 
 
 @dataclass
@@ -83,21 +88,16 @@ class TopicHierarchy:
     def __post_init__(self):
         dir_ = Path(get_userdir()) / 'wis2-topic-hierarchy'
         LOGGER.debug(f'Reading topic hierarchy files in {dir_}')
-        for c in sorted(dir_.glob('*.csv')):
-            LOGGER.debug(f'Reading topic hierarchy file {c}')
-            level_name = c.stem.split('-', 1)[-1]
-            with c.open() as fh:
+        for c in topic_csvs:
+            filename = dir_ / f'{c}.csv'
+            LOGGER.debug(f'Reading topic hierarchy file {filename}')
+            level_name = filename.stem
+            with filename.open() as fh:
                 topics = {}
                 reader = csv.DictReader(fh)
                 for row in reader:
-                    if 'Country' in row:
-                        topic = CentreTopic(row['Code'], row['Name'],
-                                            row['Description'],
-                                            row['Comments'],
-                                            row['Country'])
-                    else:
-                        topic = Topic(row['Code'], row['Name'],
-                                      row['Description'], row['Comments'])
+                    topic = Topic(row['Name'],
+                                  row['Description'], row['Child'])
 
                     topics[row['Name']] = topic
                 level = TopicLevel(level_name, topics)

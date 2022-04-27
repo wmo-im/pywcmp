@@ -145,18 +145,18 @@ if not os.path.exists(USERDIR):
     os.mkdir(f'{USERDIR}{os.sep}wis2-topic-hierarchy')
 
     csvs = [
-        '01-scope.csv',
-        '02-version.csv',
-        '03-distribution.csv',
-        '04-country.csv',
-        '05-centre-id.csv',
-        '06-resource-type.csv',
-        '07-data-policy.csv',
-        '08-earth-system-domain.csv'
+        'root.csv',
+        'version.csv',
+        'distribution.csv',
+        'country.csv',
+        'centre-id.csv',
+        'resource-type.csv',
+        'data-policy.csv',
+        'earth-system-domain.csv'
     ]
 
     for c in csvs:
-        url = f'https://raw.githubusercontent.com/wmo-cop/wis2-topic-hierarchy/main/topic-hierarchy/{c}'  # noqa
+        url = f'https://raw.githubusercontent.com/wmo-im/wis2-topic-hierarchy/main/topic-hierarchy/{c}'  # noqa
         th_filename = f'{USERDIR}{os.sep}wis2-topic-hierarchy{os.sep}{c}'
 
         with open(th_filename, 'wb') as f:
