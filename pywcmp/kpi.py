@@ -174,10 +174,19 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         comments = []
 
         # run the tests
+        score = total
         try:
             ts.run_tests()
-            score = 13
         except TestSuiteError as err:
+            allowed_errors = ['6.1.1', '6.1.2', '6.2.1']
+            error_regex = re.compile(r'^ASSERTION ERROR: Requirement (\d\.\d.\d).*')
+            for error in err.errors:
+                failed_test = error_regex.match(error)
+                if failed_test is None or failed_test.group(1) not in allowed_errors:
+                    score -= 1
+                else:
+                    LOGGER.debug(f'Skipping failure of the requirement {failed_test.group(1)}')
+                    err.errors.remove(error)
             score = total - len(err.errors)
             comments = err.errors
 
