@@ -301,7 +301,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         for a in abstracts:
             abstract = a.text
             LOGGER.debug('Abstract is present')
-            total += 3
+            total += 4
 
             if abstract is None:
                 comments.append(f'Abstract at line {a.sourceline}: is null')
@@ -321,8 +321,9 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
             LOGGER.debug('Testing for bulletin headers')
             has_bulletin_header = re.search(r'[A-Z]{4}\d{2}[\s_]*[A-Z]{4}', abstract)
-            if has_bulletin_header:
-                score -= 1
+            if not has_bulletin_header:
+                score += 1
+            else:
                 comments.append(f'Line {a.sourceline}: contains bulletin header')
 
             LOGGER.debug('Testing for spelling')
