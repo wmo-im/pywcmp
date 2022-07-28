@@ -416,40 +416,6 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         return name, total, score, comments
 
-    def kpi_005(self) -> tuple:
-        """
-        Implements KPI-5: WMOEssential data links
-
-        :returns: `tuple` of KPI name, achieved score, total score, and comments
-        """
-
-        total = 0
-        score = 0
-        comments = []
-
-        name = 'KPI-5: WMOEssential data links'
-
-        LOGGER.info(f'Running {name}')
-
-        constraints_xpath = 'gmd:identificationInfo//gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints'
-
-        LOGGER.debug(f'Testing for WMOEssential constraints at "{constraints_xpath}"')
-        constraints = get_string_or_anchor_values(self.exml.findall(nspath_eval(constraints_xpath)))
-
-        for constraint in constraints:
-            if constraint == 'WMOEssential':
-                LOGGER.debug(f'Is {constraint}')
-                total += 1
-                linkage_xpath = 'gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage'
-                linkages = self.exml.xpath(linkage_xpath, namespaces=self.namespaces)
-                if len(linkages) > 0:
-                    score += 1
-                    LOGGER.debug(f'Found {len(linkages)} online resource linkage(s)')
-                else:
-                    comments.append('Resource transferOption link not found for WMOEssential data')
-
-        return name, total, score, comments
-
     def kpi_006(self) -> tuple:
         """
         Implements KPI-6: Keywords
