@@ -417,40 +417,6 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         return name, total, score, comments
 
-    def kpi_005(self) -> tuple:
-        """
-        Implements KPI-5: WMOEssential data links
-
-        :returns: `tuple` of KPI name, achieved score, total score, and comments
-        """
-
-        total = 0
-        score = 0
-        comments = []
-
-        name = 'KPI-5: WMOEssential data links'
-
-        LOGGER.info(f'Running {name}')
-
-        constraints_xpath = 'gmd:identificationInfo//gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints'
-
-        LOGGER.debug(f'Testing for WMOEssential constraints at "{constraints_xpath}"')
-        constraints = get_string_or_anchor_values(self.exml.findall(nspath_eval(constraints_xpath)))
-
-        for constraint in constraints:
-            if constraint == 'WMOEssential':
-                LOGGER.debug(f'Is {constraint}')
-                total += 1
-                linkage_xpath = 'gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage'
-                linkages = self.exml.xpath(linkage_xpath, namespaces=self.namespaces)
-                if len(linkages) > 0:
-                    score += 1
-                    LOGGER.debug(f'Found {len(linkages)} online resource linkage(s)')
-                else:
-                    comments.append('Resource transferOption link not found for WMOEssential data')
-
-        return name, total, score, comments
-
     def kpi_006(self) -> tuple:
         """
         Implements KPI-6: Keywords
@@ -744,6 +710,17 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                                         if constraint in self.codelists['wmo']['WMO_GTSProductCategoryCode']:
                                             LOGGER.debug(f'Found {value} with product category "{constraint}"')
                                             product_category_code_defined = True
+                                        # this was originally 'KPI-5: WMOEssential data links'
+                                        if constraint == 'WMOEssential':
+                                            LOGGER.debug(f'Is {constraint}')
+                                            total += 1
+                                            linkage_xpath = 'gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage'
+                                            linkages = self.exml.xpath(linkage_xpath, namespaces=self.namespaces)
+                                            if len(linkages) > 0:
+                                                score += 1
+                                                LOGGER.debug(f'Found {len(linkages)} online resource linkage(s)')
+                                            else:
+                                                comments.append('Resource transferOption link not found for WMOEssential data')
                                 if 'Anchor' in element.tag:
                                     product_category_code_is_anchor = True
                                 else:
@@ -767,7 +744,6 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         if data_license_code_is_anchor and product_category_code_is_anchor and distribution_scope_code_thesaurus_is_anchor:
             score += 1
-
         return name, total, score, comments
 
     def kpi_010(self) -> tuple:
@@ -973,7 +949,6 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             'kpi_002',
             'kpi_003',
             'kpi_004',
-            'kpi_005',
             'kpi_006',
             'kpi_007',
             'kpi_008',
@@ -1098,7 +1073,7 @@ def group_kpi_results(kpis_results: dict) -> dict:
     grouped_kpi_results['content_information'] = content_information
     grouped_kpi_results['content_information']['summary'] = generate_summary(content_information)
 
-    distribution_information = {f'kpi_{k:03}': kpis_results[f'kpi_{k:03}'] for k in [5, 9, 10]}
+    distribution_information = {f'kpi_{k:03}': kpis_results[f'kpi_{k:03}'] for k in [9, 10]}
     grouped_kpi_results['distribution_information'] = distribution_information
     grouped_kpi_results['distribution_information']['summary'] = generate_summary(distribution_information)
 

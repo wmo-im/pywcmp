@@ -109,10 +109,10 @@ class WCMPKPITest(unittest.TestCase):
 
         results = kpis.evaluate()
 
-        self.assertEqual(results['summary']['total'], 64)
+        self.assertEqual(results['summary']['total'], 63)
         self.assertEqual(results['summary']['score'], 41)
-        self.assertEqual(results['summary']['percentage'], 64.062)
-        self.assertEqual(results['summary']['grade'], "C")
+        self.assertEqual(results['summary']['percentage'], 65.079)
+        self.assertEqual(results['summary']['grade'], "B")
 
     def test_calculate_grade(self):
         self.assertEqual(calculate_grade(98), 'A')
@@ -162,7 +162,6 @@ class WCMPKPITest(unittest.TestCase):
                          content_information_kpis)
 
         distribution_information_kpis = [
-            'kpi_005',
             'kpi_009',
             'kpi_010',
             'summary'
