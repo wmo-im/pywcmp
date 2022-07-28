@@ -153,9 +153,9 @@ class WCMPKPITest(unittest.TestCase):
             'kpi_002',
             'kpi_003',
             'kpi_004',
+            'kpi_005',
             'kpi_006',
             'kpi_007',
-            'kpi_012',
             'summary'
         ]
         self.assertEqual(sorted(grouped_results['content_information'].keys()),

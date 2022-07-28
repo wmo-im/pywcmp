@@ -417,6 +417,58 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         return name, total, score, comments
 
+    def kpi_005(self) -> tuple:
+        """
+        Implements KPI-5: DOI citation
+
+        :returns: `tuple` of KPI name, achieved score, total score, and comments
+        """
+
+        total = 3
+        score = 0
+        comments = []
+
+        name = 'KPI-5: DOI citation'
+
+        LOGGER.info(f'Running {name}')
+
+        xpath = '//gmd:identificationInfo//gmd:citation//gmd:identifier//gmd:code/gmx:Anchor'
+
+        LOGGER.debug(f'Testing all DOIs at {xpath}')
+
+        doi_anchors = self.exml.xpath(xpath, namespaces=self.namespaces)
+
+        for doi_anchor in doi_anchors:
+            LOGGER.debug('DOI anchor is present')
+            # TODO: KPI def does not check for actual value
+            total += 3
+            score += 1
+
+            LOGGER.debug('testing for DOI title')
+            doi_title = doi_anchor.get(nspath_eval('xlink:title'))
+            doi_text = doi_anchor.text
+
+            if doi_title is not None and doi_title == 'DOI':
+                score += 1
+            else:
+                comments.append('Line {doi_anchor.sourceline}: DOI title is not equal to "DOI"')
+
+            xpath2 = '//gmd:identificationInfo//gmd:resourceConstraints//gmd:otherConstraints/gco:CharacterString'
+
+            LOGGER.debug(f'Testing all DOIs in constraints at {xpath2}')
+
+            doi_constraints = self.exml.xpath(xpath2, namespaces=self.namespaces)
+
+            for d in doi_constraints:
+                doi_constraint = d.text
+                if doi_constraint is not None:
+                    if 'Cite as:' in doi_constraint and doi_text in doi_constraint:
+                        score += 1
+                    else:
+                        comments.append(f'Line {d.sourceline}: citation should start with "Cite as" and have matching DOI')
+
+        return name, total, score, comments
+
     def kpi_006(self) -> tuple:
         """
         Implements KPI-6: Keywords
@@ -885,58 +937,6 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         return name, total, score, comments
 
-    def kpi_012(self) -> tuple:
-        """
-        Implements KPI-12: DOI citation
-
-        :returns: `tuple` of KPI name, achieved score, total score, and comments
-        """
-
-        total = 3
-        score = 0
-        comments = []
-
-        name = 'KPI-12: DOI citation'
-
-        LOGGER.info(f'Running {name}')
-
-        xpath = '//gmd:identificationInfo//gmd:citation//gmd:identifier//gmd:code/gmx:Anchor'
-
-        LOGGER.debug(f'Testing all DOIs at {xpath}')
-
-        doi_anchors = self.exml.xpath(xpath, namespaces=self.namespaces)
-
-        for doi_anchor in doi_anchors:
-            LOGGER.debug('DOI anchor is present')
-            # TODO: KPI def does not check for actual value
-            total += 3
-            score += 1
-
-            LOGGER.debug('testing for DOI title')
-            doi_title = doi_anchor.get(nspath_eval('xlink:title'))
-            doi_text = doi_anchor.text
-
-            if doi_title is not None and doi_title == 'DOI':
-                score += 1
-            else:
-                comments.append('Line {doi_anchor.sourceline}: DOI title is not equal to "DOI"')
-
-            xpath2 = '//gmd:identificationInfo//gmd:resourceConstraints//gmd:otherConstraints/gco:CharacterString'
-
-            LOGGER.debug(f'Testing all DOIs in constraints at {xpath2}')
-
-            doi_constraints = self.exml.xpath(xpath2, namespaces=self.namespaces)
-
-            for d in doi_constraints:
-                doi_constraint = d.text
-                if doi_constraint is not None:
-                    if 'Cite as:' in doi_constraint and doi_text in doi_constraint:
-                        score += 1
-                    else:
-                        comments.append(f'Line {d.sourceline}: citation should start with "Cite as" and have matching DOI')
-
-        return name, total, score, comments
-
     def evaluate(self, kpi: int = 0) -> dict:
         """
         Convenience function to run all tests
@@ -949,13 +949,13 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             'kpi_002',
             'kpi_003',
             'kpi_004',
+            'kpi_005',
             'kpi_006',
             'kpi_007',
             'kpi_008',
             'kpi_009',
             'kpi_010',
-            'kpi_011',
-            'kpi_012'
+            'kpi_011'
         ]
 
         kpis_to_run = known_kpis
@@ -1069,7 +1069,7 @@ def group_kpi_results(kpis_results: dict) -> dict:
     grouped_kpi_results = {}
     grouped_kpi_results['mandatory'] = {k: kpis_results[k] for k in ['kpi_001']}
 
-    content_information = {f'kpi_{k:03}': kpis_results[f'kpi_{k:03}'] for k in [2, 3, 4, 6, 7, 12]}
+    content_information = {f'kpi_{k:03}': kpis_results[f'kpi_{k:03}'] for k in [2, 3, 4, 5, 6, 7]}
     grouped_kpi_results['content_information'] = content_information
     grouped_kpi_results['content_information']['summary'] = generate_summary(content_information)
 
