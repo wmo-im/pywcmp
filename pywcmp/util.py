@@ -97,8 +97,8 @@ def get_codelists():
     userdir = get_userdir()
 
     codelist_files = {
-        'iso': f'{userdir}/schema/resources/Codelist/gmxCodelists.xml',
-        'wmo': f'{userdir}{os.sep}WMOCodeLists.xml'
+        'iso': f'{userdir}/wcmp-1.3/schema/resources/Codelist/gmxCodelists.xml',
+        'wmo': f'{userdir}{os.sep}wcmp-1.3{os.sep}WMOCodeLists.xml'
     }
 
     for key, value in codelist_files.items():
@@ -360,7 +360,7 @@ def validate_iso_xml(xml):
         raise IOError(f'{userdir} does not exist')
     if isinstance(xml, str):
         xml = etree.fromstring(xml)
-    xsd = os.path.join(userdir, 'iso-all.xsd')
+    xsd = os.path.join(userdir, 'wcmp-1.3', 'iso-all.xsd')
     LOGGER.debug(f'Validating {xml} against schema {xsd}')
     schema = etree.XMLSchema(etree.parse(xsd))
     schema.assertValid(xml)
