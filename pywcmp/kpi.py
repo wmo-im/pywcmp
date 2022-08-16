@@ -213,10 +213,11 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         titles = self.exml.xpath(xpath, namespaces=self.namespaces)
 
-        for t in titles:
+        total = 8
+        if len(titles) > 0:
+            t = titles[0]
             title = t.text
             LOGGER.debug('Title is present')
-            total += 8
             score += 1
             title_words = []
 
@@ -225,7 +226,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 title_words = title.split()
             except Exception as err:
                 LOGGER.debug(err)
-                continue
+                return
 
             title_words = title.split()
 
