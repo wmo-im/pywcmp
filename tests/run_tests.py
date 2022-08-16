@@ -51,6 +51,7 @@ from lxml import etree
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
 from pywcmp.kpi import (calculate_grade, group_kpi_results,
                         WMOCoreMetadataProfileKeyPerformanceIndicators)
+from pywcmp.topics import TopicHierarchy
 from pywcmp.util import parse_wcmp
 
 
@@ -166,7 +167,8 @@ class WCMPKPITest(unittest.TestCase):
             'kpi_010',
             'summary'
         ]
-        self.assertEqual(sorted(grouped_results['distribution_information'].keys()),
+        self.assertEqual(sorted(
+                         grouped_results['distribution_information'].keys()),
                          distribution_information_kpis)
 
         enhancements_kpis = [
@@ -176,6 +178,59 @@ class WCMPKPITest(unittest.TestCase):
         ]
         self.assertEqual(sorted(grouped_results['enhancements'].keys()),
                          enhancements_kpis)
+
+
+class WCMPTopicHierarchyTest(unittest.TestCase):
+    """WCMP Topic Hierarchy tests"""
+
+    def setUp(self):
+        """setup test fixtures, etc."""
+        self.th = TopicHierarchy()
+        pass
+
+    def tearDown(self):
+        """return to pristine state"""
+        pass
+
+    def test_validate(self):
+        value = None
+        with self.assertRaises(ValueError):
+            _ = self.th.validate(value)
+
+        value = 'invalid.topic.hierarchy'
+        self.assertFalse(self.th.validate(value))
+
+        value = 'wis2.a.cache'
+        self.assertTrue(self.th.validate(value))
+
+    def test_list_children(self):
+        value = None
+        expected_children = [
+            'root',
+            'version',
+            'distribution',
+            'country',
+            'centre-id',
+            'resource-type',
+            'data-policy',
+            'earth-system-domain'
+        ]
+        level, children = self.th.list_children(value)
+        self.assertEqual(level, '/')
+        self.assertEqual(children, expected_children)
+
+        value = 'invalid.topic.hierarchy'
+        with self.assertRaises(ValueError):
+            level, children = self.th.list_children(value)
+
+        value = 'wis2.a'
+        expected_children = [
+            'cache',
+            'origin'
+        ]
+        level, children = self.th.list_children(value)
+        self.assertEqual(level, 'distribution')
+        self.assertEqual(children, expected_children)
 
 
 class WCMPUtilTest(unittest.TestCase):
