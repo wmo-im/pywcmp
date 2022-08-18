@@ -581,7 +581,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             'image/webp'
         ]
 
-        xpath = '//gmd:identificationInfo/gmd:MD_DataIdentification/gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gmx:Anchor'
+        xpath = '//gmd:identificationInfo/gmd:MD_DataIdentification/gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName'
 
         LOGGER.debug(f'Testing all graphic overviews at {xpath}')
 
@@ -589,12 +589,20 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         LOGGER.info(graphic_overviews)
 
-        for graphic_overview in graphic_overviews:
+        if graphic_overviews:
             LOGGER.debug('Graphic overview is present')
-            total += 3
+            total = 3
             score += 1
+            graphic_overview = graphic_overviews[0]
+            anchors = graphic_overview.findall(nspath_eval('gmx:Anchor'))
+            link = ''
+            if anchors:
+                link = anchors[0].get(nspath_eval('xlink:href'))
+            else:
+                character_strings = graphic_overview.findall(nspath_eval('gco:CharacterString'))
+                if character_strings:
+                    link = character_strings[0].text
 
-            link = graphic_overview.get(nspath_eval('xlink:href'))
             result = check_url(link, False)
 
             LOGGER.debug('Testing whether link resolves successfully')
