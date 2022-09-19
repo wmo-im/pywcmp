@@ -438,7 +438,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         LOGGER.debug(f'Testing all DOIs at {xpath}')
 
         doi_anchors = self.exml.xpath(xpath, namespaces=self.namespaces)
-        
+
         if len(doi_anchors) > 0:
             doi_anchor = doi_anchors[0]
             LOGGER.debug('DOI anchor is present')
