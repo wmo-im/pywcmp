@@ -161,7 +161,7 @@ if not os.path.exists(WIS2_TOPICS_FILES):
     ]
 
     for c in csvs:
-        url = f'https://raw.githubusercontent.com/wmo-im/wis2-topic-hierarchy/main/topic-hierarchy/{c}'  # noqa
+        url = f'https://raw.githubusercontent.com/wmo-im/wis2-topic-hierarchy/main/wis2-topic-hierarchy/{c}'  # noqa
         th_filename = f'{WIS2_TOPICS_FILES}{os.sep}{c}'
 
         with open(th_filename, 'wb') as f:
