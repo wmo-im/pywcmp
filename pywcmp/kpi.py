@@ -425,7 +425,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         :returns: `tuple` of KPI name, achieved score, total score, and comments
         """
 
-        total = 3
+        total = 0
         score = 0
         comments = []
 
@@ -439,7 +439,8 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         doi_anchors = self.exml.xpath(xpath, namespaces=self.namespaces)
 
-        for doi_anchor in doi_anchors:
+        if len(doi_anchors) > 0:
+            doi_anchor = doi_anchors[0]
             LOGGER.debug('DOI anchor is present')
             # TODO: KPI def does not check for actual value
             total += 3
