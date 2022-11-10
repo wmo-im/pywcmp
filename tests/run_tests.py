@@ -182,37 +182,25 @@ class WCMPTopicHierarchyTest(unittest.TestCase):
         value = 'invalid.topic.hierarchy'
         self.assertFalse(self.th.validate(value))
 
-        value = 'wis2.a.cache'
+        value = 'cache.a.wis2'
         self.assertTrue(self.th.validate(value))
 
     def test_list_children(self):
         value = None
-        expected_children = [
-            'root',
-            'version',
-            'distribution',
-            'country',
-            'centre-id',
-            'resource-type',
-            'data-policy',
-            'earth-system-domain'
-        ]
-        level, children = self.th.list_children(value)
-        self.assertEqual(level, '/')
-        self.assertEqual(children, expected_children)
+        children = self.th.list_children(value)
+        self.assertEqual(sorted(children), ['cache', 'origin'])
 
         value = 'invalid.topic.hierarchy'
         with self.assertRaises(ValueError):
-            level, children = self.th.list_children(value)
+            _ = self.th.list_children(value)
 
-        value = 'wis2.a'
-        expected_children = [
-            'cache',
-            'origin'
-        ]
-        level, children = self.th.list_children(value)
-        self.assertEqual(level, 'distribution')
-        self.assertEqual(children, expected_children)
+        value = 'cache.c'
+        with self.assertRaises(ValueError):
+            _ = self.th.list_children(value)
+
+        value = 'cache'
+        children = self.th.list_children(value)
+        self.assertEqual(children, ['a'])
 
 
 class WCMPUtilTest(unittest.TestCase):
