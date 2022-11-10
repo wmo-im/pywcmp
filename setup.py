@@ -25,14 +25,17 @@
 ###############################################################################
 
 import io
+import json
 import os
 import re
 from setuptools import Command, find_packages, setup
+import shutil
 import sys
 import zipfile
 
 from lxml import etree
 
+from pywcmp.topics import build_topics, WIS2_TOPIC_HIERARCHY_LOOKUP
 from pywcmp.util import get_userdir, urlopen_
 
 
@@ -74,7 +77,7 @@ USERDIR = get_userdir()
 
 WCMP1_FILES = f'{USERDIR}{os.sep}wcmp-1.3'
 WCMP2_FILES = f'{USERDIR}{os.sep}wcmp-2.0'
-WIS2_TOPICS_FILES = f'{USERDIR}{os.sep}wis2-topic-hierarchy'
+WIS2_TOPIC_HIERARCHY_DIR = f'{USERDIR}{os.sep}wis2-topic-hierarchy'
 
 KEYWORDS = [
     'WMO',
@@ -126,28 +129,29 @@ if not os.path.exists(WCMP1_FILES):
                              schemaLocation=schema_location)
         f.write(etree.tostring(SCHEMA, pretty_print=True))
 
-if not os.path.exists(WIS2_TOPICS_FILES):
-    print('Downloading topic hierarchies')
-    os.makedirs(WIS2_TOPICS_FILES, exist_ok=True)
 
-    csvs = [
-        'root.csv',
-        'version.csv',
-        'distribution.csv',
-        'country.csv',
-        'centre-id.csv',
-        'resource-type.csv',
-        'data-policy.csv',
-        'earth-system-domain.csv'
-    ]
+if not os.path.exists(WIS2_TOPIC_HIERARCHY_DIR):
+    print('Downloading WIS2 topic hierarchy')
+    os.makedirs(WIS2_TOPIC_HIERARCHY_DIR, exist_ok=True)
 
-    for c in csvs:
-        url = f'https://raw.githubusercontent.com/wmo-im/wis2-topic-hierarchy/main/wis2-topic-hierarchy/{c}'  # noqa
-        th_filename = f'{WIS2_TOPICS_FILES}{os.sep}{c}'
+    ZIPFILE_URL = 'https://github.com/wmo-im/wis2-topic-hierarchy/archive/refs/heads/main.zip'  # noqa
+    FH = io.BytesIO(urlopen_(ZIPFILE_URL).read())
+    with zipfile.ZipFile(FH) as z:
+        for name in z.namelist():
+            if 'wis2-topic-hierarchy-main/topic-hierarchy' in name:
+                print("NAME", name)
+                filename = os.path.basename(name)
 
-        with open(th_filename, 'wb') as f:
-            f.write(urlopen_(url).read())
+                if not filename:
+                    continue
 
+                dest_file = f'{WIS2_TOPIC_HIERARCHY_DIR}/{filename}'
+                with z.open(name) as src, open(dest_file, 'wb') as dest:
+                    shutil.copyfileobj(src, dest)
+
+    with WIS2_TOPIC_HIERARCHY_LOOKUP.open('w') as fh:
+        content = build_topics()
+        fh.write(json.dumps(content, indent=4))
 
 setup(
     name='pywcmp',

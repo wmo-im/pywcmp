@@ -27,10 +27,10 @@
 ###############################################################################
 
 import csv
-from dataclasses import dataclass, field
+import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import click
 
@@ -38,74 +38,114 @@ from pywcmp.util import get_userdir
 
 LOGGER = logging.getLogger(__name__)
 
-topic_csvs = [
-    'root',
-    'version',
-    'distribution',
-    'country',
-    'centre-id',
-    'resource-type',
-    'data-policy',
-    'earth-system-domain'
-]
+
+WIS2_TOPIC_HIERARCHY_LOOKUP = Path(get_userdir()) / 'wis2-topic-hierarchy' / 'all.json'  # noqa
 
 
-@dataclass
-class Topic:
-    name: str
-    description: str
-    child: str
+def rstrip_add(value, token='.', pad_again=False):
+    """
+    Strips and adds trailing string
+
+    :param value: `str` of value
+    :param token: `str` of token to rstrip and add
+    :param pad_again: `bool` of whether to right pad the string witht token
+
+    :returns: string of rstrip'd and added value
+    """
+
+    value2 = value
+
+    if value2.endswith(token):
+        value2 = value2[:-1]
+
+    if pad_again:
+        value2 = f'{value2}{token}'
+
+    return value2
 
 
-@dataclass
-class TopicLevel:
-    name: str
-    topics: Dict[str, Topic] = field(default_factory=dict)
+def build_topics() -> Dict[str, list]:
+    """
+    Builds bundled/dereferenced dict or topic list
 
+    :returns: `dict` of list of topics
+    """
 
-@dataclass
-class TopicHierarchy:
-    name: str = 'WIS 2.0 Topic Hierarchy'
-    levels: List[TopicLevel] = field(default_factory=list)
+    content = {
+        'topics': []
+    }
 
-    def __post_init__(self):
-        dir_ = Path(get_userdir()) / 'wis2-topic-hierarchy'
-        LOGGER.debug(f'Reading topic hierarchy files in {dir_}')
-        for c in topic_csvs:
-            filename = dir_ / f'{c}.csv'
-            LOGGER.debug(f'Reading topic hierarchy file {filename}')
-            level_name = filename.stem
-            with filename.open() as fh:
-                topics = {}
+    root_topic = 'channel'
+    dir_ = Path(get_userdir()) / 'wis2-topic-hierarchy'
+    LOGGER.debug(f'Topic hierarchy files location: {dir_}')
+
+    def process_level(level, parent=None):
+        level_file = dir_ / f'{level}.csv'
+        if level_file.exists():
+            with level_file.open() as fh:
+                LOGGER.debug(f'Reading topic hierarchy file {level_file}')
                 reader = csv.DictReader(fh)
+
                 for row in reader:
-                    topic = Topic(row['Name'],
-                                  row['Description'], row['Child'])
+                    if parent is not None:
+                        path = f"{parent}.{row['Name']}"
+                    else:
+                        path = row['Name']
 
-                    topics[row['Name']] = topic
-                level = TopicLevel(level_name, topics)
-                self.levels.append(level)
+                    content['topics'].append(path)
+                    process_level(row['Child'], path)
 
-    def list_children(self, topic_hierarchy: str = None) -> Tuple[str, list]:
+        else:
+            LOGGER.warning(f'Topic file {level_file} does not exist')
+
+    root_file = dir_ / f'{root_topic}.csv'
+    process_level(root_file.stem)
+
+    return content
+
+
+class TopicHierarchy:
+    def __init__(self):
+        with WIS2_TOPIC_HIERARCHY_LOOKUP.open() as fh:
+            self.topics = json.load(fh)['topics']
+
+    def list_children(self, topic_hierarchy: str = None) -> List[str]:
         """
         Lists children at a given level of a topic hierarchy
 
         :param topic_hierarchy: `str` of topic hierarchy
 
-        :returns: tuple of level and its (`list` of) children
+        :returns: `list` of topic children
         """
 
-        if topic_hierarchy is None:
-            return '/', [level.name for level in self.levels]
+        matches = []
 
-        if not self.validate(topic_hierarchy):
-            msg = 'Topic hierarchy is not valid'
+        if topic_hierarchy is None:
+            matches = list(set([i.split('.')[0] for i in self.topics]))
+            return matches
+
+        th = rstrip_add(topic_hierarchy)
+
+        if not self.validate(th):
+            msg = 'Invalid topic'
             LOGGER.error(msg)
             raise ValueError(msg)
 
-        step = len(topic_hierarchy.split('.'))
+        th = rstrip_add(topic_hierarchy, pad_again=True)
 
-        return self.levels[step].name, list(self.levels[step].topics.keys())
+        for topic in self.topics:
+            topic2 = rstrip_add(topic, pad_again=True)
+            if topic2.startswith(th):
+                child = topic2.replace(th, '').split('.')[0]
+                if child:
+                    matches.append(child)
+
+        if not matches:
+            msg = f'No matching topics for {topic_hierarchy}'
+            LOGGER.error(msg)
+            raise ValueError(msg)
+
+        return list(set(matches))
 
     def validate(self, topic_hierarchy: str = None) -> bool:
         """
@@ -121,23 +161,7 @@ class TopicHierarchy:
             LOGGER.error(msg)
             raise ValueError(msg)
 
-        for step, topic in enumerate(topic_hierarchy.split('.')):
-            level_name = self.levels[step].name
-
-            LOGGER.debug(f'Validating step={step}, level={level_name}')
-
-            if not topic:
-                msg = f'Topic at step={step}, level={level_name} is empty'
-                LOGGER.error(msg)
-                return False
-
-            if topic not in self.levels[step].topics:
-                msg = (f'Topic {topic} at step={step}, level={level_name} '
-                       f'not in {list(self.levels[step].topics.keys())}')
-                LOGGER.error(msg)
-                return False
-
-        return True
+        return topic_hierarchy in self.topics
 
 
 @click.group()
@@ -154,11 +178,13 @@ def list_(ctx, topic_hierarchy):
 
     th = TopicHierarchy()
 
-    result = th.list_children(topic_hierarchy)
-    click.echo(f'Level: {result[0]}')
-    click.echo('Children:')
-    for child in result[1]:
-        click.echo(f'- {child}')
+    try:
+        matching_topics = th.list_children(topic_hierarchy)
+        click.echo('Matching topics')
+        for matching_topic in matching_topics:
+            click.echo(f'- {matching_topic}')
+    except ValueError as err:
+        raise click.ClickException(err)
 
 
 @click.command()
