@@ -185,6 +185,12 @@ class WCMPTopicHierarchyTest(unittest.TestCase):
         value = 'cache.a.wis2'
         self.assertTrue(self.th.validate(value))
 
+        value = 'a.wis2'
+        self.assertFalse(self.th.validate(value))
+
+        value = 'a.wis2'
+        self.assertTrue(self.th.validate(value, fuzzy=True))
+
     def test_list_children(self):
         value = None
         children = self.th.list_children(value)
