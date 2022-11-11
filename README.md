@@ -74,10 +74,13 @@ pywcmp kpi validate --kpi 4 -f /path/to/file.xml -v INFO
 # WIS topic hierarchies
 
 # validate a WIS 2.0 topic hierarchy
-pywcmp topics validate -th wis2.a.cache.CAN
+pywcmp topics validate origin.a.wis2.can
+
+# validate a partial WIS 2.0 topic hierarchy
+pywcmp topics validate wis2.can --fuzzy
 
 # list children of a given WIS 2.0 topic hierarchy level
-pywcmp topics list -th wis2.a
+pywcmp topics list wis2.a
 
 ```
 

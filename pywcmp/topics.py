@@ -34,7 +34,7 @@ from typing import Dict, List
 
 import click
 
-from pywcmp.util import get_userdir
+from pywcmp.util import get_cli_common_options, get_userdir, setup_logger
 
 LOGGER = logging.getLogger(__name__)
 
@@ -121,6 +121,7 @@ class TopicHierarchy:
         matches = []
 
         if topic_hierarchy is None:
+            LOGGER.debug('Dumping root topic children')
             matches = list(set([i.split('.')[0] for i in self.topics]))
             return matches
 
@@ -147,21 +148,32 @@ class TopicHierarchy:
 
         return list(set(matches))
 
-    def validate(self, topic_hierarchy: str = None) -> bool:
+    def validate(self, topic_hierarchy: str = None,
+                 fuzzy: str = False) -> bool:
         """
         Validates a topic hierarchy
 
         :param topic_hierarchy: `str` of topic hierarchy
+        :param fuzzy: `bool` of whether to apply fuzzy logic
 
-        :returns: `bool` of whether topic hiearchy is valid
+        :returns: `bool` of whether topic hierarchy is valid
         """
+
+        LOGGER.debug(f'Validating topic hierarchy {topic_hierarchy}')
 
         if topic_hierarchy is None:
             msg = 'Topic hierarchy is empty'
             LOGGER.error(msg)
             raise ValueError(msg)
 
-        return topic_hierarchy in self.topics
+        if fuzzy:
+            LOGGER.debug('Applying fuzzy logic')
+            if [t for t in self.topics if topic_hierarchy in t]:
+                return True
+            else:
+                return False
+        else:
+            return topic_hierarchy in self.topics
 
 
 @click.group()
@@ -172,9 +184,12 @@ def topics():
 
 @click.command('list')
 @click.pass_context
-@click.option('--topic-hierarchy', '-th', help='Topic hierarchy')
-def list_(ctx, topic_hierarchy):
+@get_cli_common_options
+@click.argument('topic-hierarchy')
+def list_(ctx, topic_hierarchy, logfile, verbosity):
     """List topic hierarchies at a given level"""
+
+    setup_logger(verbosity, logfile)
 
     th = TopicHierarchy()
 
@@ -189,13 +204,18 @@ def list_(ctx, topic_hierarchy):
 
 @click.command()
 @click.pass_context
-@click.option('--topic-hierarchy', '-th', help='Topic hierarchy')
-def validate(ctx, topic_hierarchy):
+@get_cli_common_options
+@click.argument('topic-hierarchy')
+@click.option('--fuzzy', '-f', is_flag=True, help='Apply fuzzy search',
+              default=False)
+def validate(ctx, topic_hierarchy, fuzzy, logfile, verbosity):
     """Valite topic hierarchy"""
+
+    setup_logger(verbosity, logfile)
 
     th = TopicHierarchy()
 
-    if th.validate(topic_hierarchy):
+    if th.validate(topic_hierarchy, fuzzy):
         click.echo('Valid')
     else:
         click.echo('Invalid')
