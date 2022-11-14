@@ -25,18 +25,10 @@
 ###############################################################################
 
 import io
-import json
 import os
 import re
 from setuptools import Command, find_packages, setup
-import shutil
 import sys
-import zipfile
-
-from lxml import etree
-
-from pywcmp.topics import build_topics, WIS2_TOPIC_HIERARCHY_LOOKUP
-from pywcmp.util import get_userdir, urlopen_
 
 
 class PyTest(Command):
@@ -73,12 +65,6 @@ def get_package_version():
     raise RuntimeError("Unable to find version string.")
 
 
-USERDIR = get_userdir()
-
-WCMP1_FILES = f'{USERDIR}{os.sep}wcmp-1.3'
-WCMP2_FILES = f'{USERDIR}{os.sep}wcmp-2.0'
-WIS2_TOPIC_HIERARCHY_DIR = f'{USERDIR}{os.sep}wis2-topic-hierarchy'
-
 KEYWORDS = [
     'WMO',
     'Metadata',
@@ -92,66 +78,6 @@ DESCRIPTION = 'A Python implementation of the test suite for WMO Core Metadata P
 if (os.path.exists('MANIFEST')):
     os.unlink('MANIFEST')
 
-
-print('Caching schemas, codelists and topic hierarchy')
-
-if not os.path.exists(WCMP1_FILES):
-    os.makedirs(WCMP1_FILES, exist_ok=True)
-
-    print(f'Downloading WCMP1 schemas and codelists to {WCMP1_FILES}')
-    ZIPFILE_URL = 'https://wis.wmo.int/2011/schemata/iso19139_2007/19139.zip'
-    FH = io.BytesIO(urlopen_(ZIPFILE_URL).read())
-    with zipfile.ZipFile(FH) as z:
-        z.extractall(WCMP1_FILES)
-    CODELIST_URL = 'https://wis.wmo.int/2012/codelists/WMOCodeLists.xml'
-
-    schema_filename = f'{WCMP1_FILES}{os.sep}WMOCodeLists.xml'
-
-    with open(schema_filename, 'wb') as f:
-        f.write(urlopen_(CODELIST_URL).read())
-
-    # because some ISO instances ref both gmd and gmx, create a
-    # stub xsd in order to validate
-    SCHEMA = etree.Element('schema',
-                           elementFormDefault='qualified',
-                           version='1.0.0',
-                           nsmap={None: 'http://www.w3.org/2001/XMLSchema'})
-
-    schema_wrapper_filename = f'{WCMP1_FILES}{os.sep}iso-all.xsd'
-
-    with open(schema_wrapper_filename, 'wb') as f:
-        for uri in ['gmd', 'gmx']:
-            namespace = f'http://www.isotc211.org/2005/{uri}'
-            schema_location = f'schema/{uri}/{uri}.xsd'
-
-            etree.SubElement(SCHEMA, 'import',
-                             namespace=namespace,
-                             schemaLocation=schema_location)
-        f.write(etree.tostring(SCHEMA, pretty_print=True))
-
-
-if not os.path.exists(WIS2_TOPIC_HIERARCHY_DIR):
-    print('Downloading WIS2 topic hierarchy')
-    os.makedirs(WIS2_TOPIC_HIERARCHY_DIR, exist_ok=True)
-
-    ZIPFILE_URL = 'https://github.com/wmo-im/wis2-topic-hierarchy/archive/refs/heads/main.zip'  # noqa
-    FH = io.BytesIO(urlopen_(ZIPFILE_URL).read())
-    with zipfile.ZipFile(FH) as z:
-        for name in z.namelist():
-            if 'wis2-topic-hierarchy-main/topic-hierarchy' in name:
-                print("NAME", name)
-                filename = os.path.basename(name)
-
-                if not filename:
-                    continue
-
-                dest_file = f'{WIS2_TOPIC_HIERARCHY_DIR}/{filename}'
-                with z.open(name) as src, open(dest_file, 'wb') as dest:
-                    shutil.copyfileobj(src, dest)
-
-    with WIS2_TOPIC_HIERARCHY_LOOKUP.open('w') as fh:
-        content = build_topics()
-        fh.write(json.dumps(content, indent=4))
 
 setup(
     name='pywcmp',

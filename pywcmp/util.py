@@ -28,6 +28,7 @@
 
 import logging
 import os
+from pathlib import Path
 import ssl
 import sys
 from datetime import datetime, timezone, timedelta
@@ -190,7 +191,7 @@ def get_userdir() -> str:
     :returns: user's home directory
     """
 
-    return f'{os.path.expanduser("~")}{os.sep}.pywcmp'
+    return Path.home() / '.pywcmp'
 
 
 def nspath_eval(xpath: str) -> str:
