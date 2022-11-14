@@ -32,7 +32,6 @@ cd pywcmp
 git clone https://github.com/wmo-im/pywcmp.git
 cd pywcmp
 pip3 install -r requirements.txt
-python3 setup.py build
 python3 setup.py install
 ```
 
@@ -42,6 +41,9 @@ From command line:
 ```bash
 # fetch version
 pywcmp --version
+
+# sync supporting configuration bundle (schemas, topics, etc.)
+pywcmp bundle sync
 
 # abstract test suite
 

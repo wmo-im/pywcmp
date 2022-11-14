@@ -29,6 +29,7 @@
 import click
 
 from pywcmp.ats import ats
+from pywcmp.bundle import bundle
 from pywcmp.kpi import kpi
 from pywcmp.topics import topics
 
@@ -42,5 +43,6 @@ def cli():
 
 
 cli.add_command(ats)
+cli.add_command(bundle)
 cli.add_command(kpi)
 cli.add_command(topics)
