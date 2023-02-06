@@ -31,9 +31,9 @@ import unittest
 
 from lxml import etree
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
-from pywcmp.kpi import (calculate_grade, group_kpi_results,
-                        WMOCoreMetadataProfileKeyPerformanceIndicators)
-from pywcmp.topics import TopicHierarchy
+from pywcmp.wcmp1.kpi import (calculate_grade, group_kpi_results,
+                              WMOCoreMetadataProfileKeyPerformanceIndicators)
+from pywcmp.wcmp2.topics import TopicHierarchy
 from pywcmp.util import parse_wcmp
 
 
