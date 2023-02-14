@@ -114,7 +114,6 @@ def sync(ctx):
     with zipfile.ZipFile(FH) as z:
         for name in z.namelist():
             if 'wis2-topic-hierarchy-main/topic-hierarchy' in name:
-                print("NAME", name)
                 filename = os.path.basename(name)
 
                 if not filename:
