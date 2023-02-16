@@ -24,8 +24,7 @@
 #
 ###############################################################################
 
-import io
-import os
+from pathlib import Path
 import re
 from setuptools import Command, find_packages, setup
 import sys
@@ -42,15 +41,16 @@ class PyTest(Command):
 
     def run(self):
         import subprocess
-        errno = subprocess.call([sys.executable, os.path.join('tests',
-                                 'run_tests.py')])
+        errno = subprocess.call([sys.executable, 'tests/run_tests.py'])
         raise SystemExit(errno)
 
 
 def read(filename, encoding='utf-8'):
     """read file contents"""
-    full_path = os.path.join(os.path.dirname(__file__), filename)
-    with io.open(full_path, encoding=encoding) as fh:
+
+    fullpath = Path(__file__).resolve().parent / filename
+
+    with fullpath.open() as fh:
         contents = fh.read().strip()
     return contents
 
@@ -74,9 +74,10 @@ KEYWORDS = [
 
 DESCRIPTION = 'A Python implementation of the test suite for WMO Core Metadata Profile'  # noqa
 
-# ensure a fresh MANIFEST file is generated
-if (os.path.exists('MANIFEST')):
-    os.unlink('MANIFEST')
+MANIFEST = Path('MANIFEST')
+
+if MANIFEST.exists():
+    MANIFEST.unlink()
 
 
 setup(

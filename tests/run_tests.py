@@ -31,9 +31,9 @@ import unittest
 
 from lxml import etree
 from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
-from pywcmp.kpi import (calculate_grade, group_kpi_results,
-                        WMOCoreMetadataProfileKeyPerformanceIndicators)
-from pywcmp.topics import TopicHierarchy
+from pywcmp.wcmp1.kpi import (calculate_grade, group_kpi_results,
+                              WMOCoreMetadataProfileKeyPerformanceIndicators)
+from pywcmp.wcmp2.topics import TopicHierarchy
 from pywcmp.util import parse_wcmp
 
 
@@ -179,16 +179,16 @@ class WCMPTopicHierarchyTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             _ = self.th.validate(value)
 
-        value = 'invalid.topic.hierarchy'
+        value = 'invalid/topic/hierarchy'
         self.assertFalse(self.th.validate(value))
 
-        value = 'cache.a.wis2'
+        value = 'cache/a/wis2'
         self.assertTrue(self.th.validate(value))
 
-        value = 'a.wis2'
+        value = 'a/wis2'
         self.assertFalse(self.th.validate(value))
 
-        value = 'a.wis2'
+        value = 'a/wis2'
         self.assertTrue(self.th.validate(value, fuzzy=True))
 
     def test_list_children(self):
@@ -200,7 +200,7 @@ class WCMPTopicHierarchyTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             _ = self.th.list_children(value)
 
-        value = 'cache.c'
+        value = 'cache/c'
         with self.assertRaises(ValueError):
             _ = self.th.list_children(value)
 

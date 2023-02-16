@@ -33,7 +33,7 @@ import zipfile
 import click
 from lxml import etree
 
-from pywcmp.topics import build_topics, WIS2_TOPIC_HIERARCHY_LOOKUP
+from pywcmp.wcmp2.topics import build_topics, WIS2_TOPIC_HIERARCHY_LOOKUP
 from pywcmp.util import get_userdir, urlopen_
 
 LOGGER = logging.getLogger(__name__)
@@ -41,7 +41,7 @@ LOGGER = logging.getLogger(__name__)
 USERDIR = get_userdir()
 
 WCMP1_FILES = get_userdir() / 'wcmp-1.3'
-WCMP2_FILES = get_userdir() / 'wcmp-2.0'
+WCMP2_FILES = get_userdir() / 'wcmp-2'
 WIS2_TOPIC_HIERARCHY_DIR = get_userdir() / 'wis2-topic-hierarchy'
 
 
@@ -60,6 +60,7 @@ def sync(ctx):
     if USERDIR.exists():
         shutil.rmtree(USERDIR)
 
+    LOGGER.debug('Caching WCMP 1.3 artifacts')
     WCMP1_FILES.mkdir(parents=True, exist_ok=True)
 
     LOGGER.debug(f'Downloading WCMP1 schemas and codelists to {WCMP1_FILES}')  # noqa
@@ -95,6 +96,16 @@ def sync(ctx):
                              schemaLocation=schema_location)
         f.write(etree.tostring(SCHEMA, pretty_print=True))
 
+    LOGGER.debug('Caching WCMP2 artifacts')
+    LOGGER.debug(f'Downloading WCMP2 schemas to {WCMP2_FILES}')
+    WCMP2_FILES.mkdir(parents=True, exist_ok=True)
+    WCMP2_SCHEMA_BASE = 'https://raw.githubusercontent.com/wmo-im/wcmp2/main/schema'  # noqa
+
+    for yaml_file in ['wcmpRecordGeoJSON.yaml', 'link.yaml']:
+        yaml_schema = WCMP2_FILES / yaml_file
+        with yaml_schema.open('wb') as fh:
+            fh.write(urlopen_(f'{WCMP2_SCHEMA_BASE}/{yaml_file}').read())
+
     LOGGER.debug('Downloading WIS2 topic hierarchy')
     WIS2_TOPIC_HIERARCHY_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -103,7 +114,6 @@ def sync(ctx):
     with zipfile.ZipFile(FH) as z:
         for name in z.namelist():
             if 'wis2-topic-hierarchy-main/topic-hierarchy' in name:
-                print("NAME", name)
                 filename = os.path.basename(name)
 
                 if not filename:

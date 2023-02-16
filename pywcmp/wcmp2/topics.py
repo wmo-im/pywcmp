@@ -42,7 +42,7 @@ LOGGER = logging.getLogger(__name__)
 WIS2_TOPIC_HIERARCHY_LOOKUP = Path(get_userdir()) / 'wis2-topic-hierarchy' / 'all.json'  # noqa
 
 
-def rstrip_add(value, token='.', pad_again=False):
+def rstrip_add(value: str, token: str = '/', pad_again: bool = False):
     """
     Strips and adds trailing string
 
@@ -88,7 +88,7 @@ def build_topics() -> Dict[str, list]:
 
                 for row in reader:
                     if parent is not None:
-                        path = f"{parent}.{row['Name']}"
+                        path = f"{parent}/{row['Name']}"
                     else:
                         path = row['Name']
 
@@ -122,7 +122,7 @@ class TopicHierarchy:
 
         if topic_hierarchy is None:
             LOGGER.debug('Dumping root topic children')
-            matches = list(set([i.split('.')[0] for i in self.topics]))
+            matches = list(set([i.split('/')[0] for i in self.topics]))
             return matches
 
         th = rstrip_add(topic_hierarchy)
@@ -137,7 +137,7 @@ class TopicHierarchy:
         for topic in self.topics:
             topic2 = rstrip_add(topic, pad_again=True)
             if topic2.startswith(th):
-                child = topic2.replace(th, '').split('.')[0]
+                child = topic2.replace(th, '').split('/')[0]
                 if child:
                     matches.append(child)
 

@@ -1,11 +1,8 @@
 ###############################################################################
 #
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
-#          Ján Osuský <jan.osusky@iblsoft.com>
 #
 # Copyright (c) 2022 Tom Kralidis
-# Copyright (c) 2022 Government of Canada
-# Copyright (c) 2020 IBL Software Engineering spol. s r. o.
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -25,24 +22,3 @@
 # under the License.
 #
 ###############################################################################
-
-import click
-
-from pywcmp.ats import ats
-from pywcmp.bundle import bundle
-from pywcmp.kpi import kpi
-from pywcmp.wcmp2.topics import topics
-
-__version__ = '0.4.dev0'
-
-
-@click.group()
-@click.version_option(version=__version__)
-def cli():
-    pass
-
-
-cli.add_command(ats)
-cli.add_command(bundle)
-cli.add_command(kpi)
-cli.add_command(topics)
