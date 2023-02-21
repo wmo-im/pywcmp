@@ -68,11 +68,15 @@ class WMOCoreMetadataProfileTestSuite2:
         """Convenience function to run all tests"""
 
         results = []
+        tests = []
 
-        tests = [f for f in dir(WMOCoreMetadataProfileTestSuite2) if
-                 callable(getattr(WMOCoreMetadataProfileTestSuite2, f))
-                 and f.startswith("test_requirement")
-                 and not f.endswith('validation')]
+        for f in dir(WMOCoreMetadataProfileTestSuite2):
+            if all([
+                    callable(getattr(WMOCoreMetadataProfileTestSuite2, f)),
+                    f.startswith('test_requirement'),
+                    not f.endswith('validation')]):
+
+                tests.append(f)
 
         validation_result = self.test_requirement_validation()
         if validation_result['code'] == 'FAILED':
