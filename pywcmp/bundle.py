@@ -97,14 +97,13 @@ def sync(ctx):
         f.write(etree.tostring(SCHEMA, pretty_print=True))
 
     LOGGER.debug('Caching WCMP2 artifacts')
-    LOGGER.debug(f'Downloading WCMP2 schemas to {WCMP2_FILES}')
+    LOGGER.debug(f'Downloading WCMP2 schema to {WCMP2_FILES}')
     WCMP2_FILES.mkdir(parents=True, exist_ok=True)
-    WCMP2_SCHEMA_BASE = 'https://raw.githubusercontent.com/wmo-im/wcmp2/main/schema'  # noqa
+    WCMP2_SCHEMA = 'https://raw.githubusercontent.com/wmo-im/wcmp2/main/schemas/wcmp2-bundled.json'  # noqa
 
-    for yaml_file in ['wcmpRecordGeoJSON.yaml', 'link.yaml']:
-        yaml_schema = WCMP2_FILES / yaml_file
-        with yaml_schema.open('wb') as fh:
-            fh.write(urlopen_(f'{WCMP2_SCHEMA_BASE}/{yaml_file}').read())
+    json_schema = WCMP2_FILES / 'wcmp2-bundled.json'
+    with json_schema.open('wb') as fh:
+        fh.write(urlopen_(f'{WCMP2_SCHEMA}').read())
 
     LOGGER.debug('Downloading WIS2 topic hierarchy')
     WIS2_TOPIC_HIERARCHY_DIR.mkdir(parents=True, exist_ok=True)
