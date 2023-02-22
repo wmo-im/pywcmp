@@ -67,7 +67,10 @@ def validate(ctx, file_or_url, logfile, verbosity,
 
     click.echo(f'Validating {file_or_url}')
 
-    data, wcmp_version_guess = parse_wcmp(content)
+    try:
+        data, wcmp_version_guess = parse_wcmp(content)
+    except Exception as err:
+        raise click.ClickException(err)
 
     if wcmp_version_guess == 1:
         click.echo('Detected WCMP 1 discovery metadata')

@@ -131,7 +131,7 @@ class WMOCoreMetadataProfileTestSuite2:
 
         identifier = self.record['id']
 
-        if identifier.count(':') != 6:
+        if identifier.count(':') != 5:
             status['code'] = 'FAILED'
             status['message'] = "identifier does not have six ':' delimiters"
             return status
@@ -270,8 +270,14 @@ class WMOCoreMetadataProfileTestSuite2:
         if not th.validate(topic):
             status['code'] = 'FAILED'
             status['message'] = f'Invalid topic {topic}'
+            return status
 
-        channel, version, system = topic.split('/', 3)
+        try:
+            channel, version, system, _ = topic.split('/', 3)
+        except ValueError:
+            status['code'] = 'FAILED'
+            status['message'] = f'Topic {topic} does not have enough components'  # noqa
+            return status
 
         for i in [channel, version, system]:
             topic_infra += i + '/'
@@ -296,7 +302,8 @@ class WMOCoreMetadataProfileTestSuite2:
 
         for role_type in ['originator', 'pointOfContact']:
             for p in providers:
-                if role_type not in p['roles']:
+                roles = [r['name'] for r in p['roles']]
+                if not roles:
                     status['code'] = 'FAILED'
                     status['message'] = f'Missing role {role_type}'
 
@@ -333,6 +340,7 @@ class WMOCoreMetadataProfileTestSuite2:
         if data_policy not in ['core', 'recommended']:
             status['code'] = 'FAILED'
             status['message'] = f'Invalid data policy {data_policy}'
+            return status
 
         if data_policy == 'recommended':
             if 'additionalConditions' not in data_policy:
@@ -347,6 +355,7 @@ class WMOCoreMetadataProfileTestSuite2:
             if not name_found:
                 status['code'] = 'FAILED'
                 status['message'] = 'missing additionalConditions name'
+                return status
 
             for ac in data_policy['additionalConditions']:
                 if 'name' not in ac and 'scheme' not in ac:

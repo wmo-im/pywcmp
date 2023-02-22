@@ -26,11 +26,13 @@
 #
 ###############################################################################
 
+import json
 import os
 import unittest
 
 from lxml import etree
-from pywcmp.ats import TestSuiteError, WMOCoreMetadataProfileTestSuite13
+from pywcmp.ats import (TestSuiteError, WMOCoreMetadataProfileTestSuite13,
+                        WMOCoreMetadataProfileTestSuite2)
 from pywcmp.wcmp1.kpi import (calculate_grade, group_kpi_results,
                               WMOCoreMetadataProfileKeyPerformanceIndicators)
 from pywcmp.wcmp2.topics import TopicHierarchy
@@ -46,8 +48,8 @@ def get_test_file_path(filename):
         return f'tests/{filename}'
 
 
-class WCMPATSTest(unittest.TestCase):
-    """WCMP ATS tests of tests"""
+class WCMP1ATSTest(unittest.TestCase):
+    """WCMP1 ATS tests of tests"""
 
     def setUp(self):
         """setup test fixtures, etc."""
@@ -74,7 +76,47 @@ class WCMPATSTest(unittest.TestCase):
             self.assertEqual(3, len(err.errors))
 
 
-class WCMPKPITest(unittest.TestCase):
+class WCMP2ATSTest(unittest.TestCase):
+    """WCMP2 ATS tests of tests"""
+
+    def setUp(self):
+        """setup test fixtures, etc."""
+        pass
+
+    def tearDown(self):
+        """return to pristine state"""
+        pass
+
+    def test_pass(self):
+        """Simple tests for a passing record"""
+        with open(get_test_file_path('data/wcmp2-passing.json')) as fh:
+            ts = WMOCoreMetadataProfileTestSuite2(json.load(fh))
+            results = ts.run_tests()
+
+            codes = [r['code'] for r in results['ets-report']]
+
+            self.assertEqual(codes.count('FAILED'), 0)
+            self.assertEqual(codes.count('PASSED'), 11)
+            self.assertEqual(codes.count('SKIPPED'), 1)
+
+    def test_fail(self):
+        """Simple tests for a failing record"""
+        with open(get_test_file_path('data/wcmp2-failing.json')) as fh:
+            record = json.load(fh)
+            ts = WMOCoreMetadataProfileTestSuite2(record)
+            results = ts.run_tests()
+
+            codes = [r['code'] for r in results['ets-report']]
+
+            self.assertEqual(codes.count('FAILED'), 2)
+            self.assertEqual(codes.count('PASSED'), 9)
+            self.assertEqual(codes.count('SKIPPED'), 1)
+
+            with self.assertRaises(ValueError):
+                ts.run_tests(fail_on_schema_validation=True)
+
+
+class WCMP1KPITest(unittest.TestCase):
     """WCMP KPI tests of tests"""
 
     def setUp(self):
@@ -162,8 +204,8 @@ class WCMPKPITest(unittest.TestCase):
                          enhancements_kpis)
 
 
-class WCMPTopicHierarchyTest(unittest.TestCase):
-    """WCMP Topic Hierarchy tests"""
+class WIS2TopicHierarchyTest(unittest.TestCase):
+    """WIS2 Topic Hierarchy tests"""
 
     def setUp(self):
         """setup test fixtures, etc."""
