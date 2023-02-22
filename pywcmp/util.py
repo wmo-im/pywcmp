@@ -219,16 +219,16 @@ def parse_wcmp(content: str) -> list:
             with open(content) as fh:
                 data = json.load(fh)
             wcmp_version_guess = 2
-        except RuntimeError as err:
+        except json.decoder.JSONDecodeError as err:
             LOGGER.error(err)
-            raise RuntimeError('Syntax error')
+            raise RuntimeError(f'Encoding error: {err}')
     else:
         LOGGER.debug('Attempting to parse as XML')
         try:
             data = etree.parse(content)
         except etree.XMLSyntaxError as err:
             LOGGER.error(err)
-            raise RuntimeError('Syntax error')
+            raise RuntimeError('Encoding error')
 
         root_tag = data.getroot().tag
 

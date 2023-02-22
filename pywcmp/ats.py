@@ -3,7 +3,7 @@
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #          Ján Osuský <jan.osusky@iblsoft.com>
 #
-# Copyright (c) 2022 Tom Kralidis
+# Copyright (c) 2023 Tom Kralidis
 # Copyright (c) 2022 Government of Canada
 # Copyright (c) 2020 IBL Software Engineering spol. s r. o.
 #
@@ -29,6 +29,7 @@
 # abstract test for WCMP1 and WCMP2
 
 from io import BytesIO
+import json
 
 import click
 
@@ -49,10 +50,15 @@ def ats():
 @click.pass_context
 @get_cli_common_options
 @click.argument('file_or_url')
-def validate(ctx, file_or_url, logfile, verbosity):
+@click.option('--fail-on-schema-validation', '-f', is_flag=True, default=False,
+              help='Stop the ETS on failing schema validation')
+def validate(ctx, file_or_url, logfile, verbosity,
+             fail_on_schema_validation=True):
     """validate against the abstract test suite"""
 
     setup_logger(verbosity, logfile)
+
+    click.echo(f'Opening {file_or_url}')
 
     if file_or_url.startswith('http'):
         content = BytesIO(urlopen_(file_or_url).read())
@@ -63,14 +69,12 @@ def validate(ctx, file_or_url, logfile, verbosity):
 
     try:
         data, wcmp_version_guess = parse_wcmp(content)
-        if wcmp_version_guess == 1:
-            cls = WMOCoreMetadataProfileTestSuite13
-        elif wcmp_version_guess == 2:
-            cls = WMOCoreMetadataProfileTestSuite2
+    except Exception as err:
+        raise click.ClickException(err)
 
-        ts = cls(data)
-
-        # run the tests
+    if wcmp_version_guess == 1:
+        click.echo('Detected WCMP 1 discovery metadata')
+        ts = WMOCoreMetadataProfileTestSuite13(data)
         try:
             ts.run_tests()
             click.echo('Success!')
@@ -78,8 +82,15 @@ def validate(ctx, file_or_url, logfile, verbosity):
             msg = '\n'.join(err.errors)
             click.echo(msg)
 
-    except ValueError as err:
-        raise click.ClickException(err)
+    elif wcmp_version_guess == 2:
+        click.echo('Detected WCMP 2 discovery metadata')
+        ts = WMOCoreMetadataProfileTestSuite2(data)
+        try:
+            results = ts.run_tests(fail_on_schema_validation)
+        except Exception as err:
+            raise click.ClickException(err)
+
+        click.echo(json.dumps(results, indent=4))
 
 
 ats.add_command(validate)

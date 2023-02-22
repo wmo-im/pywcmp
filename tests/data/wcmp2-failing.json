@@ -1,0 +1,201 @@
+{
+    "id": "urn:x-wmo:md:can:eccc-msc:weather.observations.swob-realtime",
+    "conformsTo": [
+        "http://www.opengis.net/spec/ogcapi-records-1/1.0/req/record-core"
+    ],
+    "time": "2010-11-11T11:11:11Z",
+    "type": "Feature",
+    "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [
+                    -142,
+                    28
+                ],
+                [
+                    -142,
+                    82
+                ],
+                [
+                    -52,
+                    82
+                ],
+                [
+                    -52,
+                    28
+                ],
+                [
+                    -142,
+                    28
+                ]
+            ]
+        ]
+    },
+    "properties": {
+        "title": "Surface Weather Observations",
+        "description": "Surface Observations measured at the automatic and manual stations of the Environment and Climate Change Canada and partners networks, either for a single station, or for the stations of specific provinces and territories (last 30 days)",
+        "themes": [
+            {
+                "concepts": [
+                    {
+                        "id": "Hydrology"
+                    },
+                    {
+                        "id": "Streamflow"
+                    },
+                    {
+                        "id": "Discharge"
+                    },
+                    {
+                        "id": "Water level"
+                    },
+                    {
+                        "id": "Water quantity"
+                    },
+                    {
+                        "id": "Sediment concentration"
+                    }
+                ]
+            },
+            {
+                "concepts": [
+                    {
+                        "id": "Weather forecasts"
+                    },
+                    {
+                        "id": "Precipitation"
+                    },
+                    {
+                        "id": "Air temperature"
+                    },
+                    {
+                        "id": "Humidity"
+                    },
+                    {
+                        "id": "Snow"
+                    },
+                    {
+                        "id": "Wind"
+                    },
+                    {
+                        "id": "Meteorological data"
+                    }
+                ]
+            },
+            {
+                "concepts": [
+                    {
+                        "id": "Weather and Climate"
+                    }
+                ]
+            },
+            {
+                "concepts": [
+                    {
+                        "id": "International"
+                    }
+                ]
+            },
+            {
+                "concepts": [
+                    {
+                        "id": "Atmosphere"
+                    }
+                ]
+            },
+            {
+                "concepts": [
+                    {
+                        "id": "weatherObservations"
+                    }
+                ],
+                "scheme": "https://github.com/wmo-im/wcmp-codelists/blob/main/codelists/WMO_CategoryCode.csv"
+            }
+        ],
+        "providers": [
+            {
+                "name": "Government of Canada; Environment and Climate Change Canada; Meteorological Service of Canada",
+                "individual": "National Inquiry Response Team / \u00c9quipe nationale de r\u00e9ponse des demandes du public",
+                "positionName": "National Inquiry Response Team",
+                "contactInfo": {
+                    "phone": {
+                        "office": "+01-819-997-2800"
+                    },
+                    "email": {
+                        "office": "+01-506-451-6010"
+                    },
+                    "address": {
+                        "office": {
+                            "deliveryPoint": "77 Westmorland Street, suite 260",
+                            "city": "Fredericton",
+                            "administrativeArea": "NB",
+                            "postalCode": "E3B 6Z4",
+                            "country": "Canada"
+                        },
+                        "onlineResource": {
+                            "href": "https://www.canada.ca/en/environment-climate-change.html"
+                        }
+                    },
+                    "hoursOfService": "0700h - 1500h EST",
+                    "contactInstructions": "email",
+                    "url": {
+                        "rel": "canonical",
+                        "type": "text/html",
+                        "href": "https://www.canada.ca/en/environment-climate-change.html"
+                    }
+                },
+                "url": "https://www.canada.ca/en/environment-climate-change.html",
+                "roles": [
+                    {
+                        "name": "pointOfContact"
+                    },
+                    {
+                        "name": "distributor"
+                    }
+                ]
+            }
+        ],
+        "type": "dataset",
+        "created": "2018-01-01",
+        "updated": "2022-06-22",
+        "wmo:topicHierarchy": "origin/a/wis/fake/value/1/2/3",
+        "wmo:dataPolicy": {
+            "name": "core"
+        }
+    },
+    "links": [
+        {
+            "rel": "http://www.wmo.int/def/rel/wmdr/1.0/FacilitySet",
+            "href": "https://dd.weather.gc.ca/observations/doc/swob-xml_station_list.csv",
+            "type": "text/csv",
+            "title": "Stations associated with this dataset"
+        },
+        {
+            "rel": "download",
+            "href": "https://dd.weather.gc.ca/observations/swob-ml",
+            "type": "text/html",
+            "hreflang": "en",
+            "title": "Raw data download (CSV files)"
+        },
+        {
+            "rel": "items",
+            "href": "https://api.weather.gc.ca/collections/swob-realtime/items",
+            "type": "application/json",
+            "title": "Data access API interface"
+        },
+        {
+            "rel": "related",
+            "href": "https://eccc-msc.github.io/open-data/msc-data/obs_station/readme_obs_insitu_swobdatamart_en",
+            "type": "text/html",
+            "title": "Documentation"
+        },
+        {
+            "rel": "items",
+            "href": "mqtts://example.org",
+            "channel": "origin/a/wis2/can/eccc-msc/data/core/weather/observations/surface-land/landFixed",
+            "type": "application/json",
+            "title": "Data notifications"
+        }
+    ]
+}
