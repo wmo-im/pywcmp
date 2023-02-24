@@ -116,7 +116,17 @@ PROCESS_LIST_TOPICS = {
             'description': 'List of child topics',
             'schema': {
                 'type': 'object',
-                'contentMediaType': 'application/json'
+                'contentMediaType': 'application/json',
+                'properties': {
+                    'topics': {
+                        'type': 'array',
+                        'minOccurs': 1,
+                        'items': {
+                            'type': 'string',
+                            'descriptiopn': 'Matching topic'
+                        }
+                    }
+                }
             }
         }
     },
@@ -132,33 +142,40 @@ PROCESS_VALIDATE_TOPIC = {
     'version': '0.1.0',
     'id': 'pywcmp-wis2-topics-validate',
     'title': {
-        'en': 'list WIS2 topics'
+        'en': 'validate WIS2 topics'
     },
     'description': {
-        'en': 'Lists WIS2 topics'
+        'en': 'Validates WIS2 topics'
     },
     'keywords': ['wis2', 'topics', 'metadata'],
     'links': WIS2_TOPIC_HIERARCHY_LINKS,
     'inputs': {
-        'record': {
-            'title': 'record',
-            'description': 'WCMP2 record',
+        'topic': WIS2_TOPIC_HIERARCHY_INPUT_TOPIC,
+        'fuzzy': {
+            'title': 'Fuzzy',
+            'description': 'Whether to apply fuzzy logic to validation',
             'schema': {
-                'type': object
+                'type': 'boolean',
+                'default': 'false'
             },
-            'minOccurs': 1,
             'maxOccurs': 1,
             'metadata': None,
-            'keywords': ['topic']
+            'keywords': ['fuzzy']
         }
     },
     'outputs': {
         'result': {
-            'title': 'List of child topics',
-            'description': 'List of child topics',
+            'title': 'Result of topic validity',
+            'description': 'Result of topic validity',
             'schema': {
                 'type': 'object',
-                'contentMediaType': 'application/json'
+                'contentMediaType': 'application/json',
+                'properties': {
+                    'topic_is_valid': {
+                        'type': 'boolean'
+                    }
+                },
+                'required': ['topic_is_valie']
             }
         }
     },
