@@ -100,7 +100,7 @@ PROCESS_LIST_TOPICS = {
     'version': '0.1.0',
     'id': 'pywcmp-wis2-topics-list',
     'title': {
-        'en': 'list WIS2 topics'
+        'en': 'List WIS2 topics'
     },
     'description': {
         'en': 'Lists WIS2 topics'
@@ -142,7 +142,7 @@ PROCESS_VALIDATE_TOPIC = {
     'version': '0.1.0',
     'id': 'pywcmp-wis2-topics-validate',
     'title': {
-        'en': 'validate WIS2 topics'
+        'en': 'Validate WIS2 topics'
     },
     'description': {
         'en': 'Validates WIS2 topics'
@@ -191,10 +191,10 @@ PROCESS_WCMP2_ETS = {
     'version': '0.1.0',
     'id': 'pywcmp-wis2-wcmp2-ets',
     'title': {
-        'en': 'validate a WCMP2 document against the ATS'
+        'en': 'Validate a WCMP2 document against the ATS'
     },
     'description': {
-        'en': 'validate a WCMP2 document against the ATS'
+        'en': 'Validate a WCMP2 document against the ATS'
     },
     'keywords': ['wis2', 'wcmp2', 'metadata'],
     'links': [{
