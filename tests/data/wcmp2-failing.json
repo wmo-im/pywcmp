@@ -3,7 +3,6 @@
     "conformsTo": [
         "http://www.opengis.net/spec/ogcapi-records-1/1.0/req/record-core"
     ],
-    "time": "2010-11-11T11:11:11Z",
     "type": "Feature",
     "geometry": {
         "type": "Polygon",
@@ -31,6 +30,9 @@
                 ]
             ]
         ]
+    },
+    "time": {
+        "interval": ["2010-11-11T11:11:11Z", ".."]
     },
     "properties": {
         "title": "Surface Weather Observations",
