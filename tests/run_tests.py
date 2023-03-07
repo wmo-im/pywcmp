@@ -31,7 +31,7 @@ import os
 import unittest
 
 from lxml import etree
-from pywcmp.ats import (TestSuiteError, WMOCoreMetadataProfileTestSuite13,
+from pywcmp.ets import (TestSuiteError, WMOCoreMetadataProfileTestSuite13,
                         WMOCoreMetadataProfileTestSuite2)
 from pywcmp.wcmp1.kpi import (calculate_grade, group_kpi_results,
                               WMOCoreMetadataProfileKeyPerformanceIndicators)
@@ -48,8 +48,8 @@ def get_test_file_path(filename):
         return f'tests/{filename}'
 
 
-class WCMP1ATSTest(unittest.TestCase):
-    """WCMP1 ATS tests of tests"""
+class WCMP1ETSTest(unittest.TestCase):
+    """WCMP1 ETS tests of tests"""
 
     def setUp(self):
         """setup test fixtures, etc."""
@@ -76,8 +76,8 @@ class WCMP1ATSTest(unittest.TestCase):
             self.assertEqual(3, len(err.errors))
 
 
-class WCMP2ATSTest(unittest.TestCase):
-    """WCMP2 ATS tests of tests"""
+class WCMP2ETSTest(unittest.TestCase):
+    """WCMP2 ETS tests of tests"""
 
     def setUp(self):
         """setup test fixtures, etc."""

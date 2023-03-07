@@ -35,7 +35,7 @@ import re
 from bs4 import BeautifulSoup
 
 from pywcmp.util import check_spelling, check_url
-from pywcmp.wcmp1.ats import WMOCoreMetadataProfileTestSuite13
+from pywcmp.wcmp1.ets import WMOCoreMetadataProfileTestSuite13
 from pywcmp.errors import TestSuiteError
 from pywcmp.wcmp1.helpers import (get_codelists, get_keyword_info,
                                   get_string_or_anchor_value,
@@ -131,7 +131,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         name = 'KPI-1: WCMP 1.3, Part 2 Compliance'
 
         LOGGER.info(f'Running {name}')
-        LOGGER.debug('Running ATS tests')
+        LOGGER.debug('Running ETS tests')
         ts = WMOCoreMetadataProfileTestSuite13(self.exml)
 
         total = 13

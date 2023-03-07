@@ -71,7 +71,7 @@ import logging
 from pygeoapi.process.base import BaseProcessor, ProcessorExecuteError
 
 from pywcmp.wcmp2.topics import TopicHierarchy
-from pywcmp.wcmp2.ats import WMOCoreMetadataProfileTestSuite2
+from pywcmp.wcmp2.ets import WMOCoreMetadataProfileTestSuite2
 
 LOGGER = logging.getLogger(__name__)
 
