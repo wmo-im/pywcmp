@@ -26,7 +26,7 @@
 #
 ###############################################################################
 
-# abstract test suite as per WMO Core Metadata Profile 1.3, Part 2
+# executable test suite as per WMO Core Metadata Profile 1.3, Part 2
 
 import logging
 
@@ -75,7 +75,7 @@ class WMOCoreMetadataProfileTestSuite13:
 
         :param exml: `etree.ElementTree` object
 
-        :returns: `pywcmp.wcmp1.ats.WMOCoreMetadataProfileTestSuite13`
+        :returns: `pywcmp.wcmp1.ets.WMOCoreMetadataProfileTestSuite13`
         """
 
         self.test_id = None

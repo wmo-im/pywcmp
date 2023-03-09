@@ -23,7 +23,7 @@
 #
 ###############################################################################
 
-# abstract test suite as per WMO Core Metadata Profile 2, Annex A
+# executable test suite as per WMO Core Metadata Profile 2, Annex A
 
 import json
 import logging
@@ -57,7 +57,7 @@ class WMOCoreMetadataProfileTestSuite2:
 
         :param data: dict of WCMP2 JSON
 
-        :returns: `pywcmp.wcmp2.ats.WMOCoreMetadataProfileTestSuite2`
+        :returns: `pywcmp.wcmp2.ets.WMOCoreMetadataProfileTestSuite2`
         """
 
         self.test_id = None

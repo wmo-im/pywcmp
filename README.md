@@ -49,23 +49,23 @@ pywcmp bundle sync
 # abstract test suite
 
 # validate WCMP 1.3 metadata against abstract test suite (file on disk)
-pywcmp ats validate /path/to/file.xml
+pywcmp ets validate /path/to/file.xml
 
 # validate WCMP 1.3 metadata against abstract test suite (URL)
-pywcmp ats validate https://example.org/path/to/file.xml
+pywcmp ets validate https://example.org/path/to/file.xml
 
 # validate WCMP 2 metadata against abstract test suite (URL)
-pywcmp ats validate https://example.org/path/to/file.json
+pywcmp ets validate https://example.org/path/to/file.json
 
 # adjust debugging messages (CRITICAL, ERROR, WARNING, INFO, DEBUG) to stdout
-pywcmp ats validate https://example.org/path/to/file.xml --verbosity DEBUG
+pywcmp ets validate https://example.org/path/to/file.xml --verbosity DEBUG
 
 # write results to logfile
-pywcmp ats validate https://example.org/path/to/file.json --verbosity DEBUG --logfile /tmp/foo.txt
+pywcmp ets validate https://example.org/path/to/file.json --verbosity DEBUG --logfile /tmp/foo.txt
 
 # key performance indicators
 
-# all key performance indicators at once # note: running KPIs automatically runs the ats
+# all key performance indicators at once # note: running KPIs automatically runs the ets
 pywcmp kpi validate https://example.org/path/to/file.xml --verbosity DEBUG
 
 # all key performance indicators at once, in summary
@@ -94,17 +94,17 @@ pywcmp topics list wis2.a
 ```pycon
 >>> # test a file on disk
 >>> from lxml import etree
->>> from pywcmp.ats import ats
+>>> from pywcmp.ets import ets
 >>> exml = etree.parse('/path/to/file.xml')
->>> # test ATS
->>> ts = ats.WMOCoreMetadataProfileTestSuite13(exml)
+>>> # test ETS
+>>> ts = ets.WMOCoreMetadataProfileTestSuite13(exml)
 >>> ts.run_tests()  # raises ValueError error stack on exception
 >>> # test a URL
 >>> from urllib2 import urlopen
 >>> from StringIO import StringIO
 >>> content = StringIO(urlopen('https://....').read())
 >>> exml = etree.parse(content)
->>> ts = ats.WMOCoreMetadataProfileTestSuite13(exml)
+>>> ts = ets.WMOCoreMetadataProfileTestSuite13(exml)
 >>> ts.run_tests()  # raises ValueError error stack on exception
 >>> # handle pywcmp.errors.TestSuiteError
 >>> # pywcmp.errors.TestSuiteError.errors is a list of errors

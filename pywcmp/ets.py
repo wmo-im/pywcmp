@@ -26,7 +26,7 @@
 #
 ###############################################################################
 
-# abstract test for WCMP1 and WCMP2
+# executable test for WCMP1 and WCMP2
 
 from io import BytesIO
 import json
@@ -34,15 +34,15 @@ import json
 import click
 
 from pywcmp.errors import TestSuiteError
-from pywcmp.wcmp1.ats import WMOCoreMetadataProfileTestSuite13
-from pywcmp.wcmp2.ats import WMOCoreMetadataProfileTestSuite2
+from pywcmp.wcmp1.ets import WMOCoreMetadataProfileTestSuite13
+from pywcmp.wcmp2.ets import WMOCoreMetadataProfileTestSuite2
 from pywcmp.util import (get_cli_common_options, parse_wcmp, setup_logger,
                          urlopen_)
 
 
 @click.group()
-def ats():
-    """abstract test suite"""
+def ets():
+    """executable test suite"""
     pass
 
 
@@ -93,4 +93,4 @@ def validate(ctx, file_or_url, logfile, verbosity,
         click.echo(json.dumps(results, indent=4))
 
 
-ats.add_command(validate)
+ets.add_command(validate)
