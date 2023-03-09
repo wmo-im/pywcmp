@@ -34,7 +34,7 @@ import click
 from lxml import etree
 
 from pywcmp.wcmp2.topics import build_topics, WIS2_TOPIC_HIERARCHY_LOOKUP
-from pywcmp.util import get_userdir, urlopen_
+from pywcmp.util import get_cli_common_options, get_userdir, urlopen_, setup_logger
 
 LOGGER = logging.getLogger(__name__)
 
@@ -52,9 +52,12 @@ def bundle():
 
 
 @click.command()
+@get_cli_common_options
 @click.pass_context
-def sync(ctx):
+def sync(ctx, logfile, verbosity):
     "Sync configuration bundle"""
+
+    setup_logger(verbosity, logfile)
     LOGGER.debug('Caching schemas, codelists and topic hierarchy')
 
     if USERDIR.exists():
@@ -111,7 +114,9 @@ def sync(ctx):
     ZIPFILE_URL = 'https://github.com/wmo-im/wis2-topic-hierarchy/archive/refs/heads/main.zip'  # noqa
     FH = io.BytesIO(urlopen_(ZIPFILE_URL).read())
     with zipfile.ZipFile(FH) as z:
+        LOGGER.debug(f'Processing zipfile "{z.filename}"')
         for name in z.namelist():
+            LOGGER.debug(f'Processing entry "{name}"')
             if 'wis2-topic-hierarchy-main/topic-hierarchy' in name:
                 filename = os.path.basename(name)
 
@@ -119,6 +124,7 @@ def sync(ctx):
                     continue
 
                 dest_file = WIS2_TOPIC_HIERARCHY_DIR / filename
+                LOGGER.debug(f'Creating "{dest_file}"')
                 with z.open(name) as src, dest_file.open('wb') as dest:
                     shutil.copyfileobj(src, dest)
 
