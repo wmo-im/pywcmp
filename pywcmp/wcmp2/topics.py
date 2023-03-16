@@ -129,7 +129,7 @@ class TopicHierarchy:
 
         if not self.validate(th):
             msg = 'Invalid topic'
-            LOGGER.error(msg)
+            LOGGER.info(msg)
             raise ValueError(msg)
 
         th = rstrip_add(topic_hierarchy, pad_again=True)
@@ -143,7 +143,7 @@ class TopicHierarchy:
 
         if not matches:
             msg = f'No matching topics for {topic_hierarchy}'
-            LOGGER.error(msg)
+            LOGGER.info(msg)
             raise ValueError(msg)
 
         return list(set(matches))
@@ -163,7 +163,7 @@ class TopicHierarchy:
 
         if topic_hierarchy is None:
             msg = 'Topic hierarchy is empty'
-            LOGGER.error(msg)
+            LOGGER.info(msg)
             raise ValueError(msg)
 
         if fuzzy:

@@ -82,7 +82,8 @@ class WMOCoreMetadataProfileTestSuite2:
         if validation_result['code'] == 'FAILED':
             if fail_on_schema_validation:
                 msg = 'Record fails WCMP2 validation. Stopping ETS'
-                LOGGER.error(msg)
+                msg += f"Validation error: {validation_result['message']}"
+                LOGGER.info(msg)
                 raise ValueError(msg)
 
         for t in tests:
@@ -106,7 +107,7 @@ class WMOCoreMetadataProfileTestSuite2:
 
         if not schema.exists():
             msg = "WCMP2 schema missing. Run 'pywcmp bundle sync' to cache"
-            LOGGER.error(msg)
+            LOGGER.info(msg)
             raise RuntimeError(msg)
 
         LOGGER.debug(f'Validating {self.record} against {schema}')

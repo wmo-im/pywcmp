@@ -50,7 +50,8 @@ def ets():
 @click.pass_context
 @get_cli_common_options
 @click.argument('file_or_url')
-@click.option('--fail-on-schema-validation', '-f', is_flag=True, default=False,
+@click.option('--fail-on-schema-validation/--no-fail-on-schema-validation',
+              '-f', default=True,
               help='Stop the ETS on failing schema validation')
 def validate(ctx, file_or_url, logfile, verbosity,
              fail_on_schema_validation=True):
