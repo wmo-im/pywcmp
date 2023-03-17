@@ -57,6 +57,9 @@ pywcmp ets validate https://example.org/path/to/file.xml
 # validate WCMP 2 metadata against abstract test suite (URL)
 pywcmp ets validate https://example.org/path/to/file.json
 
+# validate WCMP 2 metadata against abstract test suite (URL), but turn JSON Schema validation off
+pywcmp ets validate https://example.org/path/to/file.json --no-fail-on-schema-validation
+
 # adjust debugging messages (CRITICAL, ERROR, WARNING, INFO, DEBUG) to stdout
 pywcmp ets validate https://example.org/path/to/file.xml --verbosity DEBUG
 
