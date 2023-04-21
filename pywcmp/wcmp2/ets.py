@@ -383,7 +383,7 @@ class WMOCoreMetadataProfileTestSuite2:
             if link['rel'] == 'canonical':
                 canonical_found = True
 
-        if canonical_found:
+        if not canonical_found:
             status['code'] = 'FAILED'
             status['message'] = 'missing at least one canonical link'
 
