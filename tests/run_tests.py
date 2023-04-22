@@ -108,8 +108,8 @@ class WCMP2ETSTest(unittest.TestCase):
 
             codes = [r['code'] for r in results['ets-report']]
 
-            self.assertEqual(codes.count('FAILED'), 2)
-            self.assertEqual(codes.count('PASSED'), 9)
+            self.assertEqual(codes.count('FAILED'), 3)
+            self.assertEqual(codes.count('PASSED'), 8)
             self.assertEqual(codes.count('SKIPPED'), 1)
 
             with self.assertRaises(ValueError):

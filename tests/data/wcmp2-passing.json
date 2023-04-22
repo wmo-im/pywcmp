@@ -181,6 +181,13 @@
             "title": "Raw data download (CSV files)"
         },
         {
+            "rel": "canonical",
+            "href": "https://dd.weather.gc.ca/observations/swob-ml",
+            "type": "text/html",
+            "hreflang": "en",
+            "title": "Raw data download (CSV files)"
+        },
+        {
             "rel": "items",
             "href": "https://api.weather.gc.ca/collections/swob-realtime/items",
             "type": "application/json",
