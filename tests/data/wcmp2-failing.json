@@ -1,7 +1,7 @@
 {
     "id": "urn:x-wmo:md:can:eccc-msc:weather.observations.swob-realtime",
     "conformsTo": [
-        "http://www.opengis.net/spec/ogcapi-records-1/1.0/req/record-core"
+        "http://wis.wmo.int/spec/wcmp/2.0/conf/core"
     ],
     "type": "Feature",
     "geometry": {
@@ -115,7 +115,7 @@
                 "scheme": "https://github.com/wmo-im/wcmp-codelists/blob/main/codelists/WMO_CategoryCode.csv"
             }
         ],
-        "providers": [
+        "contacts": [
             {
                 "name": "Government of Canada; Environment and Climate Change Canada; Meteorological Service of Canada",
                 "individual": "National Inquiry Response Team / \u00c9quipe nationale de r\u00e9ponse des demandes du public",

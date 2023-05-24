@@ -69,6 +69,9 @@ class WMOCoreMetadataProfileTestSuite2:
 
         results = []
         tests = []
+        ets_report = {
+            'summary': {},
+        }
 
         for f in dir(WMOCoreMetadataProfileTestSuite2):
             if all([
@@ -82,15 +85,20 @@ class WMOCoreMetadataProfileTestSuite2:
         if validation_result['code'] == 'FAILED':
             if fail_on_schema_validation:
                 msg = 'Record fails WCMP2 validation. Stopping ETS'
-                msg += f"Validation error: {validation_result['message']}"
-                LOGGER.info(msg)
+                LOGGER.error(msg)
                 raise ValueError(msg)
 
         for t in tests:
             results.append(getattr(self, t)())
 
+        for code in ['PASSED', 'FAILED', 'SKIPPED']:
+            r = len([t for t in results if t['code'] == code])
+            ets_report['summary'][code] = r
+
+        ets_report['tests'] = results
+
         return {
-            'ets-report': results
+            'ets-report': ets_report
         }
 
     def test_requirement_validation(self):
@@ -107,7 +115,7 @@ class WMOCoreMetadataProfileTestSuite2:
 
         if not schema.exists():
             msg = "WCMP2 schema missing. Run 'pywcmp bundle sync' to cache"
-            LOGGER.info(msg)
+            LOGGER.error(msg)
             raise RuntimeError(msg)
 
         LOGGER.debug(f'Validating {self.record} against {schema}')
@@ -169,7 +177,7 @@ class WMOCoreMetadataProfileTestSuite2:
         Validate that a WCMP record provides valid conformance information.
         """
 
-        conformance_class = 'http://wis.wmo.int/spec/wcmp/2.0'
+        conformance_class = 'http://wis.wmo.int/spec/wcmp/2.0/conf/core'
 
         status = {
             'id': gen_test_id('conformance'),
@@ -253,60 +261,65 @@ class WMOCoreMetadataProfileTestSuite2:
 
         return status
 
-    def test_requirement_topic_hierarchy(self):
+    def test_requirement_themes(self):
         """
-        Validate that a WCMP record provides a valid WIS2 Topic Hierarchy.
+        Validate that a WCMP record provides a themes property.
         """
 
         status = {
-            'id': gen_test_id('topic_hierarchy'),
+            'id': gen_test_id('themes'),
             'code': 'PASSED'
         }
 
-        topic_infra = str()
-        topic = self.record['properties']['wmo:topicHierarchy']
+        themes = self.record['properties']['themes']
 
-        th = TopicHierarchy()
-
-        if not th.validate(topic):
+        if len(themes) < 1:
             status['code'] = 'FAILED'
-            status['message'] = f'Invalid topic {topic}'
+            status['message'] = 'Missing at least one theme'
+
             return status
 
-        try:
-            channel, version, system, _ = topic.split('/', 3)
-        except ValueError:
-            status['code'] = 'FAILED'
-            status['message'] = f'Topic {topic} does not have enough components'  # noqa
-            return status
-
-        for i in [channel, version, system]:
-            topic_infra += i + '/'
-            if th.validate(topic_infra):
+        for t in themes:
+            concepts = t['concepts']
+            if len(concepts) < 1:
                 status['code'] = 'FAILED'
-                status['message'] = f'Topic {topic} should not include levels 1-3'  # noqa
+                status['message'] = 'Missing at least one concept'
+
+                return status
+
+            if t.get('scheme') is None:
+                status['code'] = 'FAILED'
+                status['message'] = 'Missing scheme'
+
+                return status
+
+            for c in concepts:
+                if c.get('id') is None:
+                    status['code'] = 'FAILED'
+                    status['message'] = 'Missing concept id'
+
+                return status
 
         return status
 
-    def test_requirement_providers(self):
+    def test_requirement_contacts(self):
         """
         Validate that a WCMP record provides contact information for the
         metadata point of contact and originator of the data.
         """
 
         status = {
-            'id': gen_test_id('providers'),
+            'id': gen_test_id('contacts'),
             'code': 'PASSED'
         }
 
-        providers = self.record['properties']['providers']
+        contacts = self.record['properties']['contacts']
 
         for role_type in ['originator', 'pointOfContact']:
-            for p in providers:
-                roles = [r['name'] for r in p['roles']]
-                if not roles:
+            for c in contacts:
+                if role_type not in c['roles']:
                     status['code'] = 'FAILED'
-                    status['message'] = f'Missing role {role_type}'
+                    status['message'] = f'Missing required role {role_type}'
 
         return status
 
@@ -329,14 +342,18 @@ class WMOCoreMetadataProfileTestSuite2:
         if applicable additional information about licensing and/or rights.
         """
 
-        name_found = False
-
         status = {
             'id': gen_test_id('data_policy'),
             'code': 'PASSED'
         }
 
-        data_policy = self.record['properties']['wmo:dataPolicy']['name']
+        if self.record['properties']['type'] == 'dataset':
+            if 'wmo:dataPolicy' not in self.record['properties']:
+                status['code'] = 'FAILED'
+                status['message'] = 'Missing data policy'
+                return status
+
+        data_policy = self.record['properties']['wmo:dataPolicy']
 
         if data_policy not in ['core', 'recommended']:
             status['code'] = 'FAILED'
@@ -344,24 +361,12 @@ class WMOCoreMetadataProfileTestSuite2:
             return status
 
         if data_policy == 'recommended':
-            if 'additionalConditions' not in data_policy:
+            conditions_links = [link for link in self.record['links']
+                                if link['rel'] in ['license', 'copyright']]
+            if not conditions_links:
                 status['code'] = 'FAILED'
-                status['message'] = 'missing additionalConditions'
+                status['message'] = 'missing recommended conditions'
                 return status
-
-            for ac in data_policy['additionalConditions']:
-                if 'name' in ac:
-                    name_found = True
-
-            if not name_found:
-                status['code'] = 'FAILED'
-                status['message'] = 'missing additionalConditions name'
-                return status
-
-            for ac in data_policy['additionalConditions']:
-                if 'name' not in ac and 'scheme' not in ac:
-                    status['code'] = 'FAILED'
-                    status['message'] = 'missing additionalConditions name/scheme'  # noqa
 
         return status
 
@@ -370,8 +375,6 @@ class WMOCoreMetadataProfileTestSuite2:
         Validate that a WCMP record provides a link property.
         """
 
-        canonical_found = False
-
         status = {
             'id': gen_test_id('links'),
             'code': 'PASSED'
@@ -379,12 +382,25 @@ class WMOCoreMetadataProfileTestSuite2:
 
         links = self.record['links']
 
-        for link in links:
-            if link['rel'] == 'canonical':
-                canonical_found = True
-
-        if not canonical_found:
+        LOGGER.debug('Checking for at least one link')
+        if len(links) < 1:
             status['code'] = 'FAILED'
-            status['message'] = 'missing at least one canonical link'
+            status['message'] = 'missing at least one link'
+            return status
+
+        for link in links:
+            LOGGER.debug('Checking that Pub/Sub links have a channel')
+            if link['href'].startswith('mqtt'):
+                if 'channel' not in link:
+                    status['code'] = 'FAILED'
+                    status['message'] = 'missing channel for Pub/Sub link'
+                    return status
+
+            LOGGER.debug('Checking that links with security have descriptions')
+            if 'security' in link:
+                if link['security'].get('description') is None:
+                    status['code'] = 'FAILED'
+                    status['message'] = 'missing security descirption for link'
+                    return status
 
         return status
