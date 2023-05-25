@@ -42,7 +42,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         :param data: dict of WCMP JSON
 
-        :returns: `pywcmp.wcmp2.kpi.WMOCoreMetadataProfileKeyPerformanceIndicators`
+        :returns: `pywcmp.wcmp2.kpi.WMOCoreMetadataProfileKeyPerformanceIndicators`  # noqa
         """
 
         self.data = data
@@ -52,7 +52,8 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         """
         Implements KPI-XXX: TODO
 
-        :returns: `tuple` of KPI name, achieved score, total score, and comments
+        :returns: `tuple` of KPI name, achieved score, total score,
+                  and comments
         """
 
         name = 'KPI-xxx: TODO'

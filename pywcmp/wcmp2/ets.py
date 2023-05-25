@@ -84,7 +84,8 @@ class WMOCoreMetadataProfileTestSuite2:
         validation_result = self.test_requirement_validation()
         if validation_result['code'] == 'FAILED':
             if fail_on_schema_validation:
-                msg = 'Record fails WCMP2 validation. Stopping ETS'
+                msg = ('Record fails WCMP2 validation. Stopping ETS ',
+                       f"errors: {validation_result['message']}")
                 LOGGER.error(msg)
                 raise ValueError(msg)
 
@@ -106,6 +107,8 @@ class WMOCoreMetadataProfileTestSuite2:
         Validate that a WCMP record is valid to the authoritative WCMP schema.
         """
 
+        validation_errors = []
+
         status = {
             'id': gen_test_id('validation'),
             'code': 'PASSED'
@@ -118,13 +121,17 @@ class WMOCoreMetadataProfileTestSuite2:
             LOGGER.error(msg)
             raise RuntimeError(msg)
 
-        LOGGER.debug(f'Validating {self.record} against {schema}')
         with schema.open() as fh:
-            try:
-                Draft202012Validator(json.load(fh)).validate(self.record)
-            except Exception as err:
+            LOGGER.debug(f'Validating {self.record} against {schema}')
+            validator = Draft202012Validator(json.load(fh))
+
+            for error in validator.iter_errors(self.record):
+                validation_errors.append(f'{error.json_path}: {error.message}')
+
+            if validation_errors:
                 status['code'] = 'FAILED'
-                status['message'] = f'Invalid document: {repr(err)}'
+                status['message'] = '\n'.join(validation_errors)
+                status['messages'] = validation_errors
 
         return status
 
