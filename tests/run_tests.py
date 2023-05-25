@@ -93,7 +93,7 @@ class WCMP2ETSTest(unittest.TestCase):
             ts = WMOCoreMetadataProfileTestSuite2(json.load(fh))
             results = ts.run_tests()
 
-            codes = [r['code'] for r in results['ets-report']]
+            codes = [r['code'] for r in results['ets-report']['tests']]
 
             self.assertEqual(codes.count('FAILED'), 0)
             self.assertEqual(codes.count('PASSED'), 11)
@@ -106,7 +106,7 @@ class WCMP2ETSTest(unittest.TestCase):
             ts = WMOCoreMetadataProfileTestSuite2(record)
             results = ts.run_tests()
 
-            codes = [r['code'] for r in results['ets-report']]
+            codes = [r['code'] for r in results['ets-report']['tests']]
 
             self.assertEqual(codes.count('FAILED'), 3)
             self.assertEqual(codes.count('PASSED'), 8)
