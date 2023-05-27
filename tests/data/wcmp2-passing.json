@@ -1,7 +1,7 @@
 {
     "id": "urn:x-wmo:md:can:eccc-msc:weather.observations.swob-realtime",
     "conformsTo": [
-        "http://wis.wmo.int/spec/wcmp/2.0/conf/core"
+        "http://wis.wmo.int/spec/wcmp/2/conf/core"
     ],
     "time": {
         "interval": [

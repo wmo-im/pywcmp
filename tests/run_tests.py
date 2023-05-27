@@ -96,8 +96,8 @@ class WCMP2ETSTest(unittest.TestCase):
             codes = [r['code'] for r in results['ets-report']['tests']]
 
             self.assertEqual(codes.count('FAILED'), 0)
-            self.assertEqual(codes.count('PASSED'), 11)
-            self.assertEqual(codes.count('SKIPPED'), 1)
+            self.assertEqual(codes.count('PASSED'), 12)
+            self.assertEqual(codes.count('SKIPPED'), 0)
 
     def test_fail(self):
         """Simple tests for a failing record"""
@@ -109,8 +109,8 @@ class WCMP2ETSTest(unittest.TestCase):
             codes = [r['code'] for r in results['ets-report']['tests']]
 
             self.assertEqual(codes.count('FAILED'), 3)
-            self.assertEqual(codes.count('PASSED'), 8)
-            self.assertEqual(codes.count('SKIPPED'), 1)
+            self.assertEqual(codes.count('PASSED'), 9)
+            self.assertEqual(codes.count('SKIPPED'), 0)
 
             with self.assertRaises(ValueError):
                 ts.run_tests(fail_on_schema_validation=True)
