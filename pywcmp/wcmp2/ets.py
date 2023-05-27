@@ -25,13 +25,16 @@
 
 # executable test suite as per WMO Core Metadata Profile 2, Annex A
 
+import csv
 import json
 import logging
+from pathlib import Path
 
 from jsonschema.validators import Draft202012Validator
 
 from pywcmp.bundle import WCMP2_FILES
 from pywcmp.wcmp2.topics import TopicHierarchy
+from pywcmp.util import get_userdir
 
 LOGGER = logging.getLogger(__name__)
 
@@ -45,7 +48,7 @@ def gen_test_id(test_id: str) -> str:
     :returns: test identifier as URI
     """
 
-    return f'http://www.wmo.int/spec/wcmp/2.0/req/conf/core/{test_id}'
+    return f'http://www.wmo.int/spec/wcmp/2/req/conf/core/{test_id}'
 
 
 class WMOCoreMetadataProfileTestSuite2:
@@ -126,12 +129,13 @@ class WMOCoreMetadataProfileTestSuite2:
             validator = Draft202012Validator(json.load(fh))
 
             for error in validator.iter_errors(self.record):
+                LOGGER.debug(f'{error.json_path}: {error.message}')
                 validation_errors.append(f'{error.json_path}: {error.message}')
 
             if validation_errors:
                 status['code'] = 'FAILED'
-                status['message'] = '\n'.join(validation_errors)
-                status['messages'] = validation_errors
+                status['message'] = f'{len(validation_errors)} error(s)'
+                status['errors'] = validation_errors
 
         return status
 
@@ -184,7 +188,7 @@ class WMOCoreMetadataProfileTestSuite2:
         Validate that a WCMP record provides valid conformance information.
         """
 
-        conformance_class = 'http://wis.wmo.int/spec/wcmp/2.0/conf/core'
+        conformance_class = 'http://wis.wmo.int/spec/wcmp/2/conf/core'
 
         status = {
             'id': gen_test_id('conformance'),
@@ -205,13 +209,31 @@ class WMOCoreMetadataProfileTestSuite2:
         the WCMP record.
         """
 
+        found = False
+
         status = {
             'id': gen_test_id('type'),
-            'code': 'SKIPPED',
-            'message': 'Test needs WCMP2 codelists'
+            'code': 'PASSED'
         }
 
-        # TODO: assess value against a codelist
+        rt = Path(get_userdir()) / 'wcmp-2' / 'codelists' / 'resource-type.csv'
+
+        if not rt.exists():
+            msg = 'WCMP2 codeslists missing. Run "pywcmp bundle sync"'
+            LOGGER.error(msg)
+            raise RuntimeError(msg)
+
+        with rt.open() as fh:
+            LOGGER.debug(f'Reading topic hierarchy file {rt}')
+            reader = csv.DictReader(fh)
+            for row in reader:
+                if self.record['properties']['type'] == row['Name']:
+                    found = True
+                    break
+
+        if not found:
+            status['id'] = 'FAILED'
+            status['message'] = f"Invalid type: {self.record['properties']['type']}"  # noqa
 
         return status
 
@@ -349,6 +371,8 @@ class WMOCoreMetadataProfileTestSuite2:
         if applicable additional information about licensing and/or rights.
         """
 
+        found = False
+
         status = {
             'id': gen_test_id('data_policy'),
             'code': 'PASSED'
@@ -360,20 +384,35 @@ class WMOCoreMetadataProfileTestSuite2:
                 status['message'] = 'Missing data policy'
                 return status
 
-        data_policy = self.record['properties']['wmo:dataPolicy']
+            data_policy = self.record['properties']['wmo:dataPolicy']
 
-        if data_policy not in ['core', 'recommended']:
-            status['code'] = 'FAILED'
-            status['message'] = f'Invalid data policy {data_policy}'
-            return status
+            dp = Path(get_userdir()) / 'wcmp-2' / 'codelists' / 'resource-type.csv'  # noqa
 
-        if data_policy == 'recommended':
-            conditions_links = [link for link in self.record['links']
-                                if link['rel'] in ['license', 'copyright']]
-            if not conditions_links:
-                status['code'] = 'FAILED'
-                status['message'] = 'missing recommended conditions'
+            if not dp.exists():
+                msg = 'WCMP2 codelists missing. Run "pywcmp bundle sync"'
+                LOGGER.error(msg)
+                raise RuntimeError(msg)
+
+            with dp.open() as fh:
+                LOGGER.debug(f'Reading topic hierarchy file {dp}')
+                reader = csv.DictReader(fh)
+                for row in reader:
+                    if data_policy == row['Name']:
+                        found = True
+                        break
+
+            if not found:
+                status['id'] = 'FAILED'
+                status['message'] = f'Invalid data policy {data_policy}'
                 return status
+
+            if data_policy == 'recommended':
+                conditions_links = [link for link in self.record['links']
+                                    if link['rel'] in ['license', 'copyright']]
+                if not conditions_links:
+                    status['code'] = 'FAILED'
+                    status['message'] = 'missing recommended conditions'
+                    return status
 
         return status
 

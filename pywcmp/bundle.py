@@ -108,6 +108,26 @@ def sync(ctx, logfile, verbosity):
     with json_schema.open('wb') as fh:
         fh.write(urlopen_(f'{WCMP2_SCHEMA}').read())
 
+    WCMP2_CODELISTS = WCMP2_FILES / 'codelists'
+    LOGGER.debug(f'Downloading WCMP2 codelists to {WCMP2_CODELISTS}')
+    WCMP2_CODELISTS.mkdir(parents=True, exist_ok=True)
+    CODELISTS_URL = 'https://github.com/wmo-im/wcmp2-codelists/archive/refs/heads/main.zip'  # noqa
+    FH = io.BytesIO(urlopen_(CODELISTS_URL).read())
+    with zipfile.ZipFile(FH) as z:
+        LOGGER.debug(f'Processing zipfile "{z.filename}"')
+        for name in z.namelist():
+            LOGGER.debug(f'Processing entry "{name}"')
+            if '.csv' in name:
+                filename = os.path.basename(name)
+
+                if not filename:
+                    continue
+
+                dest_file = WCMP2_CODELISTS / filename
+                LOGGER.debug(f'Creating "{dest_file}"')
+                with z.open(name) as src, dest_file.open('wb') as dest:
+                    shutil.copyfileobj(src, dest)
+
     LOGGER.debug('Downloading WIS2 topic hierarchy')
     WIS2_TOPIC_HIERARCHY_DIR.mkdir(parents=True, exist_ok=True)
 
