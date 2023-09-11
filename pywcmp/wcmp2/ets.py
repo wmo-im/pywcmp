@@ -386,7 +386,7 @@ class WMOCoreMetadataProfileTestSuite2:
 
             data_policy = self.record['properties']['wmo:dataPolicy']
 
-            dp = Path(get_userdir()) / 'wcmp-2' / 'codelists' / 'resource-type.csv'  # noqa
+            dp = Path(get_userdir()) / 'wis2-topic-hierarchy' / 'data-policy.csv'  # noqa
 
             if not dp.exists():
                 msg = 'WCMP2 codelists missing. Run "pywcmp bundle sync"'
