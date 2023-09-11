@@ -239,7 +239,7 @@ class WMOCoreMetadataProfileTestSuite2:
 
     def test_requirement_extent_geospatial(self):
         """
-        Check for the existence of a valid properties.type property in
+        Check for the existence of a valid geometry property in
         the WCMP record.
         """
 
