@@ -232,7 +232,7 @@ class WMOCoreMetadataProfileTestSuite2:
                     break
 
         if not found:
-            status['id'] = 'FAILED'
+            status['code'] = 'FAILED'
             status['message'] = f"Invalid type: {self.record['properties']['type']}"  # noqa
 
         return status
@@ -402,7 +402,7 @@ class WMOCoreMetadataProfileTestSuite2:
                         break
 
             if not found:
-                status['id'] = 'FAILED'
+                status['code'] = 'FAILED'
                 status['message'] = f'Invalid data policy {data_policy}'
                 return status
 
