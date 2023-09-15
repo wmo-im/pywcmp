@@ -34,7 +34,8 @@ import click
 from lxml import etree
 
 from pywcmp.wcmp2.topics import build_topics, WIS2_TOPIC_HIERARCHY_LOOKUP
-from pywcmp.util import get_cli_common_options, get_userdir, urlopen_, setup_logger
+from pywcmp.util import (get_cli_common_options, get_userdir, urlopen_,
+                         setup_logger)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -151,6 +152,12 @@ def sync(ctx, logfile, verbosity):
     with WIS2_TOPIC_HIERARCHY_LOOKUP.open('w') as fh:
         content = build_topics()
         fh.write(json.dumps(content, indent=4))
+
+    LOGGER.debug('Downloading IANA link relations')
+    IANA_URL = 'https://www.iana.org/assignments/link-relations/link-relations-1.csv'  # noqa
+    iana_file = WCMP2_FILES / 'link-relations-1.csv'
+    with iana_file.open('wb') as fh:
+        fh.write(urlopen_(f'{IANA_URL}').read())
 
 
 bundle.add_command(sync)

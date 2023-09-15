@@ -219,7 +219,7 @@ class WMOCoreMetadataProfileTestSuite2:
         rt = Path(get_userdir()) / 'wcmp-2' / 'codelists' / 'resource-type.csv'
 
         if not rt.exists():
-            msg = 'WCMP2 codeslists missing. Run "pywcmp bundle sync"'
+            msg = 'WCMP2 codelists missing. Run "pywcmp bundle sync"'
             LOGGER.error(msg)
             raise RuntimeError(msg)
 
@@ -300,6 +300,8 @@ class WMOCoreMetadataProfileTestSuite2:
             'code': 'PASSED'
         }
 
+        earth_system_discipline_theme_found = False
+
         themes = self.record['properties']['themes']
 
         if len(themes) < 1:
@@ -316,16 +318,40 @@ class WMOCoreMetadataProfileTestSuite2:
 
                 return status
 
-            if t.get('scheme') is None:
+            scheme = t.get('scheme')
+
+            if scheme is None:
                 status['code'] = 'FAILED'
                 status['message'] = 'Missing scheme'
 
                 return status
 
+            if 'earth-system-discipline' in scheme:
+                esdt = Path(get_userdir()) / 'wcmp-2' / 'codelists' / 'earth-system-discipline.csv'
+                earth_system_discipline_theme_found = True
+
             for c in concepts:
                 if c.get('id') is None:
                     status['code'] = 'FAILED'
                     status['message'] = 'Missing concept id'
+
+                if 'earth-system-discipline' in scheme:
+                    if c.get('id') not in
+
+                if not esdt.exists():
+                    msg = 'WCMP2 codelists missing. Run "pywcmp bundle sync"'
+                    LOGGER.error(msg)
+                    raise RuntimeError(msg)
+
+                with esdt.open() as fh:
+                    LOGGER.debug(f'Reading topic hierarchy file {rt}')
+                    reader = csv.DictReader(fh)
+                    for row in reader:
+                        if self.record['properties']['type'] == row['Name']:
+                            found = True
+                            break
+
+        if not found:
 
                 return status
 
