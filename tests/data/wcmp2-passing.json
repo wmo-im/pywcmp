@@ -81,7 +81,7 @@
         ],
         "contacts": [
             {
-                "name": "Government of Canada; Environment and Climate Change Canada; Meteorological Service of Canada",
+                "organization": "Government of Canada; Environment and Climate Change Canada; Meteorological Service of Canada",
                 "positionName": "National Inquiry Response Team",
                 "phones": [
                     {
@@ -124,13 +124,13 @@
     },
     "links": [
         {
-            "rel": "http://www.wmo.int/def/rel/wmdr/1.0/FacilitySet",
+            "rel": "http://def.wmo.int/def/rel/wmdr/-/FacilitySet",
             "href": "https://dd.weather.gc.ca/observations/doc/swob-xml_station_list.csv",
             "type": "text/csv",
             "title": "Stations associated with this dataset"
         },
         {
-            "rel": "download",
+            "rel": "data",
             "href": "https://dd.weather.gc.ca/observations/swob-ml",
             "type": "text/html",
             "hreflang": "en",
