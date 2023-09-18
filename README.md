@@ -158,7 +158,7 @@ git push --tags
 
 # upload to PyPI
 rm -fr build dist *.egg-info
-python setup.py sdist bdist_wheel --universal
+python3 setup.py sdist bdist_wheel --universal
 twine upload dist/*
 
 # publish release on GitHub (https://github.com/wmo-im/pywcmp/releases/new)
