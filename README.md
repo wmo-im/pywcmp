@@ -152,7 +152,7 @@ python3 tests/run_tests.py
 # create release (x.y.z is the release version)
 vi pywcmp/__init__.py  # update __version__
 git commit -am 'update release version x.y.z'
-git push origin main
+git push origin master
 git tag -a x.y.z -m 'tagging release version x.y.z'
 git push --tags
 
@@ -166,7 +166,7 @@ twine upload dist/*
 # bump version back to dev
 vi pywcmp/__init__.py  # update __version__
 git commit -am 'back to dev'
-git push origin main
+git push origin master
 ```
 
 ## Code Conventions
