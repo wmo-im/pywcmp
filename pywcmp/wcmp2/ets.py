@@ -209,29 +209,15 @@ class WMOCoreMetadataProfileTestSuite2:
         the WCMP record.
         """
 
-        found = False
-
         status = {
             'id': gen_test_id('type'),
             'code': 'PASSED'
         }
 
         rt = Path(get_userdir()) / 'wcmp-2' / 'codelists' / 'resource-type.csv'
+        resource_types = get_codelist(rt)
 
-        if not rt.exists():
-            msg = 'WCMP2 codeslists missing. Run "pywcmp bundle sync"'
-            LOGGER.error(msg)
-            raise RuntimeError(msg)
-
-        with rt.open() as fh:
-            LOGGER.debug(f'Reading topic hierarchy file {rt}')
-            reader = csv.DictReader(fh)
-            for row in reader:
-                if self.record['properties']['type'] == row['Name']:
-                    found = True
-                    break
-
-        if not found:
+        if self.record['properties']['type'] not in resource_types:
             status['code'] = 'FAILED'
             status['message'] = f"Invalid type: {self.record['properties']['type']}"  # noqa
 
@@ -300,6 +286,9 @@ class WMOCoreMetadataProfileTestSuite2:
             'code': 'PASSED'
         }
 
+        esd = Path(get_userdir()) / 'wis2-topic-hierarchy' / 'earth-system-discipline.csv'  # noqa
+        esds = get_codelist(esd)
+
         themes = self.record['properties']['themes']
 
         if len(themes) < 1:
@@ -316,18 +305,31 @@ class WMOCoreMetadataProfileTestSuite2:
 
                 return status
 
-            if t.get('scheme') is None:
+            scheme = t.get('scheme')
+
+            if scheme is None:
                 status['code'] = 'FAILED'
                 status['message'] = 'Missing scheme'
 
                 return status
 
             for c in concepts:
-                if c.get('id') is None:
+                cid = c.get('id')
+
+                if cid is None:
                     status['code'] = 'FAILED'
                     status['message'] = 'Missing concept id'
 
-                return status
+                    return status
+
+                if 'earth-system-discipline' in scheme:
+                    if cid not in esds:
+                        msg = f'Invalid Earth system discipline {cid}: {esds}'
+
+                        status['code'] = 'FAILED'
+                        status['message'] = msg
+
+                        return status
 
         return status
 
@@ -371,8 +373,6 @@ class WMOCoreMetadataProfileTestSuite2:
         if applicable additional information about licensing and/or rights.
         """
 
-        found = False
-
         status = {
             'id': gen_test_id('data_policy'),
             'code': 'PASSED'
@@ -387,21 +387,9 @@ class WMOCoreMetadataProfileTestSuite2:
             data_policy = self.record['properties']['wmo:dataPolicy']
 
             dp = Path(get_userdir()) / 'wis2-topic-hierarchy' / 'data-policy.csv'  # noqa
+            dps = get_codelist(dp)
 
-            if not dp.exists():
-                msg = 'WCMP2 codelists missing. Run "pywcmp bundle sync"'
-                LOGGER.error(msg)
-                raise RuntimeError(msg)
-
-            with dp.open() as fh:
-                LOGGER.debug(f'Reading topic hierarchy file {dp}')
-                reader = csv.DictReader(fh)
-                for row in reader:
-                    if data_policy == row['Name']:
-                        found = True
-                        break
-
-            if not found:
+            if data_policy not in dps:
                 status['code'] = 'FAILED'
                 status['message'] = f'Invalid data policy {data_policy}'
                 return status
@@ -426,6 +414,8 @@ class WMOCoreMetadataProfileTestSuite2:
             'code': 'PASSED'
         }
 
+        lrs = get_link_relations()
+
         links = self.record['links']
 
         LOGGER.debug('Checking for at least one link')
@@ -435,6 +425,12 @@ class WMOCoreMetadataProfileTestSuite2:
             return status
 
         for link in links:
+            LOGGER.debug('Checking that links have valid link relatrions')
+            if link['rel'] not in lrs:
+                status['code'] = 'FAILED'
+                status['message'] = f"invalid link relation {link['rel']}"
+                return status
+
             LOGGER.debug('Checking that Pub/Sub links have a channel')
             if link['href'].startswith('mqtt'):
                 if 'channel' not in link:
@@ -450,3 +446,43 @@ class WMOCoreMetadataProfileTestSuite2:
                     return status
 
         return status
+
+
+def get_codelist(filepath: Path) -> list:
+    """
+    Helper function to derive WCMP2 codelist
+
+
+    :param filepath: `Path` of CSV file
+    :returns: `list` of all codelist 'Name' columns
+    """
+
+    names = []
+
+    if not filepath.exists():
+        msg = f'File {filepath} missing. Run "pywcmp bundle sync"'
+        LOGGER.error(msg)
+        raise RuntimeError(msg)
+
+    with filepath.open() as fh:
+        LOGGER.debug(f'Reading codelist file {fh}')
+        reader = csv.reader(fh)
+        for row in reader:
+            names.append(row[0])
+
+    return names
+
+
+def get_link_relations() -> list:
+    """
+    Helper function to derive combined list of required link relations:
+    - IANA
+    - WCMP2 codelists
+
+    :returns: `list` of all required link relations
+    """
+
+    lr = Path(get_userdir()) / 'wcmp-2' / 'link-relations-1.csv'
+    lt = Path(get_userdir()) / 'wcmp-2' / 'codelists' / 'link-type.csv'
+
+    return get_codelist(lr) + get_codelist(lt)
