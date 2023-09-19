@@ -3,7 +3,7 @@
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #          Ján Osuský <jan.osusky@iblsoft.com>
 #
-# Copyright (c) 2022 Tom Kralidis
+# Copyright (c) 2023 Tom Kralidis
 # Copyright (c) 2022 Government of Canada
 # Copyright (c) 2020 IBL Software Engineering spol. s r. o.
 #
@@ -34,12 +34,7 @@ import logging
 
 import click
 
-from pywcmp.wcmp1.kpi import (
-    group_kpi_results as group_kpi_results1,
-    WMOCoreMetadataProfileKeyPerformanceIndicators as wcmp_kpis1
-)
 from pywcmp.wcmp2.kpi import (
-    group_kpi_results as group_kpi_results2,
     WMOCoreMetadataProfileKeyPerformanceIndicators as wcmp_kpis2
 )
 from pywcmp.util import (get_cli_common_options, parse_wcmp, setup_logger,
@@ -60,10 +55,8 @@ def kpi():
 @click.argument('file_or_url')
 @click.option('--summary', '-s', is_flag=True, default=False,
               help='Provide summary of KPI test results')
-@click.option('--group', '-g', is_flag=True, default=False,
-              help='Group KPIs by into categories')
-@click.option('--kpi', '-k', default=0, help='KPI to run, default is all')
-def validate(ctx, file_or_url, summary, group, kpi, logfile, verbosity):
+@click.option('--kpi', '-k', help='KPI to run, default is all')
+def validate(ctx, file_or_url, summary, kpi, logfile, verbosity):
     """run key performance indicators"""
 
     setup_logger(verbosity, logfile)
@@ -76,16 +69,11 @@ def validate(ctx, file_or_url, summary, group, kpi, logfile, verbosity):
     click.echo(f'Validating {file_or_url}')
 
     try:
-        data, wcmp_version_guess = parse_wcmp(content)
+        data = parse_wcmp(content)
     except Exception as err:
         raise click.ClickException(err)
 
-    if wcmp_version_guess == 1:
-        cls = wcmp_kpis1
-        group_kpi_results = group_kpi_results1
-    elif wcmp_version_guess == 2:
-        cls = wcmp_kpis2
-        group_kpi_results = group_kpi_results2
+    cls = wcmp_kpis2
 
     kpis = cls(data)
 
@@ -94,10 +82,7 @@ def validate(ctx, file_or_url, summary, group, kpi, logfile, verbosity):
     except ValueError as err:
         raise click.UsageError(f'Invalid KPI {kpi}: {err}')
 
-    if group and kpi == 0:
-        kpis_results = group_kpi_results(kpis_results)
-
-    if not summary or kpi != 0:
+    if not summary or kpi is not None:
         click.echo(json.dumps(kpis_results, indent=4))
     else:
         click.echo(json.dumps(kpis_results['summary'], indent=4))

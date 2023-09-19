@@ -3,7 +3,7 @@
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #          Ján Osuský <jan.osusky@iblsoft.com>
 #
-# Copyright (c) 2022 Tom Kralidis
+# Copyright (c) 2023 Tom Kralidis
 # Copyright (c) 2022 Government of Canada
 # Copyright (c) 2020 IBL Software Engineering spol. s r. o.
 #
@@ -30,11 +30,9 @@ import json
 import os
 import unittest
 
-from lxml import etree
-from pywcmp.ets import (TestSuiteError, WMOCoreMetadataProfileTestSuite13,
-                        WMOCoreMetadataProfileTestSuite2)
-from pywcmp.wcmp1.kpi import (calculate_grade, group_kpi_results,
-                              WMOCoreMetadataProfileKeyPerformanceIndicators)
+from pywcmp.ets import WMOCoreMetadataProfileTestSuite2
+from pywcmp.wcmp2.kpi import (
+    calculate_grade, WMOCoreMetadataProfileKeyPerformanceIndicators)
 from pywcmp.wcmp2.topics import TopicHierarchy
 from pywcmp.util import parse_wcmp
 
@@ -46,34 +44,6 @@ def get_test_file_path(filename):
         return filename
     else:
         return f'tests/{filename}'
-
-
-class WCMP1ETSTest(unittest.TestCase):
-    """WCMP1 ETS tests of tests"""
-
-    def setUp(self):
-        """setup test fixtures, etc."""
-        pass
-
-    def tearDown(self):
-        """return to pristine state"""
-        pass
-
-    def test_jma_raise(self):
-        """Simple JMA Tests"""
-        exml = etree.parse(get_test_file_path('data/md-WTPQ50RJTD-gmd.xml'))
-        ts = WMOCoreMetadataProfileTestSuite13(exml)
-        with self.assertRaises(TestSuiteError):
-            ts.run_tests()
-
-    def test_jma_inspect_errors(self):
-        """Simple JMA Tests"""
-        exml = etree.parse(get_test_file_path('data/md-SMJP01RJTD-gmd.xml'))
-        ts = WMOCoreMetadataProfileTestSuite13(exml)
-        try:
-            ts.run_tests()
-        except TestSuiteError as err:
-            self.assertEqual(3, len(err.errors))
 
 
 class WCMP2ETSTest(unittest.TestCase):
@@ -128,16 +98,18 @@ class WCMP1KPITest(unittest.TestCase):
         pass
 
     def test_kpi_evaluate(self):
-        exml = etree.parse(get_test_file_path('data/urn:x-wmo:md:int.wmo.wis::ca.gc.ec.msc-1.1.5.6.xml'))  # noqa
+        file_ = 'data/wcmp2-passing.json'
+        with open(get_test_file_path(file_)) as fh:
+            data = json.load(fh)
 
-        kpis = WMOCoreMetadataProfileKeyPerformanceIndicators(exml)
+        kpis = WMOCoreMetadataProfileKeyPerformanceIndicators(data)
 
         results = kpis.evaluate()
 
-        self.assertEqual(results['summary']['total'], 60)
-        self.assertEqual(results['summary']['score'], 41)
-        self.assertEqual(results['summary']['percentage'], 68.333)
-        self.assertEqual(results['summary']['grade'], "B")
+        self.assertEqual(results['summary']['total'], 12)
+        self.assertEqual(results['summary']['score'], 12)
+        self.assertEqual(results['summary']['percentage'], 100)
+        self.assertEqual(results['summary']['grade'], 'A')
 
     def test_calculate_grade(self):
         self.assertEqual(calculate_grade(98), 'A')
@@ -150,58 +122,6 @@ class WCMP1KPITest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             calculate_grade(101)
-
-    def test_group_kpi_results(self):
-        exml = etree.parse(get_test_file_path('data/urn:x-wmo:md:int.wmo.wis::ca.gc.ec.msc-1.1.5.6.xml'))  # noqa
-
-        kpis = WMOCoreMetadataProfileKeyPerformanceIndicators(exml)
-
-        results = kpis.evaluate()
-        grouped_results = group_kpi_results(results)
-
-        self.assertEqual(len(grouped_results), 5)
-
-        expected_keys = [
-            'content_information',
-            'distribution_information',
-            'enhancements',
-            'mandatory',
-            'summary'
-        ]
-        self.assertEqual(sorted(grouped_results.keys()), expected_keys)
-
-        mandatory_kpis = ['kpi_001']
-        self.assertEqual(sorted(grouped_results['mandatory'].keys()),
-                         mandatory_kpis)
-
-        content_information_kpis = [
-            'kpi_002',
-            'kpi_003',
-            'kpi_004',
-            'kpi_005',
-            'kpi_006',
-            'kpi_007',
-            'summary'
-        ]
-        self.assertEqual(sorted(grouped_results['content_information'].keys()),
-                         content_information_kpis)
-
-        distribution_information_kpis = [
-            'kpi_009',
-            'kpi_010',
-            'summary'
-        ]
-        self.assertEqual(sorted(
-                         grouped_results['distribution_information'].keys()),
-                         distribution_information_kpis)
-
-        enhancements_kpis = [
-            'kpi_008',
-            'kpi_011',
-            'summary'
-        ]
-        self.assertEqual(sorted(grouped_results['enhancements'].keys()),
-                         enhancements_kpis)
 
 
 class WIS2TopicHierarchyTest(unittest.TestCase):
@@ -265,13 +185,8 @@ class WCMPUtilTest(unittest.TestCase):
     def test_parse_wcmp(self):
         """test invalid input"""
 
-        exml = parse_wcmp(get_test_file_path('data/urn:x-wmo:md:int.wmo.wis::ca.gc.ec.msc-1.1.5.6.xml'))  # noqa
-
         with self.assertRaises(RuntimeError):
-            _ = parse_wcmp(get_test_file_path('data/not-wcmp.xml'))
-
-        with self.assertRaises(RuntimeError):
-            _ = parse_wcmp(get_test_file_path('data/not-xml.csv'))
+            _ = parse_wcmp(get_test_file_path('data/not-json.csv'))
 
 
 if __name__ == '__main__':

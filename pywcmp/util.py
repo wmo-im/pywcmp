@@ -3,7 +3,7 @@
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #          Ján Osuský <jan.osusky@iblsoft.com>
 #
-# Copyright (c) 2022 Tom Kralidis
+# Copyright (c) 2023 Tom Kralidis
 # Copyright (c) 2022 Government of Canada
 # Copyright (c) 2020 IBL Software Engineering spol. s r. o.
 #
@@ -36,7 +36,6 @@ from urllib.request import urlopen
 from urllib.parse import urlparse
 
 from spellchecker import SpellChecker
-from lxml import etree
 
 LOGGER = logging.getLogger(__name__)
 THISDIR = Path(__file__).parent.resolve()
@@ -200,39 +199,21 @@ def check_url(url: str, check_ssl: bool, timeout: int = 30) -> dict:
     return result
 
 
-def parse_wcmp(content: str) -> list:
+def parse_wcmp(content: str) -> dict:
     """
-    Parse a buffer into an etree ElementTree (WCMP1) or JSON dict (WCMP2)
+    Parse a buffer into a JSON dict (WCMP2)
 
-    :param content: str of JSON or XML
+    :param content: str of JSON
 
-    :returns: list of:
-              -  `lxml.etree._ElementTree` or `dict` object of WCMP
-              -  WCMP version
+    :returns: `dict` object of WCMP
     """
 
-    wcmp_version_guess = 1
+    LOGGER.debug('Attempting to parse as JSON')
+    try:
+        with open(content) as fh:
+            data = json.load(fh)
+    except json.decoder.JSONDecodeError as err:
+        LOGGER.error(err)
+        raise RuntimeError(f'Encoding error: {err}')
 
-    if content.strip().endswith('.json'):
-        LOGGER.debug('Attempting to parse as JSON')
-        try:
-            with open(content) as fh:
-                data = json.load(fh)
-            wcmp_version_guess = 2
-        except json.decoder.JSONDecodeError as err:
-            LOGGER.error(err)
-            raise RuntimeError(f'Encoding error: {err}')
-    else:
-        LOGGER.debug('Attempting to parse as XML')
-        try:
-            data = etree.parse(content)
-        except etree.XMLSyntaxError as err:
-            LOGGER.error(err)
-            raise RuntimeError('Encoding error')
-
-        root_tag = data.getroot().tag
-
-        if root_tag != '{http://www.isotc211.org/2005/gmd}MD_Metadata':
-            raise RuntimeError('Does not look like a WCMP document!')
-
-    return data, wcmp_version_guess
+    return data
