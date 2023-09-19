@@ -26,15 +26,13 @@
 #
 ###############################################################################
 
-# executable test for WCMP1 and WCMP2
+# executable test for WCMP2
 
 from io import BytesIO
 import json
 
 import click
 
-from pywcmp.errors import TestSuiteError
-from pywcmp.wcmp1.ets import WMOCoreMetadataProfileTestSuite13
 from pywcmp.wcmp2.ets import WMOCoreMetadataProfileTestSuite2
 from pywcmp.util import (get_cli_common_options, parse_wcmp, setup_logger,
                          urlopen_)
@@ -69,29 +67,18 @@ def validate(ctx, file_or_url, logfile, verbosity,
     click.echo(f'Validating {file_or_url}')
 
     try:
-        data, wcmp_version_guess = parse_wcmp(content)
+        data = parse_wcmp(content)
     except Exception as err:
         raise click.ClickException(err)
 
-    if wcmp_version_guess == 1:
-        click.echo('Detected WCMP 1 discovery metadata')
-        ts = WMOCoreMetadataProfileTestSuite13(data)
-        try:
-            ts.run_tests()
-            click.echo('Success!')
-        except TestSuiteError as err:
-            msg = '\n'.join(err.errors)
-            click.echo(msg)
+    click.echo('Detected WCMP 2 discovery metadata')
+    ts = WMOCoreMetadataProfileTestSuite2(data)
+    try:
+        results = ts.run_tests(fail_on_schema_validation)
+    except Exception as err:
+        raise click.ClickException(err)
 
-    elif wcmp_version_guess == 2:
-        click.echo('Detected WCMP 2 discovery metadata')
-        ts = WMOCoreMetadataProfileTestSuite2(data)
-        try:
-            results = ts.run_tests(fail_on_schema_validation)
-        except Exception as err:
-            raise click.ClickException(err)
-
-        click.echo(json.dumps(results, indent=4))
+    click.echo(json.dumps(results, indent=4))
 
 
 ets.add_command(validate)

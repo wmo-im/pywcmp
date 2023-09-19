@@ -2,7 +2,7 @@
 #
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #
-# Copyright (c) 2022 Tom Kralidis
+# Copyright (c) 2023 Tom Kralidis
 # Copyright (c) 2022 Government of Canada
 #
 # Licensed to the Apache Software Foundation (ASF) under one
@@ -86,7 +86,7 @@ setup(
     description=DESCRIPTION.strip(),
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
-    license='MIT',
+    license='Apache Software License',
     platforms='all',
     keywords=' '.join(KEYWORDS),
     author='Tom Kralidis',
@@ -107,7 +107,7 @@ setup(
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Scientific/Engineering :: Atmospheric Science',

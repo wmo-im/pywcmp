@@ -230,7 +230,7 @@ PROCESS_WCMP2_ETS = {
     'example': {
         'inputs': {
             'record': {
-                '$ref': 'https://raw.githubusercontent.com/wmo-im/pywcmp/master/tests/data/wcmp2-passing.json'
+                '$ref': 'https://raw.githubusercontent.com/wmo-im/pywcmp/master/tests/data/wcmp2-passing.json'  # noqa
             }
         }
     }
