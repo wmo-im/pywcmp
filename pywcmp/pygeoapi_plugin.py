@@ -51,6 +51,11 @@
 #     processor:
 #         name: pywcmp.pygeoapi_plugin.WCMP2ETSProcessor
 #
+# pywcmp-wis2-wcmp2-kpi:
+#     type: process
+#     processor:
+#         name: pywcmp.pygeoapi_plugin.WCMP2KPIProcessor
+#
 # 3. (re)start pygeoapi
 #
 # The resulting processes will be available at the following endpoints:
@@ -58,8 +63,10 @@
 # /processes/pywcmp-wis2-topics-list
 #
 # /processes/pywcmp-wis2-topics-validate
-
+#
 # /processes/pywcmp-wis2-wcmp2-ets
+#
+# /processes/pywcmp-wis2-wcmp2-kpi
 #
 # Note that pygeoapi's OpenAPI/Swagger interface (at /openapi) will also
 # provide a developer-friendly interface to test and run requests
@@ -72,6 +79,7 @@ from pygeoapi.process.base import BaseProcessor, ProcessorExecuteError
 
 from pywcmp.wcmp2.topics import TopicHierarchy
 from pywcmp.wcmp2.ets import WMOCoreMetadataProfileTestSuite2
+from pywcmp.kpi import WMOCoreMetadataProfileKeyPerformanceIndicators
 
 LOGGER = logging.getLogger(__name__)
 
@@ -191,12 +199,12 @@ PROCESS_WCMP2_ETS = {
     'version': '0.1.0',
     'id': 'pywcmp-wis2-wcmp2-ets',
     'title': {
-        'en': 'Validate a WCMP2 document against the ATS'
+        'en': 'Validate a WCMP2 document against the ETS'
     },
     'description': {
-        'en': 'Validate a WCMP2 document against the ATS'
+        'en': 'Validate a WCMP2 document against the ETS'
     },
-    'keywords': ['wis2', 'wcmp2', 'metadata'],
+    'keywords': ['wis2', 'wcmp2', 'ets', 'test suite', 'metadata'],
     'links': [{
         'type': 'text/html',
         'rel': 'about',
@@ -221,6 +229,56 @@ PROCESS_WCMP2_ETS = {
         'result': {
             'title': 'Report of ETS results',
             'description': 'Report of ETS results',
+            'schema': {
+                'type': 'object',
+                'contentMediaType': 'application/json'
+            }
+        }
+    },
+    'example': {
+        'inputs': {
+            'record': {
+                '$ref': 'https://raw.githubusercontent.com/wmo-im/pywcmp/master/tests/data/wcmp2-passing.json'  # noqa
+            }
+        }
+    }
+}
+
+
+PROCESS_WCMP2_KPI = {
+    'version': '0.1.0',
+    'id': 'pywcmp-wis2-wcmp2-kpi',
+    'title': {
+        'en': 'Validate a WCMP2 document against the KPI suite'
+    },
+    'description': {
+        'en': 'Validate a WCMP2 document against the KPI suite'
+    },
+    'keywords': ['wis2', 'wcmp2', 'kpi', 'test suite', 'metadata'],
+    'links': [{
+        'type': 'text/html',
+        'rel': 'about',
+        'title': 'information',
+        'href': 'https://wmo-im.github.io/wcmp2',
+        'hreflang': 'en-US'
+    }],
+    'inputs': {
+        'record': {
+            'title': 'WCMP2 record',
+            'description': 'WCMP2 record',
+            'schema': {
+                'type': 'string'
+            },
+            'minOccurs': 1,
+            'maxOccurs': 1,
+            'metadata': None,
+            'keywords': ['wcmp2']
+        }
+    },
+    'outputs': {
+        'result': {
+            'title': 'Report of KPI results',
+            'description': 'Report of KPI results',
             'schema': {
                 'type': 'object',
                 'contentMediaType': 'application/json'
@@ -347,3 +405,38 @@ class WCMP2ETSProcessor(BaseProcessor):
 
     def __repr__(self):
         return '<WCMP2ETSProcessor>'
+
+
+class WCMP2KPIProcessor(BaseProcessor):
+    """WCMP2 KPI"""
+
+    def __init__(self, processor_def):
+        """
+        Initialize object
+
+        :param processor_def: provider definition
+
+        :returns: wis2box_api.plugins.process.metadata.WCMP2KPIProcessor
+        """
+
+        super().__init__(processor_def, PROCESS_WCMP2_KPI)
+
+    def execute(self, data):
+
+        response = None
+        mimetype = 'application/json'
+        record = data.get('record')
+
+        if record is None:
+            msg = 'Missing record'
+            LOGGER.error(msg)
+            raise ProcessorExecuteError(msg)
+
+        LOGGER.debug('Running KPIs against record')
+        kpis = WMOCoreMetadataProfileKeyPerformanceIndicators(record)
+        response = kpis.evaluate()
+
+        return mimetype, response
+
+    def __repr__(self):
+        return '<WCMP2KPIProcessor>'
