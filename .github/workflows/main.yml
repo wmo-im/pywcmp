@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
@@ -29,6 +29,6 @@ jobs:
       run: python3 setup.py test
     - name: run flake8 ⚙️
       run: |
-        find . -type f -name "*.py" | xargs flake8 --ignore=E501,E402
+        find . -type f -name "*.py" | xargs flake8
     - name: build Python package 🏗️
       run: python3 setup.py sdist bdist_wheel --universal
