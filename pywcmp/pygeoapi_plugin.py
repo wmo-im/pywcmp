@@ -304,7 +304,7 @@ class WIS2TopicHierarchyListTopicsProcessor(BaseProcessor):
 
         :param processor_def: provider definition
 
-        :returns: wis2box_api.plugins.process.metadata.WIS2TopicHierarchyListTopicsProcessor  # noqa
+        :returns: pywcmp.pygeoapi_plugin.WIS2TopicHierarchyListTopicsProcessor  # noqa
         """
 
         super().__init__(processor_def, PROCESS_LIST_TOPICS)
@@ -345,7 +345,7 @@ class WIS2TopicHierarchyValidateTopicProcessor(BaseProcessor):
 
         :param processor_def: provider definition
 
-        :returns: wis2box_api.plugins.process.metadata.WIS2TopicHierarchyValidateTopicProcessor  # noqa
+        :returns: pywcmp.pygeoapi_plugin.WIS2TopicHierarchyValidateTopicProcessor  # noqa
         """
 
         super().__init__(processor_def, PROCESS_VALIDATE_TOPIC)
@@ -382,7 +382,7 @@ class WCMP2ETSProcessor(BaseProcessor):
 
         :param processor_def: provider definition
 
-        :returns: wis2box_api.plugins.process.metadata.WCMP2ETSProcessor
+        :returns: pywcmp.pygeoapi_plugin.WCMP2ETSProcessor
         """
 
         super().__init__(processor_def, PROCESS_WCMP2_ETS)
@@ -416,7 +416,7 @@ class WCMP2KPIProcessor(BaseProcessor):
 
         :param processor_def: provider definition
 
-        :returns: wis2box_api.plugins.process.metadata.WCMP2KPIProcessor
+        :returns: pywcmp.pygeoapi_plugin.WCMP2KPIProcessor
         """
 
         super().__init__(processor_def, PROCESS_WCMP2_KPI)
