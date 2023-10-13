@@ -88,7 +88,7 @@ class WMOCoreMetadataProfileTestSuite2:
         if validation_result['code'] == 'FAILED':
             if fail_on_schema_validation:
                 msg = ('Record fails WCMP2 validation. Stopping ETS ',
-                       f"errors: {validation_result['message']}")
+                       f"errors: {validation_result['errors']}")
                 LOGGER.error(msg)
                 raise ValueError(msg)
 
