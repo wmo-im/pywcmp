@@ -33,7 +33,7 @@ from pywcmp.bundle import bundle
 from pywcmp.kpi import kpi
 from pywcmp.wcmp2.topics import topics
 
-__version__ = '0.6.1'
+__version__ = '0.7.dev0'
 
 
 @click.group()
