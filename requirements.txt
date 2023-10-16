@@ -1,5 +1,5 @@
 beautifulsoup4
 click
-jsonschema
+jsonschema>4.19
 pyspellchecker
 python-dateutil
