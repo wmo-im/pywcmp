@@ -151,9 +151,10 @@ class WMOCoreMetadataProfileTestSuite2:
 
         identifier = self.record['id']
 
-        if identifier.count(':') != 5:
+        identifier_tokens = identifier.split(':')
+        if len(identifier_tokens) < 6:
             status['code'] = 'FAILED'
-            status['message'] = "identifier does not have six ':' delimiters"
+            status['message'] = 'identifier does not have at least six tokens'
             return status
 
         if not identifier.startswith('urn:x-wmo:md:'):
@@ -163,7 +164,7 @@ class WMOCoreMetadataProfileTestSuite2:
 
         th = TopicHierarchy()
 
-        country, centre_id = identifier.split(':')[3:5]
+        country, centre_id = identifier_tokens[3:5]
 
         if country not in th.list_children('origin/a/wis2'):
             status['code'] = 'FAILED'
