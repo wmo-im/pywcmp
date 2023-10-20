@@ -345,13 +345,15 @@ class WMOCoreMetadataProfileTestSuite2:
             'code': 'PASSED'
         }
 
-        contacts = self.record['properties']['contacts']
+        cr = Path(get_userdir()) / 'wcmp-2' / 'codelists' / 'contact-role.csv'
+        contact_role_types = get_codelist(cr)
 
-        for role_type in ['originator', 'pointOfContact']:
-            for c in contacts:
-                if role_type not in c['roles']:
+        for c in self.record['properties']['contacts']:
+            for role in c['roles']:
+                if role not in contact_role_types:
                     status['code'] = 'FAILED'
-                    status['message'] = f'Missing required role {role_type}'
+                    status['message'] = f'Invalid role {role}'
+                    break
 
         return status
 
