@@ -111,8 +111,7 @@
                     }
                 ],
                 "roles": [
-                    "pointOfContact",
-                    "originator"
+                    "processor"
                 ]
             }
         ],
