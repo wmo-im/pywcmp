@@ -152,9 +152,9 @@ class WMOCoreMetadataProfileTestSuite2:
         identifier = self.record['id']
 
         identifier_tokens = identifier.split(':')
-        if len(identifier_tokens) < 6:
+        if len(identifier_tokens) < 5:
             status['code'] = 'FAILED'
-            status['message'] = 'identifier does not have at least six tokens'
+            status['message'] = 'identifier does not have at least five tokens'
             return status
 
         if not identifier.startswith('urn:x-wmo:md:'):
@@ -164,14 +164,9 @@ class WMOCoreMetadataProfileTestSuite2:
 
         th = TopicHierarchy()
 
-        country, centre_id = identifier_tokens[3:5]
+        centre_id = identifier_tokens[3]
 
-        if country not in th.list_children('origin/a/wis2'):
-            status['code'] = 'FAILED'
-            status['message'] = f'Invalid country: {country}'
-            return status
-
-        centre_ids = th.list_children(f'origin/a/wis2/{country}')
+        centre_ids = th.list_children('origin/a/wis2')
         if centre_id not in centre_ids:
             status['code'] = 'FAILED'
             status['message'] = f'Invalid centre_id: {centre_id}'
@@ -179,7 +174,7 @@ class WMOCoreMetadataProfileTestSuite2:
 
         if not identifier.isascii():
             status['code'] = 'FAILED'
-            status['message'] = 'Bad characters in id'
+            status['message'] = 'Invalid characters in id'
             return status
 
         return status

@@ -1,5 +1,5 @@
 {
-    "id": "urn:x-wmo:md:can:eccc-msc:weather.observations.swob-realtime",
+    "id": "urn:x-wmo:md:ca-eccc-msc:weather.observations.swob-realtime",
     "conformsTo": [
         "bad-uri"
     ],
