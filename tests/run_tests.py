@@ -86,7 +86,7 @@ class WCMP2ETSTest(unittest.TestCase):
                 ts.run_tests(fail_on_schema_validation=True)
 
 
-class WCMP1KPITest(unittest.TestCase):
+class WCMP2KPITest(unittest.TestCase):
     """WCMP KPI tests of tests"""
 
     def setUp(self):
@@ -106,8 +106,8 @@ class WCMP1KPITest(unittest.TestCase):
 
         results = kpis.evaluate()
 
-        self.assertEqual(results['summary']['total'], 12)
-        self.assertEqual(results['summary']['score'], 12)
+        self.assertEqual(results['summary']['total'], 18)
+        self.assertEqual(results['summary']['score'], 18)
         self.assertEqual(results['summary']['percentage'], 100)
         self.assertEqual(results['summary']['grade'], 'A')
 

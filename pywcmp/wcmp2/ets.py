@@ -423,7 +423,7 @@ class WMOCoreMetadataProfileTestSuite2:
             return status
 
         for link in links:
-            LOGGER.debug('Checking that links have valid link relatrions')
+            LOGGER.debug('Checking that links have valid link relations')
             if link['rel'] not in lrs:
                 status['code'] = 'FAILED'
                 status['message'] = f"invalid link relation {link['rel']}"

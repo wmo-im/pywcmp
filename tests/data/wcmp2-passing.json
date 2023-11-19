@@ -7,7 +7,8 @@
         "interval": [
             "2010-11-11T11:11:11Z",
             ".."
-        ]
+        ],
+        "resolution": "P1H"
     },
     "type": "Feature",
     "geometry": {
@@ -38,7 +39,7 @@
         ]
     },
     "properties": {
-        "title": "Surface Weather Observations",
+        "title": "Surface weather observations",
         "description": "Surface Observations measured at the automatic and manual stations of the Environment and Climate Change Canada and partners networks, either for a single station, or for the stations of specific provinces and territories (last 30 days)",
         "themes": [
             {
@@ -111,7 +112,9 @@
                         "href": "https://www.canada.ca/en/environment-climate-change.html"
                     }
                 ],
+                "contactInstructions": "via email",
                 "roles": [
+                    "host",
                     "producer"
                 ]
             }
