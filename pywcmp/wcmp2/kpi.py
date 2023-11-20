@@ -302,7 +302,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         return name, total, score, comments
 
-    def ikpi_links_health(self) -> tuple:
+    def kpi_links_health(self) -> tuple:
         """
         Implements KPI for Links health
 
