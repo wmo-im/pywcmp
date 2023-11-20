@@ -328,22 +328,28 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         LOGGER.debug('Assembling all links')
 
-        links.extend([link['href'] for link in self.data['links']])
+        links.extend([link for link in self.data['links']])
 
         for theme in self.data['properties']['themes']:
             for concept in theme['concepts']:
                 if 'url' in concept:
-                    links.append(concept['url'])
-            links.append(theme['scheme'])
+                    links.append({
+                        'href': concept['url']
+                    })
+            links.append({
+                'href': theme['scheme']
+            })
 
         for contact in self.data['properties']['contacts']:
             for link in contact['links']:
-                links.append(link['href'])
+                links.append({
+                    'href': link['href']
+                })
 
         for link in links:
             total += 2
 
-            result = check_url(link, False)
+            result = check_url(link['href'], False)
 
             LOGGER.debug('Testing whether link resolves successfully')
             if result['accessible']:
@@ -351,8 +357,9 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             else:
                 comments.append(f"URL not accessible: {link['href']}")
 
-            LOGGER.debug('Checking whether link has a valid media types')
-            if link.get('type', '') not in valid_link_mime_types:
+            LOGGER.debug('Checking whether link has a valid media type')
+            if (link.get('type') is not None and
+                    link['type'] not in valid_link_mime_types):
                 comments.append(f"invalid link type {link['type']}")
             else:
                 score += 1
