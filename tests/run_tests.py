@@ -33,7 +33,6 @@ import unittest
 from pywcmp.ets import WMOCoreMetadataProfileTestSuite2
 from pywcmp.wcmp2.kpi import (
     calculate_grade, WMOCoreMetadataProfileKeyPerformanceIndicators)
-from pywcmp.wcmp2.topics import TopicHierarchy
 from pywcmp.util import parse_wcmp
 
 
@@ -86,7 +85,7 @@ class WCMP2ETSTest(unittest.TestCase):
                 ts.run_tests(fail_on_schema_validation=True)
 
 
-class WCMP1KPITest(unittest.TestCase):
+class WCMP2KPITest(unittest.TestCase):
     """WCMP KPI tests of tests"""
 
     def setUp(self):
@@ -106,8 +105,8 @@ class WCMP1KPITest(unittest.TestCase):
 
         results = kpis.evaluate()
 
-        self.assertEqual(results['summary']['total'], 12)
-        self.assertEqual(results['summary']['score'], 12)
+        self.assertEqual(results['summary']['total'], 32)
+        self.assertEqual(results['summary']['score'], 32)
         self.assertEqual(results['summary']['percentage'], 100)
         self.assertEqual(results['summary']['grade'], 'A')
 
@@ -122,53 +121,6 @@ class WCMP1KPITest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             calculate_grade(101)
-
-
-class WIS2TopicHierarchyTest(unittest.TestCase):
-    """WIS2 Topic Hierarchy tests"""
-
-    def setUp(self):
-        """setup test fixtures, etc."""
-        self.th = TopicHierarchy()
-        pass
-
-    def tearDown(self):
-        """return to pristine state"""
-        pass
-
-    def test_validate(self):
-        value = None
-        with self.assertRaises(ValueError):
-            _ = self.th.validate(value)
-
-        value = 'invalid/topic/hierarchy'
-        self.assertFalse(self.th.validate(value))
-
-        value = 'cache/a/wis2'
-        self.assertTrue(self.th.validate(value))
-
-        value = 'a/wis2'
-        self.assertFalse(self.th.validate(value))
-
-        value = 'a/wis2'
-        self.assertTrue(self.th.validate(value, fuzzy=True))
-
-    def test_list_children(self):
-        value = None
-        children = self.th.list_children(value)
-        self.assertEqual(sorted(children), ['cache', 'origin'])
-
-        value = 'invalid.topic.hierarchy'
-        with self.assertRaises(ValueError):
-            _ = self.th.list_children(value)
-
-        value = 'cache/c'
-        with self.assertRaises(ValueError):
-            _ = self.th.list_children(value)
-
-        value = 'cache'
-        children = self.th.list_children(value)
-        self.assertEqual(children, ['a'])
 
 
 class WCMPUtilTest(unittest.TestCase):

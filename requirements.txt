@@ -3,3 +3,4 @@ click
 jsonschema>4.19
 pyspellchecker
 python-dateutil
+pywis-topics

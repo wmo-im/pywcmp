@@ -33,7 +33,7 @@ from pathlib import Path
 from jsonschema.validators import Draft202012Validator
 
 from pywcmp.bundle import WCMP2_FILES
-from pywcmp.wcmp2.topics import TopicHierarchy
+from pywis_topics.topics import TopicHierarchy
 from pywcmp.util import get_userdir
 
 LOGGER = logging.getLogger(__name__)
@@ -66,6 +66,8 @@ class WMOCoreMetadataProfileTestSuite2:
         self.test_id = None
         self.record = data
         self.report = []
+
+        self.th = TopicHierarchy(tables=get_userdir())
 
     def run_tests(self, fail_on_schema_validation=False):
         """Convenience function to run all tests"""
@@ -162,12 +164,9 @@ class WMOCoreMetadataProfileTestSuite2:
             status['message'] = 'bad prefix'
             return status
 
-        th = TopicHierarchy()
-
         centre_id = identifier_tokens[3]
 
-        centre_ids = th.list_children('origin/a/wis2')
-        if centre_id not in centre_ids:
+        if centre_id not in self.th.topics[3]:
             status['code'] = 'FAILED'
             status['message'] = f'Invalid centre_id: {centre_id}'
             return status
@@ -282,9 +281,6 @@ class WMOCoreMetadataProfileTestSuite2:
             'code': 'PASSED'
         }
 
-        esd = Path(get_userdir()) / 'wis2-topic-hierarchy' / 'earth-system-discipline.csv'  # noqa
-        esds = get_codelist(esd)
-
         themes = self.record['properties']['themes']
 
         if len(themes) < 1:
@@ -319,8 +315,8 @@ class WMOCoreMetadataProfileTestSuite2:
                     return status
 
                 if 'earth-system-discipline' in scheme:
-                    if cid not in esds:
-                        msg = f'Invalid Earth system discipline {cid}: {esds}'
+                    if cid not in self.th.topics[6]:
+                        msg = f'Invalid Earth system discipline {cid}'
 
                         status['code'] = 'FAILED'
                         status['message'] = msg
@@ -384,10 +380,7 @@ class WMOCoreMetadataProfileTestSuite2:
 
             data_policy = self.record['properties']['wmo:dataPolicy']
 
-            dp = Path(get_userdir()) / 'wis2-topic-hierarchy' / 'data-policy.csv'  # noqa
-            dps = get_codelist(dp)
-
-            if data_policy not in dps:
+            if data_policy not in self.th.topics[5]:
                 status['code'] = 'FAILED'
                 status['message'] = f'Invalid data policy {data_policy}'
                 return status
@@ -423,7 +416,7 @@ class WMOCoreMetadataProfileTestSuite2:
             return status
 
         for link in links:
-            LOGGER.debug('Checking that links have valid link relatrions')
+            LOGGER.debug('Checking that links have valid link relations')
             if link['rel'] not in lrs:
                 status['code'] = 'FAILED'
                 status['message'] = f"invalid link relation {link['rel']}"

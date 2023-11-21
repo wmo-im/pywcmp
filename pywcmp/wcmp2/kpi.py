@@ -26,11 +26,12 @@
 # WMO Core Metadata Profile Key Performance Indicators (KPIs)
 
 import logging
+import mimetypes
 import re
 
 from bs4 import BeautifulSoup
 
-from pywcmp.util import check_spelling
+from pywcmp.util import check_spelling, check_url
 
 LOGGER = logging.getLogger(__name__)
 
@@ -71,17 +72,16 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                   and comments
         """
 
-        total = 0
+        total = 8
         score = 0
         comments = []
 
         name = 'KPI: Good quality title'
+        acronym_regex = r'\b([A-Z]{2,}\d*)\b'
 
         LOGGER.info(f'Running {name}')
 
         title = self.data['properties']['title']
-
-        total = 8
 
         LOGGER.debug('Title is present')
         score += 1
@@ -114,14 +114,16 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         else:
             comments.append('Title contains non-printable characters')
 
-        LOGGER.debug('Testing for title case')
-        if title.istitle():
+        LOGGER.debug('Testing for sentence case')
+        title2 = re.sub(acronym_regex, '', title).strip()
+        if title2.capitalize() == title2:
             score += 1
         else:
-            comments.append('Title is not title case')
+            comments.append('Title is not sentence case')
 
         LOGGER.debug('Testing for acronyms')
-        if len(re.findall(r'([A-Z]\.*){2,}s?', title)) <= 3:
+
+        if len(re.findall(acronym_regex, title)) <= 3:
             score += 1
         else:
             comments.append('Title has more than 3 acronyms')
@@ -152,7 +154,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                   and comments
         """
 
-        total = 0
+        total = 4
         score = 0
         comments = []
 
@@ -163,7 +165,6 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         description = self.data['properties']['description']
 
         LOGGER.debug('Description is present')
-        total += 4
 
         if description is None:
             comments.append('Description is null')
@@ -197,6 +198,257 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         return name, total, score, comments
 
+    def kpi_time_intervals(self) -> tuple:
+        """
+        Implements KPI for Time intervals
+
+        :returns: `tuple` of KPI name, achieved score, total score,
+                  and comments
+        """
+
+        time_intervals = []
+
+        total = 0
+        score = 0
+        comments = []
+
+        name = 'KPI: Time intervals'
+
+        LOGGER.info(f'Running {name}')
+
+        interval = self.data['time'].get('interval')
+
+        if interval is not None:
+            time_intervals.append(self.data['time'])
+
+        try:
+            if self.data['additionalExtents']['temporal']['interval'] is not None:  # noqa
+                time_intervals.append(
+                    self.data['additionalExtents']['temporal'])
+        except KeyError:
+            pass
+
+        for time_interval in time_intervals:
+            total += 3
+
+            interval = time_interval['interval']
+
+            if '..' not in interval and interval[0] <= interval[1]:
+                score += 1
+            elif interval[1] == '..':
+                score += 1
+            else:
+                comments.append('Begin must be less than or equal to the end or open')  # noqa
+
+            if interval != ['..', '..']:
+                score += 1
+            else:
+                comments.append('Temporal interval cannot be fully open')
+
+            if time_interval.get('resolution') is not None:
+                score += 1
+            else:
+                comments.append('No temporal resolution found')
+
+        return name, total, score, comments
+
+    def kpi_graphic_overview(self) -> tuple:
+        """
+        Implements KPI for Graphic overview for metadata records
+
+        :returns: `tuple` of KPI name, achieved score, total score,
+                  and comments
+        """
+
+        total = 0
+        score = 0
+        comments = []
+
+        web_image_mime_types = [
+            'image/apng',
+            'image/avif',
+            'image/gif',
+            'image/jpeg',
+            'image/png',
+            'image/svg+xml',
+            'image/webp'
+        ]
+
+        name = 'KPI: Graphic overview for metadata records'
+
+        LOGGER.info(f'Running {name}')
+
+        for link in self.data['links']:
+            if link.get('rel') == 'preview':
+                LOGGER.debug('Found a preview link')
+
+                total += 3
+                score += 1
+
+                result = check_url(link['href'], False)
+
+                LOGGER.debug('Testing whether link is a web image file type')
+                mime_type = link.get('type', '')
+                if mime_type in web_image_mime_types and result['mime-type'] in web_image_mime_types:  # noqa
+                    score += 1
+                else:
+                    comments.append(f'MIME type {mime_type} not a web image')
+
+                LOGGER.debug('Testing whether link resolves successfully')
+                if result['accessible']:
+                    score += 1
+                else:
+                    comments.append(f"URL not accessible: {link['href']}")
+
+        return name, total, score, comments
+
+    def kpi_links_health(self) -> tuple:
+        """
+        Implements KPI for Links health
+
+        :returns: `tuple` of KPI name, achieved score, total score,
+                  and comments
+        """
+
+        links = []
+
+        total = 0
+        score = 0
+        comments = []
+
+        name = 'KPI: Links health'
+
+        valid_link_mime_types = list(mimetypes.types_map.values())
+        valid_link_mime_types.extend([
+            'application/x-bufr',
+            'application/x-grib'
+        ])
+
+        LOGGER.info(f'Running {name}')
+
+        LOGGER.debug('Assembling all links')
+
+        links.extend([link for link in self.data['links']])
+
+        for theme in self.data['properties']['themes']:
+            for concept in theme['concepts']:
+                if 'url' in concept:
+                    links.append({
+                        'href': concept['url']
+                    })
+            links.append({
+                'href': theme.get('scheme')
+            })
+
+        for contact in self.data['properties']['contacts']:
+            for link in contact['links']:
+                links.append({
+                    'href': link['href']
+                })
+
+        for link in links:
+            if link['href'].startswith('http'):
+                total += 2
+                result = check_url(link['href'], False)
+
+                LOGGER.debug('Testing whether link resolves successfully')
+                if result['accessible']:
+                    score += 1
+                else:
+                    comments.append(f"URL not accessible: {link['href']}")
+
+                LOGGER.debug('Checking whether link has a valid media type')
+                if (link.get('type') is not None and
+                        link['type'] not in valid_link_mime_types):
+                    comments.append(f"invalid link type {link['type']}")
+                else:
+                    score += 1
+
+        return name, total, score, comments
+
+    def kpi_contacts(self) -> tuple:
+        """
+        Implements KPI for Contacts
+
+        :returns: `tuple` of KPI name, achieved score, total score,
+                  and comments
+        """
+
+        host_contact = None
+        email_found = False
+
+        total = 3
+        score = 0
+        comments = []
+
+        name = 'KPI: Contacts'
+
+        LOGGER.info(f'Running {name}')
+
+        for contact in self.data['properties']['contacts']:
+            if 'host' in contact['roles']:
+                host_contact = contact
+
+        if host_contact is None:
+            comments.append('No host contact found')
+        else:
+            score += 1
+
+            if host_contact.get('contactInstructions') is None:
+                comments.append('No host contact instructions found')
+            else:
+                score += 1
+
+            for email in contact.get('emails'):
+                if 'value' in email:
+                    email_found = True
+                    break
+
+            if email_found:
+                score += 1
+            else:
+                comments.append('No host contact email found')
+
+        return name, total, score, comments
+
+    def kpi_pids(self) -> tuple:
+        """
+        Implements KPI for Persistent identifiers
+
+        :returns: `tuple` of KPI name, achieved score, total score,
+                  and comments
+        """
+
+        doi_ark_hdl_found = False
+
+        total = 0
+        score = 0
+        comments = []
+
+        name = 'KPI: Persistent identifiers'
+
+        LOGGER.info(f'Running {name}')
+
+        if 'externalIds' in self.data['properties']:
+            total = 3
+            score += 1
+
+            for external_id in self.data['properties']['externalIds']:
+                if external_id['scheme'] in ['doi', 'ark', 'hdl']:
+                    doi_ark_hdl_found = True
+
+            if doi_ark_hdl_found:
+                score += 1
+            else:
+                comments.append('No DOI/ARK/HDL schema found')
+
+        for link in self.data['links']:
+            if link.get('rel', '') == 'cite-as':
+                score += 1
+                break
+
+        return name, total, score, comments
+
     def evaluate(self, kpi: str = None) -> dict:
         """
         Convenience function to run all tests
@@ -206,17 +458,19 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         :returns: `dict` of overall test report
         """
 
-        known_kpis = [
-            'kpi_title',
-            'kpi_description'
-        ]
+        kpis_to_run = []
 
-        kpis_to_run = known_kpis
+        for f in dir(WMOCoreMetadataProfileKeyPerformanceIndicators):
+            if all([
+                    callable(getattr(WMOCoreMetadataProfileKeyPerformanceIndicators, f)),  # noqa
+                    f.startswith('kpi_')]):
+
+                kpis_to_run.append(f)
 
         if kpi is not None:
             selected_kpi = f'kpi_{kpi}'
-            if selected_kpi not in known_kpis:
-                msg = f'Invalid KPI number: {selected_kpi} is not in {known_kpis}'  # noqa
+            if selected_kpi not in kpis_to_run:
+                msg = f'Invalid KPI number: {selected_kpi} is not in {kpis_to_run}'  # noqa
                 LOGGER.error(msg)
                 raise ValueError(msg)
             else:

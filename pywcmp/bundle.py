@@ -2,7 +2,7 @@
 #
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #
-# Copyright (c) 2022 Tom Kralidis
+# Copyright (c) 2023 Tom Kralidis
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -24,7 +24,6 @@
 ###############################################################################
 
 import io
-import json
 import logging
 import os
 import shutil
@@ -32,7 +31,6 @@ import zipfile
 
 import click
 
-from pywcmp.wcmp2.topics import build_topics, WIS2_TOPIC_HIERARCHY_LOOKUP
 from pywcmp.util import (get_cli_common_options, get_userdir, urlopen_,
                          setup_logger)
 
@@ -94,26 +92,18 @@ def sync(ctx, logfile, verbosity):
     LOGGER.debug('Downloading WIS2 topic hierarchy')
     WIS2_TOPIC_HIERARCHY_DIR.mkdir(parents=True, exist_ok=True)
 
-    ZIPFILE_URL = 'https://github.com/wmo-im/wis2-topic-hierarchy/archive/refs/heads/main.zip'  # noqa
+    ZIPFILE_URL = 'https://wmo-im.github.io/wis2-topic-hierarchy/wth-bundle.zip'  # noqa
     FH = io.BytesIO(urlopen_(ZIPFILE_URL).read())
     with zipfile.ZipFile(FH) as z:
         LOGGER.debug(f'Processing zipfile "{z.filename}"')
         for name in z.namelist():
             LOGGER.debug(f'Processing entry "{name}"')
-            if 'wis2-topic-hierarchy-main/topic-hierarchy' in name:
-                filename = os.path.basename(name)
+            filename = os.path.basename(name)
 
-                if not filename:
-                    continue
-
-                dest_file = WIS2_TOPIC_HIERARCHY_DIR / filename
-                LOGGER.debug(f'Creating "{dest_file}"')
-                with z.open(name) as src, dest_file.open('wb') as dest:
-                    shutil.copyfileobj(src, dest)
-
-    with WIS2_TOPIC_HIERARCHY_LOOKUP.open('w') as fh:
-        content = build_topics()
-        fh.write(json.dumps(content, indent=4))
+            dest_file = WIS2_TOPIC_HIERARCHY_DIR / filename
+            LOGGER.debug(f'Creating "{dest_file}"')
+            with z.open(name) as src, dest_file.open('wb') as dest:
+                shutil.copyfileobj(src, dest)
 
     LOGGER.debug('Downloading IANA link relations')
     IANA_URL = 'https://www.iana.org/assignments/link-relations/link-relations-1.csv'  # noqa
