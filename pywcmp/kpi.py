@@ -34,6 +34,7 @@ import logging
 
 import click
 
+from pywcmp.ets import WMOCoreMetadataProfileTestSuite2
 from pywcmp.wcmp2.kpi import (
     WMOCoreMetadataProfileKeyPerformanceIndicators as wcmp_kpis2
 )
@@ -53,10 +54,13 @@ def kpi():
 @click.pass_context
 @get_cli_common_options
 @click.argument('file_or_url')
+@click.option('--fail-on-ets/--no-fail-on-ets',
+              '-f', default=True, help='Stop the KPI on failing ETS')
 @click.option('--summary', '-s', is_flag=True, default=False,
               help='Provide summary of KPI test results')
 @click.option('--kpi', '-k', help='KPI to run, default is all')
-def validate(ctx, file_or_url, summary, kpi, logfile, verbosity):
+def validate(ctx, file_or_url, summary, kpi, logfile, verbosity,
+             fail_on_ets=True):
     """run key performance indicators"""
 
     setup_logger(verbosity, logfile)
@@ -73,9 +77,15 @@ def validate(ctx, file_or_url, summary, kpi, logfile, verbosity):
     except Exception as err:
         raise click.ClickException(err)
 
-    cls = wcmp_kpis2
+    if fail_on_ets:
+        print("JJJ")
+        ts = WMOCoreMetadataProfileTestSuite2(data)
+        try:
+            _ = ts.run_tests(fail_on_schema_validation=True)
+        except Exception as err:
+            raise click.ClickException(err)
 
-    kpis = cls(data)
+    kpis = wcmp_kpis2(data)
 
     try:
         kpis_results = kpis.evaluate(kpi)

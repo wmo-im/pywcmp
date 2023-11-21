@@ -36,16 +36,6 @@
 #
 # 2. add the processes to the pygeoapi configuration as follows:
 #
-# pywcmp-wis2-topics-list:
-#     type: process
-#     processor:
-#         name: pywcmp.pygeoapi_plugin.WIS2TopicHierarchyListTopicsProcessor
-#
-# pywcmp-wis2-topics-validate:
-#     type: process
-#     processor:
-#         name: pywcmp.pygeoapi_plugin.WIS2TopicHierarchyListTopicsProcessor
-#
 # pywcmp-wis2-wcmp2-ets:
 #     type: process
 #     processor:
@@ -60,10 +50,6 @@
 #
 # The resulting processes will be available at the following endpoints:
 #
-# /processes/pywcmp-wis2-topics-list
-#
-# /processes/pywcmp-wis2-topics-validate
-#
 # /processes/pywcmp-wis2-wcmp2-ets
 #
 # /processes/pywcmp-wis2-wcmp2-kpi
@@ -77,123 +63,10 @@ import logging
 
 from pygeoapi.process.base import BaseProcessor, ProcessorExecuteError
 
-from pywcmp.wcmp2.topics import TopicHierarchy
 from pywcmp.wcmp2.ets import WMOCoreMetadataProfileTestSuite2
 from pywcmp.wcmp2.kpi import WMOCoreMetadataProfileKeyPerformanceIndicators
 
 LOGGER = logging.getLogger(__name__)
-
-WIS2_TOPIC_HIERARCHY_LINKS = [{
-    'type': 'text/html',
-    'rel': 'about',
-    'title': 'information',
-    'href': 'https://github.com/wmo-im/wis2-topic-hierarchy',
-    'hreflang': 'en-US'
-}]
-
-WIS2_TOPIC_HIERARCHY_INPUT_TOPIC = {
-    'title': 'Topic',
-    'description': 'Topic (full or partial)',
-    'schema': {
-        'type': 'string'
-    },
-    'minOccurs': 1,
-    'maxOccurs': 1,
-    'metadata': None,
-    'keywords': ['topic']
-}
-
-
-PROCESS_LIST_TOPICS = {
-    'version': '0.1.0',
-    'id': 'pywcmp-wis2-topics-list',
-    'title': {
-        'en': 'List WIS2 topics'
-    },
-    'description': {
-        'en': 'Lists WIS2 topics'
-    },
-    'keywords': ['wis2', 'topics', 'metadata'],
-    'links': WIS2_TOPIC_HIERARCHY_LINKS,
-    'inputs': {
-        'topic': WIS2_TOPIC_HIERARCHY_INPUT_TOPIC,
-    },
-    'outputs': {
-        'result': {
-            'title': 'List of child topics',
-            'description': 'List of child topics',
-            'schema': {
-                'type': 'object',
-                'contentMediaType': 'application/json',
-                'properties': {
-                    'topics': {
-                        'type': 'array',
-                        'minOccurs': 1,
-                        'items': {
-                            'type': 'string',
-                            'descriptiopn': 'Matching topic'
-                        }
-                    }
-                }
-            }
-        }
-    },
-    'example': {
-        'inputs': {
-            'topic': 'origin/a/wis2'
-        }
-    }
-}
-
-
-PROCESS_VALIDATE_TOPIC = {
-    'version': '0.1.0',
-    'id': 'pywcmp-wis2-topics-validate',
-    'title': {
-        'en': 'Validate WIS2 topics'
-    },
-    'description': {
-        'en': 'Validates WIS2 topics'
-    },
-    'keywords': ['wis2', 'topics', 'metadata'],
-    'links': WIS2_TOPIC_HIERARCHY_LINKS,
-    'inputs': {
-        'topic': WIS2_TOPIC_HIERARCHY_INPUT_TOPIC,
-        'fuzzy': {
-            'title': 'Fuzzy',
-            'description': 'Whether to apply fuzzy logic to validation',
-            'schema': {
-                'type': 'boolean',
-                'default': 'false'
-            },
-            'maxOccurs': 1,
-            'metadata': None,
-            'keywords': ['fuzzy']
-        }
-    },
-    'outputs': {
-        'result': {
-            'title': 'Result of topic validity',
-            'description': 'Result of topic validity',
-            'schema': {
-                'type': 'object',
-                'contentMediaType': 'application/json',
-                'properties': {
-                    'topic_is_valid': {
-                        'type': 'boolean'
-                    }
-                },
-                'required': ['topic_is_valie']
-            }
-        }
-    },
-    'example': {
-        'inputs': {
-            'topic': 'origin/a/wis2',
-            'fuzzy': True
-        }
-    }
-}
 
 PROCESS_WCMP2_ETS = {
     'version': '0.1.0',
@@ -293,84 +166,6 @@ PROCESS_WCMP2_KPI = {
         }
     }
 }
-
-
-class WIS2TopicHierarchyListTopicsProcessor(BaseProcessor):
-    """WIS2 topic hierarchy list process"""
-
-    def __init__(self, processor_def):
-        """
-        Initialize object
-
-        :param processor_def: provider definition
-
-        :returns: pywcmp.pygeoapi_plugin.WIS2TopicHierarchyListTopicsProcessor  # noqa
-        """
-
-        super().__init__(processor_def, PROCESS_LIST_TOPICS)
-
-    def execute(self, data):
-
-        response = None
-        mimetype = 'application/json'
-        topic = data.get('topic')
-
-        if topic is None:
-            msg = 'Missing topic'
-            LOGGER.error(msg)
-            raise ProcessorExecuteError(msg)
-
-        LOGGER.debug('Querying topic')
-        th = TopicHierarchy()
-        try:
-            matching_topics = th.list_children(topic)
-            response = {
-                'topics': matching_topics
-            }
-        except ValueError as err:
-            raise ProcessorExecuteError(err)
-
-        return mimetype, response
-
-    def __repr__(self):
-        return '<WIS2TopicHierarchyListTopicsProcessor>'
-
-
-class WIS2TopicHierarchyValidateTopicProcessor(BaseProcessor):
-    """WIS2 topic hierarchy validate process"""
-
-    def __init__(self, processor_def):
-        """
-        Initialize object
-
-        :param processor_def: provider definition
-
-        :returns: pywcmp.pygeoapi_plugin.WIS2TopicHierarchyValidateTopicProcessor  # noqa
-        """
-
-        super().__init__(processor_def, PROCESS_VALIDATE_TOPIC)
-
-    def execute(self, data):
-
-        response = None
-        mimetype = 'application/json'
-        topic = data.get('topic')
-        fuzzy = data.get('fuzzy', False)
-
-        if topic is None:
-            msg = 'Missing topic'
-            LOGGER.error(msg)
-            raise ProcessorExecuteError(msg)
-
-        LOGGER.debug('Querying topic')
-        th = TopicHierarchy()
-        response = {
-            'topic_is_valid': th.validate(topic, fuzzy)
-        }
-        return mimetype, response
-
-    def __repr__(self):
-        return '<WIS2TopicHierarchyValidateTopicProcessor>'
 
 
 class WCMP2ETSProcessor(BaseProcessor):

@@ -67,22 +67,14 @@ pywcmp ets validate https://example.org/path/to/file.json --verbosity DEBUG --lo
 # all key performance indicators at once
 pywcmp kpi validate https://example.org/path/to/file.json --verbosity DEBUG
 
+# all key performance indicators at once, but turn ETS validation off
+pywcmp kpi validate https://example.org/path/to/file.json --no-fail-on-ets --verbosity DEBUG
+
 # all key performance indicators at once, in summary
 pywcmp kpi validate https://example.org/path/to/file.json --verbosity DEBUG --summary
 
 # selected key performance indicator
 pywcmp kpi validate --kpi title /path/to/file.json -v INFO
-
-# WIS2 topic hierarchies
-
-# validate a WIS2 topic hierarchy
-pywcmp topics validate origin.a.wis2.can
-
-# validate a partial WIS2 topic hierarchy
-pywcmp topics validate wis2.can --fuzzy
-
-# list children of a given WIS2 topic hierarchy level
-pywcmp topics list wis2.a
 ```
 
 ## Using the API

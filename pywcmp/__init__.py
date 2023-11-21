@@ -31,7 +31,6 @@ import click
 from pywcmp.ets import ets
 from pywcmp.bundle import bundle
 from pywcmp.kpi import kpi
-from pywcmp.wcmp2.topics import topics
 
 __version__ = '0.7.dev0'
 
@@ -45,4 +44,3 @@ def cli():
 cli.add_command(ets)
 cli.add_command(bundle)
 cli.add_command(kpi)
-cli.add_command(topics)

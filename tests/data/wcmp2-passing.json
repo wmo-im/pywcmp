@@ -77,7 +77,7 @@
                         "id": "weather"
                     }
                 ],
-                "scheme": "https://github.com/wmo-im/wcmp2-codelists/blob/main/codelists/earth-system-domain.csv"
+                "scheme": "https://github.com/wmo-im/wis2-topic-hierarchy/blob/main/topic-hierarchy/earth-system-discipline/index.csv"
             }
         ],
         "contacts": [
@@ -109,7 +109,7 @@
                     {
                         "rel": "canonical",
                         "type": "text/html",
-                        "href": "https://www.canada.ca/en/environment-climate-change.html"
+                        "href": "https://example.org"
                     }
                 ],
                 "contactInstructions": "via email",

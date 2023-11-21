@@ -337,7 +337,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                         'href': concept['url']
                     })
             links.append({
-                'href': theme['scheme']
+                'href': theme.get('scheme')
             })
 
         for contact in self.data['properties']['contacts']:
@@ -347,22 +347,22 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 })
 
         for link in links:
-            total += 2
+            if link['href'].startswith('http'):
+                total += 2
+                result = check_url(link['href'], False)
 
-            result = check_url(link['href'], False)
+                LOGGER.debug('Testing whether link resolves successfully')
+                if result['accessible']:
+                    score += 1
+                else:
+                    comments.append(f"URL not accessible: {link['href']}")
 
-            LOGGER.debug('Testing whether link resolves successfully')
-            if result['accessible']:
-                score += 1
-            else:
-                comments.append(f"URL not accessible: {link['href']}")
-
-            LOGGER.debug('Checking whether link has a valid media type')
-            if (link.get('type') is not None and
-                    link['type'] not in valid_link_mime_types):
-                comments.append(f"invalid link type {link['type']}")
-            else:
-                score += 1
+                LOGGER.debug('Checking whether link has a valid media type')
+                if (link.get('type') is not None and
+                        link['type'] not in valid_link_mime_types):
+                    comments.append(f"invalid link type {link['type']}")
+                else:
+                    score += 1
 
         return name, total, score, comments
 
