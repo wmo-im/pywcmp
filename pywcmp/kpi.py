@@ -78,7 +78,6 @@ def validate(ctx, file_or_url, summary, kpi, logfile, verbosity,
         raise click.ClickException(err)
 
     if fail_on_ets:
-        print("JJJ")
         ts = WMOCoreMetadataProfileTestSuite2(data)
         try:
             _ = ts.run_tests(fail_on_schema_validation=True)
