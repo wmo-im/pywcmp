@@ -76,6 +76,7 @@ def validate(ctx, file_or_url, summary, kpi, logfile, verbosity,
         data = parse_wcmp(content)
     except Exception as err:
         raise click.ClickException(err)
+        ctx.exit(1)
 
     if fail_on_ets:
         ts = WMOCoreMetadataProfileTestSuite2(data)
@@ -83,6 +84,7 @@ def validate(ctx, file_or_url, summary, kpi, logfile, verbosity,
             _ = ts.run_tests(fail_on_schema_validation=True)
         except Exception as err:
             raise click.ClickException(err)
+            ctx.exit(1)
 
     kpis = wcmp_kpis2(data)
 
@@ -90,6 +92,7 @@ def validate(ctx, file_or_url, summary, kpi, logfile, verbosity,
         kpis_results = kpis.evaluate(kpi)
     except ValueError as err:
         raise click.UsageError(f'Invalid KPI {kpi}: {err}')
+        ctx.exit(1)
 
     if not summary or kpi is not None:
         click.echo(json.dumps(kpis_results, indent=4))

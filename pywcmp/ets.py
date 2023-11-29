@@ -70,6 +70,7 @@ def validate(ctx, file_or_url, logfile, verbosity,
         data = parse_wcmp(content)
     except Exception as err:
         raise click.ClickException(err)
+        ctx.exit(1)
 
     click.echo('Detected WCMP 2 discovery metadata')
     ts = WMOCoreMetadataProfileTestSuite2(data)
@@ -77,6 +78,7 @@ def validate(ctx, file_or_url, logfile, verbosity,
         results = ts.run_tests(fail_on_schema_validation)
     except Exception as err:
         raise click.ClickException(err)
+        ctx.exit(1)
 
     click.echo(json.dumps(results, indent=4))
     ctx.exit(results['ets-report']['summary']['FAILED'])
