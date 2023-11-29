@@ -79,6 +79,7 @@ def validate(ctx, file_or_url, logfile, verbosity,
         raise click.ClickException(err)
 
     click.echo(json.dumps(results, indent=4))
+    ctx.exit(results['ets-report']['summary']['FAILED'])
 
 
 ets.add_command(validate)
