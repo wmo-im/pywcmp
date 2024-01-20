@@ -28,7 +28,6 @@
 
 # WMO Core Metadata Profile Key Performance Indicators (KPIs)
 
-from io import BytesIO
 import json
 import logging
 
@@ -66,9 +65,10 @@ def validate(ctx, file_or_url, summary, kpi, logfile, verbosity,
     setup_logger(verbosity, logfile)
 
     if file_or_url.startswith('http'):
-        content = BytesIO(urlopen_(file_or_url).read())
+        content = urlopen_(file_or_url).read()
     else:
-        content = file_or_url
+        with open(file_or_url) as fh:
+            content = fh.read()
 
     click.echo(f'Validating {file_or_url}')
 

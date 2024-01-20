@@ -138,7 +138,13 @@ class WCMPUtilTest(unittest.TestCase):
         """test invalid input"""
 
         with self.assertRaises(RuntimeError):
-            _ = parse_wcmp(get_test_file_path('data/not-json.csv'))
+            file_ = 'data/not-json.csv'
+            with open(get_test_file_path(file_)) as fh:
+                _ = parse_wcmp(fh.read())
+
+        file_ = 'data/wcmp2-passing.json'
+        with open(get_test_file_path(file_)) as fh:
+            _ = parse_wcmp(fh.read())
 
 
 if __name__ == '__main__':

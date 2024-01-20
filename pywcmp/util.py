@@ -201,17 +201,16 @@ def check_url(url: str, check_ssl: bool, timeout: int = 30) -> dict:
 
 def parse_wcmp(content: str) -> dict:
     """
-    Parse a buffer into a JSON dict (WCMP2)
+    Parse a string of WCMP into a JSON dict (WCMP2)
 
-    :param content: str of JSON
+    :param content: `str` of JSON
 
     :returns: `dict` object of WCMP
     """
 
     LOGGER.debug('Attempting to parse as JSON')
     try:
-        with open(content) as fh:
-            data = json.load(fh)
+        data = json.loads(content)
     except json.decoder.JSONDecodeError as err:
         LOGGER.error(err)
         raise RuntimeError(f'Encoding error: {err}')

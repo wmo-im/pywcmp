@@ -28,7 +28,6 @@
 
 # executable test for WCMP2
 
-from io import BytesIO
 import json
 
 import click
@@ -60,9 +59,10 @@ def validate(ctx, file_or_url, logfile, verbosity,
     click.echo(f'Opening {file_or_url}')
 
     if file_or_url.startswith('http'):
-        content = BytesIO(urlopen_(file_or_url).read())
+        content = urlopen_(file_or_url).read()
     else:
-        content = file_or_url
+        with open(file_or_url) as fh:
+            content = fh.read()
 
     click.echo(f'Validating {file_or_url}')
 
