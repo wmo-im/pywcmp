@@ -34,7 +34,7 @@ from jsonschema.validators import Draft202012Validator
 
 from pywcmp.bundle import WCMP2_FILES
 from pywis_topics.topics import TopicHierarchy
-from pywcmp.util import get_userdir
+from pywcmp.util import get_current_datetime_rfc3339, get_userdir
 
 LOGGER = logging.getLogger(__name__)
 
@@ -102,6 +102,7 @@ class WMOCoreMetadataProfileTestSuite2:
             ets_report['summary'][code] = r
 
         ets_report['tests'] = results
+        ets_report['datetime'] = get_current_datetime_rfc3339()
 
         return {
             'ets-report': ets_report

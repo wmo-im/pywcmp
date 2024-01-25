@@ -31,7 +31,8 @@ import re
 
 from bs4 import BeautifulSoup
 
-from pywcmp.util import check_spelling, check_url
+from pywcmp.util import (check_spelling, check_url,
+                         get_current_datetime_rfc3339)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -508,6 +509,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             overall_grade = 'F'
             overall_grade = calculate_grade(results['summary']['percentage'])
             results['summary']['grade'] = overall_grade
+            results['datetime'] = get_current_datetime_rfc3339()
 
         return results
 

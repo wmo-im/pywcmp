@@ -26,6 +26,7 @@
 #
 ###############################################################################
 
+from datetime import datetime, timezone
 import json
 import logging
 from pathlib import Path
@@ -216,3 +217,13 @@ def parse_wcmp(content: str) -> dict:
         raise RuntimeError(f'Encoding error: {err}')
 
     return data
+
+
+def get_current_datetime_rfc3339() -> str:
+    """
+    Gets the current datetime in RFC3339 format
+
+    :returns: `str` of RFC3339
+    """
+
+    return datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%ST')
