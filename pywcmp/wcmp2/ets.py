@@ -388,7 +388,7 @@ class WMOCoreMetadataProfileTestSuite2:
 
             if data_policy == 'recommended':
                 conditions_links = [link for link in self.record['links']
-                                    if link['rel'] in ['license', 'copyright']]
+                                    if link['rel'] == 'license']
                 if not conditions_links:
                     status['code'] = 'FAILED'
                     status['message'] = 'missing recommended conditions'
