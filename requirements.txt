@@ -1,6 +1,6 @@
 beautifulsoup4
 click
-jsonschema>4.19
+#jsonschema>4.19
 pyspellchecker
 python-dateutil
 pywis-topics

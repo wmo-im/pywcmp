@@ -509,7 +509,8 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             overall_grade = 'F'
             overall_grade = calculate_grade(results['summary']['percentage'])
             results['summary']['grade'] = overall_grade
-            results['datetime'] = get_current_datetime_rfc3339()
+
+        results['datetime'] = get_current_datetime_rfc3339()
 
         return results
 
