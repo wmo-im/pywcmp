@@ -500,15 +500,13 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             }
             LOGGER.debug(f'{kpi}: {result[1]} / {result[2]} = {percentage}')
 
-        # the summary only if more than one KPI was evaluated
-        if len(kpis_to_run) > 1:
-            LOGGER.debug('Calculating total results')
-            results['summary'] = generate_summary(results)
-            # this total summary needs extra elements
-            results['summary']['identifier'] = self.identifier,
-            overall_grade = 'F'
-            overall_grade = calculate_grade(results['summary']['percentage'])
-            results['summary']['grade'] = overall_grade
+        LOGGER.debug('Calculating total results')
+        results['summary'] = generate_summary(results)
+        # this total summary needs extra elements
+        results['summary']['identifier'] = self.identifier
+        overall_grade = 'F'
+        overall_grade = calculate_grade(results['summary']['percentage'])
+        results['summary']['grade'] = overall_grade
 
         results['datetime'] = get_current_datetime_rfc3339()
 
@@ -566,5 +564,7 @@ def calculate_grade(percentage: float) -> str:
         grade = 'D'
     elif percentage >= 20:
         grade = 'E'
+    else:
+        grade = percentage
 
     return grade
