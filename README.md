@@ -78,12 +78,12 @@ pywcmp kpi validate --kpi title /path/to/file.json -v INFO
 ```
 
 ## Using the API
-```pycon
+``pycon
 >>> # test a file on disk
 >>> import json
 >>> from pywcmp.ets import ets
 >>> 
->>> with open('/path/to/file.json')) as fh:
+>>> with open('/path/to/file.json') as fh:
 ...     data = json.load(fh)
 >>> # test ETS
 >>> ts = ets.WMOCoreMetadataProfileTestSuite2(datal)
