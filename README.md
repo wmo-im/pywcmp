@@ -81,19 +81,18 @@ pywcmp kpi validate --kpi title /path/to/file.json -v INFO
 ```pycon
 >>> # test a file on disk
 >>> import json
->>> from pywcmp.ets import ets
->>> 
+>>> from pywcmp.wcmp2.ets import WMOCoreMetadataProfileTestSuite2
 >>> with open('/path/to/file.json') as fh:
 ...     data = json.load(fh)
 >>> # test ETS
->>> ts = ets.WMOCoreMetadataProfileTestSuite2(datal)
+>>> ts = WMOCoreMetadataProfileTestSuite2(datal)
 >>> ts.run_tests()  # raises ValueError error stack on exception
 >>> # test a URL
 >>> from urllib2 import urlopen
 >>> from StringIO import StringIO
 >>> content = StringIO(urlopen('https://....').read())
 >>> data = json.loads(content)
->>> ts = ets.WMOCoreMetadataProfileTestSuite2(data)
+>>> ts = WMOCoreMetadataProfileTestSuite2(data)
 >>> ts.run_tests()  # raises ValueError error stack on exception
 >>> # handle pywcmp.errors.TestSuiteError
 >>> # pywcmp.errors.TestSuiteError.errors is a list of errors
