@@ -78,7 +78,7 @@ pywcmp kpi validate --kpi title /path/to/file.json -v INFO
 ```
 
 ## Using the API
-``pycon
+```pycon
 >>> # test a file on disk
 >>> import json
 >>> from pywcmp.ets import ets
