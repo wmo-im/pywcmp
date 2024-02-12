@@ -160,7 +160,7 @@ class WMOCoreMetadataProfileTestSuite2:
             status['message'] = 'identifier does not have at least five tokens'
             return status
 
-        if not identifier.startswith('urn:x-wmo:md:'):
+        if not identifier.startswith('urn:wmo:md:'):
             status['code'] = 'FAILED'
             status['message'] = 'bad prefix'
             return status

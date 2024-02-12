@@ -1,5 +1,5 @@
 {
-    "id": "urn:x-wmo:md:ca-eccc-msc:weather.observations.swob-realtime",
+    "id": "urn:wmo:md:ca-eccc-msc:weather.observations.swob-realtime",
     "conformsTo": [
         "http://wis.wmo.int/spec/wcmp/2/conf/core"
     ],
