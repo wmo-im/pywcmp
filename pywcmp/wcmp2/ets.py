@@ -282,6 +282,8 @@ class WMOCoreMetadataProfileTestSuite2:
             'code': 'PASSED'
         }
 
+        earth_system_discipline_theme_found = False
+
         themes = self.record['properties']['themes']
 
         if len(themes) < 1:
@@ -306,6 +308,9 @@ class WMOCoreMetadataProfileTestSuite2:
 
                 return status
 
+            if 'earth-system-discipline' in scheme:
+                earth_system_discipline_theme_found = True
+
             for c in concepts:
                 cid = c.get('id')
 
@@ -323,6 +328,13 @@ class WMOCoreMetadataProfileTestSuite2:
                         status['message'] = msg
 
                         return status
+
+        if not earth_system_discipline_theme_found:
+            msg = 'No Earth system discipline based theme found'
+            status['code'] = 'FAILED'
+            status['message'] = msg
+
+            return status
 
         return status
 
