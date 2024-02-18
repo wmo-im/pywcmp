@@ -217,6 +217,12 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         LOGGER.info(f'Running {name}')
 
+        time_ = self.data.get('time')
+        if time_ is None:
+            msg = 'time is null; no KPI check'
+            LOGGER.debug(msg)
+            return name, 0, 0, [msg]
+
         interval = self.data['time'].get('interval')
 
         if interval is not None:
