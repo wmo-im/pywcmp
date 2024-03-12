@@ -31,6 +31,7 @@ import re
 
 from bs4 import BeautifulSoup
 
+import pywcmp
 from pywcmp.util import (check_spelling, check_url,
                          get_current_datetime_rfc3339)
 
@@ -515,6 +516,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         results['summary']['grade'] = overall_grade
 
         results['datetime'] = get_current_datetime_rfc3339()
+        results['generated-by'] = f'pywcmp {pywcmp.__version__} (https://github.com/wmo-im/pywcmp)'  # noqa
 
         return results
 

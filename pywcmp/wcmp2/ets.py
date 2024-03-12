@@ -32,6 +32,7 @@ from pathlib import Path
 
 from jsonschema.validators import Draft202012Validator
 
+import pywcmp
 from pywcmp.bundle import WCMP2_FILES
 from pywis_topics.topics import TopicHierarchy
 from pywcmp.util import get_current_datetime_rfc3339, get_userdir
@@ -76,6 +77,7 @@ class WMOCoreMetadataProfileTestSuite2:
         tests = []
         ets_report = {
             'summary': {},
+            'generated-by': f'pywcmp {pywcmp.__version__} (https://github.com/wmo-im/pywcmp)'  # noqa
         }
 
         for f in dir(WMOCoreMetadataProfileTestSuite2):
