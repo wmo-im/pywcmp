@@ -355,7 +355,11 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 })
 
         for link in links:
-            if link['href'].startswith('http'):
+            if link.get('href') is None:
+                LOGGER.debug(f"URL is not a proper URL: {link['href']}")
+                continue
+
+            if link.get('href', '').startswith('http'):
                 total += 2
                 result = check_url(link['href'], False)
 
