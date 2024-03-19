@@ -448,7 +448,7 @@ class WMOCoreMetadataProfileTestSuite2:
             if 'security' in link:
                 if link['security'].get('description') is None:
                     status['code'] = 'FAILED'
-                    status['message'] = 'missing security descirption for link'
+                    status['message'] = 'missing security description for link'
                     return status
 
         return status
