@@ -322,7 +322,7 @@ class WMOCoreMetadataProfileTestSuite2:
 
                     return status
 
-                if 'earth-system-discipline' in scheme:
+                if scheme.endswith('earth-system-discipline'):
                     if cid not in self.th.topics[6]:
                         msg = f'Invalid Earth system discipline {cid}'
 
@@ -446,10 +446,11 @@ class WMOCoreMetadataProfileTestSuite2:
 
             LOGGER.debug('Checking that links with security have descriptions')
             if 'security' in link:
-                if link['security'].get('description') is None:
-                    status['code'] = 'FAILED'
-                    status['message'] = 'missing security description for link'
-                    return status
+                for key, value in link['security'].items():
+                    if value.get('description') is None:
+                        status['code'] = 'FAILED'
+                        status['message'] = f'missing security description for {key}'  # noqa
+                        return status
 
         return status
 
