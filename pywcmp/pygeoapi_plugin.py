@@ -96,6 +96,18 @@ PROCESS_WCMP2_ETS = {
             'maxOccurs': 1,
             'metadata': None,
             'keywords': ['wcmp2']
+        },
+        'fail_on_schema_validation': {
+            'title': 'Fail on schema validation',
+            'description': 'Stop the ETS on failing schema validation',
+            'schema': {
+                'type': 'boolean',
+                'default': True
+            },
+            'minOccurs': 0,
+            'maxOccurs': 1,
+            'metadata': None,
+            'keywords': ['schema', 'validation']
         }
     },
     'outputs': {
@@ -112,7 +124,8 @@ PROCESS_WCMP2_ETS = {
         'inputs': {
             'record': {
                 '$ref': 'https://raw.githubusercontent.com/wmo-im/pywcmp/master/tests/data/wcmp2-passing.json'  # noqa
-            }
+            },
+            'fail_on_schema_validation': True
         }
     }
 }
@@ -187,6 +200,7 @@ class WCMP2ETSProcessor(BaseProcessor):
         response = None
         mimetype = 'application/json'
         record = data.get('record')
+        fail_on_schema_validation = data.get('fail_on_schema_validation', True)
 
         if record is None:
             msg = 'Missing record'
@@ -194,7 +208,8 @@ class WCMP2ETSProcessor(BaseProcessor):
             raise ProcessorExecuteError(msg)
 
         LOGGER.debug('Running ETS against record')
-        response = WMOCoreMetadataProfileTestSuite2(record).run_tests()
+        response = WMOCoreMetadataProfileTestSuite2(record).run_tests(
+            fail_on_schema_validation=fail_on_schema_validation)
 
         return mimetype, response
 
