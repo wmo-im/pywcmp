@@ -26,6 +26,7 @@
 # executable test suite as per WMO Core Metadata Profile 2, Annex A
 
 import csv
+from datetime import datetime
 import json
 import logging
 from pathlib import Path
@@ -370,9 +371,16 @@ class WMOCoreMetadataProfileTestSuite2:
 
         status = {
             'id': gen_test_id('record_creation_date'),
-            'code': 'PASSED',
-            'message': 'Passes given schema is compliant/valid'
+            'code': 'PASSED'
         }
+
+        created = self.record['properties']['created']
+
+        try:
+            datetime.strptime(created, '%Y-%m-%dT%H:%M:%S%z')
+        except ValueError:
+            status['code'] = 'FAILED'
+            status['message'] = 'Invalid date-time format'
 
         return status
 
