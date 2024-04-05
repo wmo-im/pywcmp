@@ -58,6 +58,7 @@ class WCMP2ETSTest(unittest.TestCase):
 
     def test_pass(self):
         """Simple tests for a passing record"""
+
         with open(get_test_file_path('data/wcmp2-passing.json')) as fh:
             ts = WMOCoreMetadataProfileTestSuite2(json.load(fh))
             results = ts.run_tests()
@@ -70,6 +71,7 @@ class WCMP2ETSTest(unittest.TestCase):
 
     def test_fail(self):
         """Simple tests for a failing record"""
+
         with open(get_test_file_path('data/wcmp2-failing.json')) as fh:
             record = json.load(fh)
             ts = WMOCoreMetadataProfileTestSuite2(record)
@@ -84,6 +86,20 @@ class WCMP2ETSTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 ts.run_tests(fail_on_schema_validation=True)
 
+    def test_fail_created_none(self):
+        """Simple tests for a failing record with an invalid creation date"""
+
+        with open(get_test_file_path('data/wcmp2-failing-created-none.json')) as fh:  # noqa
+            record = json.load(fh)
+            ts = WMOCoreMetadataProfileTestSuite2(record)
+            results = ts.run_tests()
+
+            codes = [r['code'] for r in results['ets-report']['tests']]
+
+            self.assertEqual(codes.count('FAILED'), 1)
+            self.assertEqual(codes.count('PASSED'), 11)
+            self.assertEqual(codes.count('SKIPPED'), 0)
+
 
 class WCMP2KPITest(unittest.TestCase):
     """WCMP KPI tests of tests"""
@@ -97,6 +113,8 @@ class WCMP2KPITest(unittest.TestCase):
         pass
 
     def test_kpi_evaluate(self):
+        """Tests for KPI evaluation"""
+
         file_ = 'data/wcmp2-passing.json'
         with open(get_test_file_path(file_)) as fh:
             data = json.load(fh)
