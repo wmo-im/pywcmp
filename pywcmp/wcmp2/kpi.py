@@ -349,7 +349,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             })
 
         for contact in self.data['properties']['contacts']:
-            for link in contact['links']:
+            for link in contact.get('links', []):
                 links.append({
                     'href': link['href']
                 })
