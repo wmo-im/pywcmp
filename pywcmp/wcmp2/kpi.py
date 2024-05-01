@@ -411,7 +411,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             else:
                 score += 1
 
-            for email in contact.get('emails'):
+            for email in contact.get('emails', []):
                 if 'value' in email:
                     email_found = True
                     break
