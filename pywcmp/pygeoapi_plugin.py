@@ -2,7 +2,7 @@
 #
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #
-# Copyright (c) 2023 Tom Kralidis
+# Copyright (c) 2024 Tom Kralidis
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -72,7 +72,7 @@ PROCESS_WCMP2_ETS = {
     'version': '0.1.0',
     'id': 'pywcmp-wis2-wcmp2-ets',
     'title': {
-        'en': 'Validate a WCMP2 document against the ETS'
+        'en': 'WCMP2 ETS validator'
     },
     'description': {
         'en': 'Validate a WCMP2 document against the ETS'
@@ -135,7 +135,7 @@ PROCESS_WCMP2_KPI = {
     'version': '0.1.0',
     'id': 'pywcmp-wis2-wcmp2-kpi',
     'title': {
-        'en': 'Validate a WCMP2 document against the KPI suite'
+        'en': 'WCMP2 KPI evaluator'
     },
     'description': {
         'en': 'Validate a WCMP2 document against the KPI suite'
