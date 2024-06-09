@@ -72,7 +72,7 @@ def validate(ctx, file_or_url, logfile, verbosity,
         raise click.ClickException(err)
         ctx.exit(1)
 
-    click.echo('Detected WCMP 2 discovery metadata')
+    click.echo('Detected WCMP2 discovery metadata')
     ts = WMOCoreMetadataProfileTestSuite2(data)
     try:
         results = ts.run_tests(fail_on_schema_validation)
