@@ -187,18 +187,11 @@ class WMOCoreMetadataProfileTestSuite2:
         Validate that a WCMP record provides valid conformance information.
         """
 
-        conformance_class = 'http://wis.wmo.int/spec/wcmp/2/conf/core'
-
         status = {
             'id': gen_test_id('conformance'),
-            'code': 'PASSED'
+            'code': 'PASSED',
+            'message': 'Passes given schema is compliant/valid'
         }
-
-        conformance = self.record.get('conformsTo')
-
-        if conformance_class not in conformance:
-            status['code'] = 'FAILED'
-            status['message'] = f'Missing conformance class {conformance_class}'  # noqa
 
         return status
 

@@ -8,7 +8,7 @@ pywcmp provides validation and quality assessment capabilities for the [WMO
 WIS](https://community.wmo.int/activity-areas/wis/wis-overview) Core Metadata
 Profile (WCMP).
 
-- validation against [WCMP 2 (draft)](https://github.com/wmo-im/wcmp2), specifically [Annex A: Conformance Class Abstract Test Suite](https://wmo-im.github.io/wcmp2/standard/wcmp2-DRAFT.html#_conformance_class_abstract_test_suite_normative), implementing an executable test suite against the ATS
+- validation against [WCMP2 (draft)](https://github.com/wmo-im/wcmp2), specifically [Annex A: Conformance Class Abstract Test Suite](https://wmo-im.github.io/wcmp2/standard/wcmp2-DRAFT.html#_conformance_class_abstract_test_suite_normative), implementing an executable test suite against the ATS
 - quality assessement against the [WCMP Key Performance Indicators](https://community.wmo.int/activity-areas/wis/wis-metadata-kpis)
 
 ## Installation
@@ -47,13 +47,13 @@ pywcmp bundle sync
 
 # abstract test suite
 
-# validate WCMP 2 metadata against abstract test suite (file on disk)
+# validate WCMP2 metadata against abstract test suite (file on disk)
 pywcmp ets validate /path/to/file.json
 
-# validate WCMP 2 metadata against abstract test suite (URL)
+# validate WCMP2 metadata against abstract test suite (URL)
 pywcmp ets validate https://example.org/path/to/file.json
 
-# validate WCMP 2 metadata against abstract test suite (URL), but turn JSON Schema validation off
+# validate WCMP2 metadata against abstract test suite (URL), but turn JSON Schema validation off
 pywcmp ets validate https://example.org/path/to/file.json --no-fail-on-schema-validation
 
 # adjust debugging messages (CRITICAL, ERROR, WARNING, INFO, DEBUG) to stdout
