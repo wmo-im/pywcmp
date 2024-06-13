@@ -329,7 +329,8 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         valid_link_mime_types = list(mimetypes.types_map.values())
         valid_link_mime_types.extend([
             'application/x-bufr',
-            'application/x-grib'
+            'application/x-grib',
+            'text/turtle'
         ])
 
         LOGGER.info(f'Running {name}')
@@ -370,11 +371,17 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                     comments.append(f"URL not accessible: {link['href']}")
 
                 LOGGER.debug('Checking whether link has a valid media type')
-                if (link.get('type') is not None and
-                        link['type'] not in valid_link_mime_types):
-                    comments.append(f"invalid link type {link['type']}")
-                else:
-                    score += 1
+                link_type = link.get('type')
+
+                if link_type is None:
+                    LOGGER.debug('Deriving link type from HTTP Content-Type')
+                    link_type = result.get('mime-type')
+
+                if link_type is not None:
+                    if link_type in valid_link_mime_types:
+                        score += 1
+                    else:
+                        comments.append(f"invalid link type {link_type}")
 
         return name, total, score, comments
 
