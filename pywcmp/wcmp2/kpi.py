@@ -376,8 +376,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 if link_type is None:
                     LOGGER.debug('Deriving link type from HTTP Content-Type')
                     link_type = result.get('mime-type')
-
-                if link_type is not None:
+                else:
                     if link_type in valid_link_mime_types:
                         score += 1
                     else:
