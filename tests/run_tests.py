@@ -3,7 +3,7 @@
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #          Ján Osuský <jan.osusky@iblsoft.com>
 #
-# Copyright (c) 2023 Tom Kralidis
+# Copyright (c) 2024 Tom Kralidis
 # Copyright (c) 2022 Government of Canada
 # Copyright (c) 2020 IBL Software Engineering spol. s r. o.
 #
@@ -67,6 +67,29 @@ class WCMP2ETSTest(unittest.TestCase):
 
             self.assertEqual(codes.count('FAILED'), 0)
             self.assertEqual(codes.count('PASSED'), 12)
+            self.assertEqual(codes.count('SKIPPED'), 0)
+
+    def test_centre_id(self):
+        """Simple tests for a centre-id validation"""
+
+        with open(get_test_file_path('data/wcmp2-passing-test-centre-id.json')) as fh:  # noqa
+            ts = WMOCoreMetadataProfileTestSuite2(json.load(fh))
+            results = ts.run_tests()
+
+            codes = [r['code'] for r in results['ets-report']['tests']]
+
+            self.assertEqual(codes.count('FAILED'), 0)
+            self.assertEqual(codes.count('PASSED'), 12)
+            self.assertEqual(codes.count('SKIPPED'), 0)
+
+        with open(get_test_file_path('data/wcmp2-failing-invalid-centre-id.json')) as fh:  # noqa
+            ts = WMOCoreMetadataProfileTestSuite2(json.load(fh))
+            results = ts.run_tests()
+
+            codes = [r['code'] for r in results['ets-report']['tests']]
+
+            self.assertEqual(codes.count('FAILED'), 1)
+            self.assertEqual(codes.count('PASSED'), 11)
             self.assertEqual(codes.count('SKIPPED'), 0)
 
     def test_fail(self):

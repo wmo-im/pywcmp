@@ -2,7 +2,7 @@
 #
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #
-# Copyright (c) 2023 Tom Kralidis
+# Copyright (c) 2024 Tom Kralidis
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -170,10 +170,13 @@ class WMOCoreMetadataProfileTestSuite2:
 
         centre_id = identifier_tokens[3]
 
-        if centre_id not in self.th.topics[3]:
-            status['code'] = 'FAILED'
-            status['message'] = f'Invalid centre_id: {centre_id}'
-            return status
+        if centre_id.endswith('-test'):
+            LOGGER.debug('Test centre-id, no further centre-id testing')
+        else:
+            if centre_id not in self.th.topics[3]:
+                status['code'] = 'FAILED'
+                status['message'] = f'Invalid centre_id: {centre_id}'
+                return status
 
         if not identifier.isascii():
             status['code'] = 'FAILED'
