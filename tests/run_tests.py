@@ -33,7 +33,7 @@ import unittest
 from pywcmp.ets import WMOCoreMetadataProfileTestSuite2
 from pywcmp.wcmp2.kpi import (
     calculate_grade, WMOCoreMetadataProfileKeyPerformanceIndicators)
-from pywcmp.util import parse_wcmp
+from pywcmp.util import is_valid_created_datetime, parse_wcmp
 
 
 def get_test_file_path(filename):
@@ -186,6 +186,14 @@ class WCMPUtilTest(unittest.TestCase):
         file_ = 'data/wcmp2-passing.json'
         with open(get_test_file_path(file_)) as fh:
             _ = parse_wcmp(fh.read())
+
+    def test_is_valid_created_datetime(self):
+        """test for valid/accepted RFC3339 datetimes"""
+
+        self.assertTrue(is_valid_created_datetime('2024-08-09T14:29:22Z'))
+        self.assertTrue(is_valid_created_datetime('2024-08-09T14:29:22.12Z'))
+        self.assertTrue(is_valid_created_datetime('2024-08-09T14:29:22+0400'))
+        self.assertTrue(is_valid_created_datetime('2024-08-09T14:29:22+04:00'))
 
 
 if __name__ == '__main__':

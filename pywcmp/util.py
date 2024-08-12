@@ -3,7 +3,7 @@
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #          Ján Osuský <jan.osusky@iblsoft.com>
 #
-# Copyright (c) 2023 Tom Kralidis
+# Copyright (c) 2024 Tom Kralidis
 # Copyright (c) 2022 Government of Canada
 # Copyright (c) 2020 IBL Software Engineering spol. s r. o.
 #
@@ -227,3 +227,29 @@ def get_current_datetime_rfc3339() -> str:
     """
 
     return datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+
+def is_valid_created_datetime(value: str) -> bool:
+    """
+    Helper function to test for accepted RFC3339 strings
+
+    :param value: `str` of datetime
+
+    :returns: `bool` of whether datetime is valid/acceptable
+    """
+
+    datetime_formats = [
+        '%Y-%m-%dT%H:%M:%SZ',     # 2024-08-09T14:29Z
+        '%Y-%m-%dT%H:%M:%S.%fZ',  # 2024-08-09T14:29.12Z
+        '%Y-%m-%dT%H:%M:%S%z'     # 2024-08-09T14:29+0400
+    ]
+
+    for datetime_format in datetime_formats:
+        try:
+            datetime.strptime(value, datetime_format)
+            return True
+        except ValueError as err:
+            msg = f'datetime {value} invalid against {datetime_format}: {err}'
+            LOGGER.debug(msg)
+
+    return False

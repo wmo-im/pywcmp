@@ -26,7 +26,6 @@
 # executable test suite as per WMO Core Metadata Profile 2, Annex A
 
 import csv
-from datetime import datetime
 import json
 import logging
 from pathlib import Path
@@ -36,7 +35,8 @@ from jsonschema.validators import Draft202012Validator
 import pywcmp
 from pywcmp.bundle import WCMP2_FILES
 from pywis_topics.topics import TopicHierarchy
-from pywcmp.util import get_current_datetime_rfc3339, get_userdir
+from pywcmp.util import (get_current_datetime_rfc3339, get_userdir,
+                         is_valid_created_datetime)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -360,21 +360,19 @@ class WMOCoreMetadataProfileTestSuite2:
 
         return status
 
-    def test_requirement_creation_date(self):
+    def test_requirement_created_datetime(self):
         """
-        Validate that a WCMP record provides a record creation date.
+        Validate that a WCMP record provides a valid record creation date.
         """
 
         status = {
-            'id': gen_test_id('record_creation_date'),
+            'id': gen_test_id('record_created_datetime'),
             'code': 'PASSED'
         }
 
         created = self.record['properties']['created']
 
-        try:
-            datetime.strptime(created, '%Y-%m-%dT%H:%M:%S%z')
-        except ValueError:
+        if not is_valid_created_datetime(created):
             status['code'] = 'FAILED'
             status['message'] = 'Invalid date-time format'
 
