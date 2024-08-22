@@ -446,6 +446,13 @@ class WMOCoreMetadataProfileTestSuite2:
                     status['message'] = 'missing channel for Pub/Sub link'
                     return status
 
+                if link['channel'].startswith(('origin/a/wis2', 'cache/a/wis2')):  # noqa
+                    LOGGER.debug('Validating topic in link channel')
+                    if not self.th.validate(link['channel']):
+                        status['code'] = 'FAILED'
+                        status['message'] = 'Invalid WIS2 topic for Pub/Sub link channel'  # noqa
+                        return status
+
             LOGGER.debug('Checking that links with security have descriptions')
             if 'security' in link:
                 for key, value in link['security'].items():

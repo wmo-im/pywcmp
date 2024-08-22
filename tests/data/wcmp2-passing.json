@@ -153,7 +153,7 @@
         {
             "rel": "items",
             "href": "mqtt://example.org:8883",
-            "channel": "origin/a/wis2/can/eccc-msc/data/core/weather/observations/surface-land/landFixed",
+            "channel": "origin/a/wis2/ca-eccc-msc/data/core/weather/surface-based-observations/synop",
             "type": "application/json",
             "title": "Data notifications"
         }
