@@ -60,14 +60,19 @@ class WCMP2ETSTest(unittest.TestCase):
         """Simple tests for a passing record"""
 
         with open(get_test_file_path('data/wcmp2-passing.json')) as fh:
-            ts = WMOCoreMetadataProfileTestSuite2(json.load(fh))
-            results = ts.run_tests()
+            data = json.load(fh)
 
-            codes = [r['code'] for r in results['ets-report']['tests']]
+        ts = WMOCoreMetadataProfileTestSuite2(data)
+        results = ts.run_tests()
 
-            self.assertEqual(codes.count('FAILED'), 0)
-            self.assertEqual(codes.count('PASSED'), 12)
-            self.assertEqual(codes.count('SKIPPED'), 0)
+        self.assertEqual(results['report_type'], 'ets')
+        self.assertEqual(results['metadata_id'], data['id'])
+
+        codes = [r['code'] for r in results['tests']]
+
+        self.assertEqual(codes.count('FAILED'), 0)
+        self.assertEqual(codes.count('PASSED'), 12)
+        self.assertEqual(codes.count('SKIPPED'), 0)
 
     def test_centre_id(self):
         """Simple tests for a centre-id validation"""
@@ -76,7 +81,7 @@ class WCMP2ETSTest(unittest.TestCase):
             ts = WMOCoreMetadataProfileTestSuite2(json.load(fh))
             results = ts.run_tests()
 
-            codes = [r['code'] for r in results['ets-report']['tests']]
+            codes = [r['code'] for r in results['tests']]
 
             self.assertEqual(codes.count('FAILED'), 0)
             self.assertEqual(codes.count('PASSED'), 12)
@@ -86,7 +91,7 @@ class WCMP2ETSTest(unittest.TestCase):
             ts = WMOCoreMetadataProfileTestSuite2(json.load(fh))
             results = ts.run_tests()
 
-            codes = [r['code'] for r in results['ets-report']['tests']]
+            codes = [r['code'] for r in results['tests']]
 
             self.assertEqual(codes.count('FAILED'), 1)
             self.assertEqual(codes.count('PASSED'), 11)
@@ -100,7 +105,7 @@ class WCMP2ETSTest(unittest.TestCase):
             ts = WMOCoreMetadataProfileTestSuite2(record)
             results = ts.run_tests()
 
-            codes = [r['code'] for r in results['ets-report']['tests']]
+            codes = [r['code'] for r in results['tests']]
 
             self.assertEqual(codes.count('FAILED'), 3)
             self.assertEqual(codes.count('PASSED'), 9)
@@ -117,7 +122,7 @@ class WCMP2ETSTest(unittest.TestCase):
             ts = WMOCoreMetadataProfileTestSuite2(record)
             results = ts.run_tests()
 
-            codes = [r['code'] for r in results['ets-report']['tests']]
+            codes = [r['code'] for r in results['tests']]
 
             self.assertEqual(codes.count('FAILED'), 1)
             self.assertEqual(codes.count('PASSED'), 11)
@@ -162,6 +167,9 @@ class WCMP2KPITest(unittest.TestCase):
         kpis = WMOCoreMetadataProfileKeyPerformanceIndicators(data)
 
         results = kpis.evaluate()
+
+        self.assertEqual(results['report_type'], 'kpi')
+        self.assertEqual(results['metadata_id'], data['id'])
 
         self.assertEqual(results['summary']['total'], 32)
         self.assertEqual(results['summary']['score'], 32)

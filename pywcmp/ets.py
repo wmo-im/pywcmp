@@ -3,7 +3,7 @@
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #          Ján Osuský <jan.osusky@iblsoft.com>
 #
-# Copyright (c) 2023 Tom Kralidis
+# Copyright (c) 2024 Tom Kralidis
 # Copyright (c) 2022 Government of Canada
 # Copyright (c) 2020 IBL Software Engineering spol. s r. o.
 #
@@ -81,7 +81,7 @@ def validate(ctx, file_or_url, logfile, verbosity,
         ctx.exit(1)
 
     click.echo(json.dumps(results, indent=4))
-    ctx.exit(results['ets-report']['summary']['FAILED'])
+    ctx.exit(results['summary']['FAILED'])
 
 
 ets.add_command(validate)

@@ -2,7 +2,7 @@
 #
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #
-# Copyright (c) 2023 Tom Kralidis
+# Copyright (c) 2024 Tom Kralidis
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -28,6 +28,7 @@
 import logging
 import mimetypes
 import re
+import uuid
 
 from bs4 import BeautifulSoup
 
@@ -39,6 +40,18 @@ LOGGER = logging.getLogger(__name__)
 
 # round percentages to x decimal places
 ROUND = 3
+
+
+def gen_test_id(test_id: str) -> str:
+    """
+    Convenience function to print test identifier as URI
+
+    :param test_id: test suite identifier
+
+    :returns: test identifier as URI
+    """
+
+    return f'http://wis.wmo.int/spec/wcmp/2/kpi/core/{test_id}'
 
 
 class WMOCoreMetadataProfileKeyPerformanceIndicators:
@@ -70,7 +83,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         """
         Implements KPI for Good quality title
 
-        :returns: `tuple` of KPI name, achieved score, total score,
+        :returns: `tuple` of KPI id, title, achieved score, total score,
                   and comments
         """
 
@@ -78,10 +91,11 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         score = 0
         comments = []
 
-        name = 'KPI: Good quality title'
+        id_ = gen_test_id('good_quality_title')
+        title = 'Good quality title'
         acronym_regex = r'\b([A-Z]{2,}\d*)\b'
 
-        LOGGER.info(f'Running {name}')
+        LOGGER.info(f'Running {title}')
 
         title = self.data['properties']['title']
 
@@ -146,13 +160,13 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         else:
             comments.append(f'Title contains spelling errors {misspelled}')
 
-        return name, total, score, comments
+        return id_, title, total, score, comments
 
     def kpi_description(self) -> tuple:
         """
         Implements KPI for Good quality description
 
-        :returns: `tuple` of KPI name, achieved score, total score,
+        :returns: `tuple` of KPI id, title, achieved score, total score,
                   and comments
         """
 
@@ -160,9 +174,10 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         score = 0
         comments = []
 
-        name = 'KPI: Good quality description'
+        id_ = gen_test_id('good_quality_description')
+        title = ': Good quality description'
 
-        LOGGER.info(f'Running {name}')
+        LOGGER.info(f'Running {title}')
 
         description = self.data['properties']['description']
 
@@ -198,13 +213,13 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         else:
             comments.append(f'Description contains spelling errors {misspelled}')  # noqa
 
-        return name, total, score, comments
+        return id_, title, total, score, comments
 
     def kpi_time_intervals(self) -> tuple:
         """
         Implements KPI for Time intervals
 
-        :returns: `tuple` of KPI name, achieved score, total score,
+        :returns: `tuple` of KPI id, title, achieved score, total score,
                   and comments
         """
 
@@ -214,15 +229,16 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         score = 0
         comments = []
 
-        name = 'KPI: Time intervals'
+        id_ = gen_test_id('time_intervals')
+        title = 'Time intervals'
 
-        LOGGER.info(f'Running {name}')
+        LOGGER.info(f'Running {title}')
 
         time_ = self.data.get('time')
         if time_ is None:
             msg = 'time is null; no KPI check'
             LOGGER.debug(msg)
-            return name, 0, 0, [msg]
+            return id_, title, 0, 0, [msg]
 
         interval = self.data['time'].get('interval')
 
@@ -258,13 +274,13 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             else:
                 comments.append('No temporal resolution found')
 
-        return name, total, score, comments
+        return id_, title, total, score, comments
 
     def kpi_graphic_overview(self) -> tuple:
         """
         Implements KPI for Graphic overview for metadata records
 
-        :returns: `tuple` of KPI name, achieved score, total score,
+        :returns: `tuple` of KPI id, title, achieved score, total score,
                   and comments
         """
 
@@ -282,9 +298,10 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             'image/webp'
         ]
 
-        name = 'KPI: Graphic overview for metadata records'
+        id_ = gen_test_id('graphic_overview_for_metadata_records')
+        title = 'Graphic overview for metadata records'
 
-        LOGGER.info(f'Running {name}')
+        LOGGER.info(f'Running {title}')
 
         for link in self.data['links']:
             if link.get('rel') == 'preview':
@@ -308,13 +325,13 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 else:
                     comments.append(f"URL not accessible: {link['href']}")
 
-        return name, total, score, comments
+        return id_, title, total, score, comments
 
     def kpi_links_health(self) -> tuple:
         """
         Implements KPI for Links health
 
-        :returns: `tuple` of KPI name, achieved score, total score,
+        :returns: `tuple` of KPI id, title, achieved score, total score,
                   and comments
         """
 
@@ -324,7 +341,8 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         score = 0
         comments = []
 
-        name = 'KPI: Links health'
+        id_ = gen_test_id('links_health')
+        title = 'Links health'
 
         valid_link_mime_types = list(mimetypes.types_map.values())
         valid_link_mime_types.extend([
@@ -333,7 +351,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             'text/turtle'
         ])
 
-        LOGGER.info(f'Running {name}')
+        LOGGER.info(f'Running {title}')
 
         LOGGER.debug('Assembling all links')
 
@@ -384,13 +402,13 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 else:
                     comments.append(f"invalid link type {link_type}")
 
-        return name, total, score, comments
+        return id_, title, total, score, comments
 
     def kpi_contacts(self) -> tuple:
         """
         Implements KPI for Contacts
 
-        :returns: `tuple` of KPI name, achieved score, total score,
+        :returns: `tuple` of KPI id, title, achieved score, total score,
                   and comments
         """
 
@@ -401,9 +419,10 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         score = 0
         comments = []
 
-        name = 'KPI: Contacts'
+        id_ = gen_test_id('contacts')
+        title = 'Contacts'
 
-        LOGGER.info(f'Running {name}')
+        LOGGER.info(f'Running {title}')
 
         for contact in self.data['properties']['contacts']:
             if 'host' in contact['roles']:
@@ -429,13 +448,13 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             else:
                 comments.append('No host contact email found')
 
-        return name, total, score, comments
+        return id_, title, total, score, comments
 
     def kpi_pids(self) -> tuple:
         """
         Implements KPI for Persistent identifiers
 
-        :returns: `tuple` of KPI name, achieved score, total score,
+        :returns: `tuple` of KPI id, title, achieved score, total score,
                   and comments
         """
 
@@ -445,9 +464,10 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
         score = 0
         comments = []
 
-        name = 'KPI: Persistent identifiers'
+        id_ = gen_test_id('persistent_identifiers')
+        title = 'Persistent identifiers'
 
-        LOGGER.info(f'Running {name}')
+        LOGGER.info(f'Running {title}')
 
         if 'externalIds' in self.data['properties']:
             total = 3
@@ -467,7 +487,7 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
                 score += 1
                 break
 
-        return name, total, score, comments
+        return id_, title, total, score, comments
 
     def evaluate(self, kpi: str = None) -> dict:
         """
@@ -498,7 +518,14 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         LOGGER.info(f'Evaluating KPIs: {kpis_to_run}')
 
-        results = {}
+        results = {
+            'id': str(uuid.uuid4()),
+            'report_type': 'kpi',
+            'metadata_id': self.identifier,
+            'datetime': get_current_datetime_rfc3339(),
+            'generated_by': f'pywcmp {pywcmp.__version__} (https://github.com/wmo-im/pywcmp)',  # noqa
+            'tests': []
+        }
 
         for kpi in kpis_to_run:
             LOGGER.debug(f'Running {kpi}')
@@ -506,29 +533,26 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
             LOGGER.debug(f'Raw result: {result}')
             LOGGER.debug('Calculating result')
             try:
-                percentage = round(float((result[2] / result[1]) * 100), ROUND)
+                percentage = round(float((result[3] / result[2]) * 100), ROUND)
             except ZeroDivisionError:
                 percentage = None
 
-            results[kpi] = {
-                'name': result[0],
-                'total': result[1],
-                'score': result[2],
-                'comments': result[3],
+            results['tests'].append({
+                'id': result[0],
+                'title': result[1],
+                'total': result[2],
+                'score': result[3],
+                'comments': result[4],
                 'percentage': percentage
-            }
-            LOGGER.debug(f'{kpi}: {result[1]} / {result[2]} = {percentage}')
+            })
+            LOGGER.debug(f'{kpi}: {result[2]} / {result[3]} = {percentage}')
 
         LOGGER.debug('Calculating total results')
         results['summary'] = generate_summary(results)
         # this total summary needs extra elements
-        results['summary']['identifier'] = self.identifier
         overall_grade = 'F'
         overall_grade = calculate_grade(results['summary']['percentage'])
         results['summary']['grade'] = overall_grade
-
-        results['datetime'] = get_current_datetime_rfc3339()
-        results['generated-by'] = f'pywcmp {pywcmp.__version__} (https://github.com/wmo-im/pywcmp)'  # noqa
 
         return results
 
@@ -542,9 +566,14 @@ def generate_summary(results: dict) -> dict:
     :returns: `dict` of summary report
     """
 
-    sum_total = sum(v['total'] for v in results.values())
-    sum_score = sum(v['score'] for v in results.values())
-    comments = {k: v['comments'] for k, v in results.items() if v['comments']}
+    sum_total = sum(v['total'] for v in results['tests'])
+    sum_score = sum(v['score'] for v in results['tests'])
+    comments = {}
+
+    for test in results['tests']:
+        if test['comments']:
+            for k, v in test.items():
+                comments[k] = v
 
     try:
         sum_percentage = round(float((sum_score / sum_total) * 100), ROUND)
