@@ -1,13 +1,14 @@
 {
     "id": "urn:wmo:md:ca-eccc-msc:weather.observations.swob-realtime",
     "conformsTo": [
-        "bad-uri"
+        "http://wis.wmo.int/spec/wcmp/2/conf/core"
     ],
     "time": {
         "interval": [
             "2010-11-11T11:11:11Z",
             ".."
-        ]
+        ],
+        "resolution": "P1H"
     },
     "type": "Feature",
     "geometry": {
@@ -38,7 +39,7 @@
         ]
     },
     "properties": {
-        "title": "Surface Weather Observations",
+        "title": "Surface weather observations",
         "description": "Surface Observations measured at the automatic and manual stations of the Environment and Climate Change Canada and partners networks, either for a single station, or for the stations of specific provinces and territories (last 30 days)",
         "themes": [
             {
@@ -67,7 +68,8 @@
                     {
                         "id": "Meteorological data"
                     }
-                ]
+                ],
+                "scheme": "https://library-archives.canada.ca/eng/services/government-canada/controlled-vocabularies-government-canada/pages/controlled-vocabularies-government-canada.aspx"
             },
             {
                 "concepts": [
@@ -75,12 +77,12 @@
                         "id": "weather"
                     }
                 ],
-                "scheme": "https://github.com/wmo-im/wis2-topic-hierarchy/blob/main/topic-hierarchy/earth-system-discipline/index.csv"
+                "scheme": "https://codes.wmo.int/wis/topic-hierarchy/earth-system-discipline"
             }
         ],
         "contacts": [
             {
-                "name": "Government of Canada; Environment and Climate Change Canada; Meteorological Service of Canada",
+                "organization": "Government of Canada; Environment and Climate Change Canada; Meteorological Service of Canada",
                 "position": "National Inquiry Response Team",
                 "phones": [
                     {
@@ -107,17 +109,20 @@
                     {
                         "rel": "canonical",
                         "type": "text/html",
-                        "href": "https://www.canada.ca/en/environment-climate-change.html"
+                        "href": "https://example.org"
                     }
                 ],
+                "contactInstructions": "via email",
                 "roles": [
-                    "processor"
+                    "host",
+                    "producer"
                 ]
             }
         ],
         "type": "dataset",
-        "created": "2018-01-01T21:24:45Z",
-        "updated": "2022-06-22T08:22:48Z"
+        "created": "2018-01-01T11:11:11Z",
+        "updated": "2022-06-22T12:42:46Z",
+        "wmo:dataPolicy": "core"
     },
     "links": [
         {
@@ -127,7 +132,7 @@
             "title": "Stations associated with this dataset"
         },
         {
-            "rel": "download",
+            "rel": "data",
             "href": "https://dd.weather.gc.ca/observations/swob-ml",
             "type": "text/html",
             "hreflang": "en",
@@ -148,7 +153,7 @@
         {
             "rel": "items",
             "href": "mqtt://example.org:8883",
-            "channel": "origin/a/wis2/ca-eccc-msc/data/core/weather/surface-based-observations/synop",
+            "channel": "origin/a/wis2/ca-eccc-msc/data/core/weather/surface-based-observations/landFixed",
             "type": "application/json",
             "title": "Data notifications"
         }
