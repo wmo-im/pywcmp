@@ -139,7 +139,7 @@ class WCMP2ETSTest(unittest.TestCase):
             ts = WMOCoreMetadataProfileTestSuite2(record)
             results = ts.run_tests()
 
-            codes = [r['code'] for r in results['ets-report']['tests']]
+            codes = [r['code'] for r in results['tests']]
 
             self.assertEqual(codes.count('FAILED'), 1)
             self.assertEqual(codes.count('PASSED'), 11)
