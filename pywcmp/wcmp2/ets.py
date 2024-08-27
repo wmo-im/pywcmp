@@ -29,6 +29,7 @@ import csv
 import json
 import logging
 from pathlib import Path
+import uuid
 
 from jsonschema.validators import Draft202012Validator
 
@@ -67,7 +68,6 @@ class WMOCoreMetadataProfileTestSuite2:
 
         self.test_id = None
         self.record = data
-        self.report = []
 
         self.th = TopicHierarchy(tables=get_userdir())
 
@@ -77,8 +77,10 @@ class WMOCoreMetadataProfileTestSuite2:
         results = []
         tests = []
         ets_report = {
+            'id': str(uuid.uuid4()),
+            'report_type': 'ets',
             'summary': {},
-            'generated-by': f'pywcmp {pywcmp.__version__} (https://github.com/wmo-im/pywcmp)'  # noqa
+            'generated_by': f'pywcmp {pywcmp.__version__} (https://github.com/wmo-im/pywcmp)'  # noqa
         }
 
         for f in dir(WMOCoreMetadataProfileTestSuite2):
@@ -106,10 +108,9 @@ class WMOCoreMetadataProfileTestSuite2:
 
         ets_report['tests'] = results
         ets_report['datetime'] = get_current_datetime_rfc3339()
+        ets_report['metadata_id'] = self.record['id']
 
-        return {
-            'ets-report': ets_report
-        }
+        return ets_report
 
     def test_requirement_validation(self):
         """
