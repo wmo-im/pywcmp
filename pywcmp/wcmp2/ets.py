@@ -32,6 +32,7 @@ from pathlib import Path
 import uuid
 
 from jsonschema.validators import Draft202012Validator
+from shapely.geometry import shape
 
 import pywcmp
 from pywcmp.bundle import WCMP2_FILES
@@ -169,6 +170,11 @@ class WMOCoreMetadataProfileTestSuite2:
             status['message'] = 'bad prefix'
             return status
 
+        if ' ' in identifier_tokens[-1]:
+            status['code'] = 'FAILED'
+            status['message'] = 'spaces in local identifier'
+            return status
+
         centre_id = identifier_tokens[3]
 
         if centre_id.endswith('-test'):
@@ -228,8 +234,22 @@ class WMOCoreMetadataProfileTestSuite2:
         status = {
             'id': gen_test_id('extent_geospatial'),
             'code': 'PASSED',
-            'message': 'Passes given schema is compliant/valid'
         }
+
+        if self.record['geometry'] is not None:
+            geometry = shape(self.record['geometry'])
+            bounds = geometry.bounds
+
+            x_range = range(-180, 180)
+            y_range = range(-90, 90)
+
+            if not all([bounds[0] in x_range,
+                        bounds[1] in y_range,
+                        bounds[2] in x_range,
+                        bounds[3] in y_range]):
+
+                status['code'] = 'FAILED'
+                status['messsage'] = 'Invalid geometry'
 
         return status
 

@@ -145,6 +145,40 @@ class WCMP2ETSTest(unittest.TestCase):
             self.assertEqual(codes.count('PASSED'), 11)
             self.assertEqual(codes.count('SKIPPED'), 0)
 
+    def test_fail_invalid_identifier_space(self):
+        """
+        Simple tests for a failing record with an invalid
+        identifier (space in local identifier)
+        """
+
+        with open(get_test_file_path('data/wcmp2-failing-invalid-identifier-space.json')) as fh:  # noqa
+            record = json.load(fh)
+            ts = WMOCoreMetadataProfileTestSuite2(record)
+            results = ts.run_tests()
+
+            codes = [r['code'] for r in results['tests']]
+
+            self.assertEqual(codes.count('FAILED'), 1)
+            self.assertEqual(codes.count('PASSED'), 11)
+            self.assertEqual(codes.count('SKIPPED'), 0)
+
+    def test_fail_invalid_geometry_range(self):
+        """
+        Simple tests for a failing record with an invalid
+        geometry (values out of WGS84 range)
+        """
+
+        with open(get_test_file_path('data/wcmp2-failing-invalid-geometry-range.json')) as fh:  # noqa
+            record = json.load(fh)
+            ts = WMOCoreMetadataProfileTestSuite2(record)
+            results = ts.run_tests()
+
+            codes = [r['code'] for r in results['tests']]
+
+            self.assertEqual(codes.count('FAILED'), 1)
+            self.assertEqual(codes.count('PASSED'), 11)
+            self.assertEqual(codes.count('SKIPPED'), 0)
+
 
 class WCMP2KPITest(unittest.TestCase):
     """WCMP KPI tests of tests"""
