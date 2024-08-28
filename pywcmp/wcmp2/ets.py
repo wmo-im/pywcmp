@@ -240,13 +240,10 @@ class WMOCoreMetadataProfileTestSuite2:
             geometry = shape(self.record['geometry'])
             bounds = geometry.bounds
 
-            x_range = range(-180, 180)
-            y_range = range(-90, 90)
-
-            if not all([bounds[0] in x_range,
-                        bounds[1] in y_range,
-                        bounds[2] in x_range,
-                        bounds[3] in y_range]):
+            if not all([-180 <= bounds[0] <= 180,
+                       -90 <= bounds[1] <= 90,
+                       -180 <= bounds[2] <= 180,
+                       -90 <= bounds[3] <= 90]):
 
                 status['code'] = 'FAILED'
                 status['messsage'] = 'Invalid geometry'
