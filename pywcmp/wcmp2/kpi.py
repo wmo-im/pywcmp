@@ -346,8 +346,8 @@ class WMOCoreMetadataProfileKeyPerformanceIndicators:
 
         valid_link_mime_types = list(mimetypes.types_map.values())
         valid_link_mime_types.extend([
-            'application/x-bufr',
-            'application/x-grib',
+            'application/bufr',
+            'application/grib',
             'text/turtle'
         ])
 
