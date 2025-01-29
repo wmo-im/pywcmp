@@ -195,7 +195,7 @@ class WCMP2ETSProcessor(BaseProcessor):
 
         super().__init__(processor_def, PROCESS_WCMP2_ETS)
 
-    def execute(self, data):
+    def execute(self, data, outputs=None):
 
         response = None
         mimetype = 'application/json'
@@ -231,7 +231,7 @@ class WCMP2KPIProcessor(BaseProcessor):
 
         super().__init__(processor_def, PROCESS_WCMP2_KPI)
 
-    def execute(self, data):
+    def execute(self, data, outputs=None):
 
         response = None
         mimetype = 'application/json'
