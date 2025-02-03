@@ -2,7 +2,7 @@
 #
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #
-# Copyright (c) 2023 Tom Kralidis
+# Copyright (c) 2025 Tom Kralidis
 # Copyright (c) 2022 Government of Canada
 #
 # Licensed to the Apache Software Foundation (ASF) under one
@@ -96,7 +96,7 @@ setup(
     url='https://github.com/wmo-im/pywcmp',
     install_requires=read('requirements.txt').splitlines(),
     packages=find_packages(),
-    package_data={'pywcmp': ['dictionary.txt']},
+    include_package_data=True,
     entry_points={
         'console_scripts': [
             'pywcmp=pywcmp:cli'

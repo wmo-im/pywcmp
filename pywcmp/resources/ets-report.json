@@ -1,0 +1,83 @@
+{
+    "type": "object",
+    "title": "WCMP2 Executable Test Suite report",
+    "description": "WCMP2 Executable Test Suite report",
+    "properties": {
+        "id": {
+            "type": "string",
+            "format": "uuid"
+        },
+        "report_type": {
+            "type": "string",
+            "enum": [
+                "ets"
+            ]
+        },
+        "summary": {
+            "type": "object",
+            "description": "summary information",
+            "properties": {
+                "PASSED": {
+                    "type": "integer"
+                },
+                "FAILED": {
+                    "type": "integer"
+                },
+                "SKIPPED": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "PASSED",
+                "FAILED",
+                "SKIPPED"
+            ]
+        },
+        "tests": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "code": {
+                        "type": "string",
+                        "enum": [
+                            "PASSED",
+                            "FAILED",
+                            "SKIPPED"
+                        ]
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "code"
+                ]
+            }
+        },
+        "generated_by": {
+            "type": "string"
+        },
+        "datetime": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "metadata_id": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "id",
+        "report_type",
+        "summary",
+        "generated_by",
+        "datetime",
+        "metadata_id",
+        "tests"
+    ]
+}
