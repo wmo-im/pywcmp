@@ -3,7 +3,7 @@
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #          Ján Osuský <jan.osusky@iblsoft.com>
 #
-# Copyright (c) 2024 Tom Kralidis
+# Copyright (c) 2025 Tom Kralidis
 # Copyright (c) 2022 Government of Canada
 # Copyright (c) 2020 IBL Software Engineering spol. s r. o.
 #
@@ -52,7 +52,7 @@ def check_spelling(text: str) -> list:
     LOGGER.debug(f'Spellchecking {text}')
     spell = SpellChecker()
 
-    dictionary = THISDIR / 'dictionary.txt'
+    dictionary = THISDIR / 'resources' / 'dictionary.txt'
     LOGGER.debug(f'Loading custom dictionary {dictionary}')
     spell.word_frequency.load_text_file(f'{dictionary}')
 

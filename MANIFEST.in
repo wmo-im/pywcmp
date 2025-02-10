@@ -1,1 +1,2 @@
 include LICENSE.md README.md requirements.txt
+recursive-include pywcmp *.txt *.json

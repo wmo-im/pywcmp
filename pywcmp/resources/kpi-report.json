@@ -1,0 +1,106 @@
+{
+    "type": "object",
+    "title": "WCMP2 Key Performance Indicator report",
+    "description": "WCMP2 Key Performance Indicator report",
+    "properties": {
+        "id": {
+            "type": "string",
+            "format": "uuid"
+        },
+        "report_type": {
+            "type": "string",
+            "enum": [
+                "ets"
+            ]
+        },
+        "summary": {
+            "type": "object",
+            "properties": {
+                "grade": {
+                    "type": "string",
+                    "enum": [
+                        "A",
+                        "B",
+                        "C",
+                        "D",
+                        "E",
+                        "F"
+                    ]
+                }
+            },
+            "required": [
+                "grade"
+            ]
+        },
+        "tests": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "allOf": [
+                    "#/definitions/summary",
+                    {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            "title": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "title",
+                            "total",
+                            "score",
+                            "percentage"
+                        ]
+                    }
+                ]
+            }
+        },
+        "generated_by": {
+            "type": "string"
+        },
+        "datetime": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "metadata_id": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "id",
+        "report_type",
+        "summary",
+        "generated_by",
+        "datetime",
+        "metadata_id",
+        "tests"
+    ],
+    "definitions": {
+        "summary": {
+            "type": "object",
+            "properties": {
+                "total": {
+                    "type": "integer"
+                },
+                "score": {
+                    "type": "number"
+                },
+                "comments": {
+                    "type": "string"
+                },
+                "percentage": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "total",
+                "score",
+                "percentage"
+            ]
+        }
+    }
+}

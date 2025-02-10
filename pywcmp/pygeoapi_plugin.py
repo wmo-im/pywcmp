@@ -2,7 +2,7 @@
 #
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #
-# Copyright (c) 2024 Tom Kralidis
+# Copyright (c) 2025 Tom Kralidis
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -59,14 +59,23 @@
 #
 
 
+import json
 import logging
 
 from pygeoapi.process.base import BaseProcessor, ProcessorExecuteError
 
 from pywcmp.wcmp2.ets import WMOCoreMetadataProfileTestSuite2
 from pywcmp.wcmp2.kpi import WMOCoreMetadataProfileKeyPerformanceIndicators
+from pywcmp.util import THISDIR
 
 LOGGER = logging.getLogger(__name__)
+
+with (THISDIR / 'resources' / 'ets-report.json').open() as fh:
+    ETS_REPORT_SCHEMA = json.load(fh)
+
+with (THISDIR / 'resources' / 'kpi-report.json').open() as fh:
+    KPI_REPORT_SCHEMA = json.load(fh)
+
 
 PROCESS_WCMP2_ETS = {
     'version': '0.1.0',
@@ -115,8 +124,8 @@ PROCESS_WCMP2_ETS = {
             'title': 'Report of ETS results',
             'description': 'Report of ETS results',
             'schema': {
-                'type': 'object',
-                'contentMediaType': 'application/json'
+                'contentMediaType': 'application/json',
+                **ETS_REPORT_SCHEMA
             }
         }
     },
@@ -166,8 +175,8 @@ PROCESS_WCMP2_KPI = {
             'title': 'Report of KPI results',
             'description': 'Report of KPI results',
             'schema': {
-                'type': 'object',
-                'contentMediaType': 'application/json'
+                'contentMediaType': 'application/json',
+                **KPI_REPORT_SCHEMA
             }
         }
     },
