@@ -4,12 +4,10 @@
 
 # WMO Core Metadata Profile Test Suite
 
-pywcmp provides validation and quality assessment capabilities for the [WMO
-WIS](https://community.wmo.int/activity-areas/wis/wis-overview) Core Metadata
-Profile (WCMP).
+pywcmp provides validation and quality assessment capabilities for the [WMO WIS](https://community.wmo.int/en/activity-areas/wis) Core Metadata Profile (WCMP).
 
-- validation against [WCMP2 (draft)](https://github.com/wmo-im/wcmp2), specifically [Annex A: Conformance Class Abstract Test Suite](https://wmo-im.github.io/wcmp2/standard/wcmp2-DRAFT.html#_conformance_class_abstract_test_suite_normative), implementing an executable test suite against the ATS
-- quality assessement against the [WCMP Key Performance Indicators](https://community.wmo.int/activity-areas/wis/wis-metadata-kpis)
+- validation against [WCMP2](https://wmo-im.github.io/wcmp2/standard/wcmp2-STABLE.html), specifically [Annex A: Conformance Class Abstract Test Suite](https://wmo-im.github.io/wcmp2/standard/wcmp2-STABLE.html#_conformance_class_abstract_test_suite_normative)), implementing an executable test suite against the ATS
+- quality assessement against the [WCMP Key Performance Indicators]([https://community.wmo.int/activity-areas/wis/wis-metadata-kpis](https://wmo-im.github.io/wcmp2/kpi/wcmp2-kpi-DRAFT.html))
 
 ## Installation
 
